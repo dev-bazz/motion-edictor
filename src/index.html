@@ -35,8 +35,8 @@
       }
 
       .container {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto 1fr;
         height: 100%;
         width: 100%;
         padding: 12px;
@@ -44,10 +44,10 @@
       }
 
       .header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        flex-shrink: 0;
+        gap: 12px;
       }
 
       .header h1 {
@@ -56,9 +56,9 @@
       }
 
       .controls {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto;
         gap: 8px;
-        flex-shrink: 0;
       }
 
       button {
@@ -80,23 +80,20 @@
 
       .editor-section {
         display: grid;
-        grid-template-rows: auto 1fr 2fr;
+        grid-template-rows: auto 1fr;
         gap: 12px;
-        flex: 1;
+        height: 100%;
         min-height: 0;
         overflow: hidden;
       }
 
       .canvas-wrapper {
         padding: 0.75rem;
-
-        flex: 1;
         display: flex;
         flex-direction: column;
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
-
         min-height: 0;
       }
 
@@ -155,9 +152,9 @@
       }
 
       .output-section {
-
-
-
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
@@ -207,14 +204,14 @@
       }
 
       .duration-control {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: 12px;
         padding: 8px;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
-        flex-shrink: 0;
       }
 
       .duration-control label {
@@ -247,6 +244,47 @@
         border-radius: 2px;
         font-family: monospace;
         font-size: 10px;
+      }
+
+      nav {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+      }
+
+      nav button {
+        padding: 8px 16px;
+        background: transparent;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      nav button:hover {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+      }
+
+      nav button.active {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-bottom-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .editor-content {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .editor-content.active {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
       #preview {
@@ -325,56 +363,58 @@
 
       <div class="editor-section">
         <nav>
-          <button>Easing</button>
-          <button>Spring</button>
+          <button id="easingTab" class="active">Easing</button>
+          <button id="springTab">Spring</button>
         </nav>
-        <div class="canvas-wrapper">
 
-          <svg id="easeCanvas" viewBox="0 0 330 330">
-            <!-- Grid -->
-            <g id="grid" opacity="0.1"></g>
-            <!-- Axes -->
-            <polyline fill="none" stroke="#333" stroke-width="2" points="0,0 0,330"></polyline>
-            <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 330,330"></polyline>
-            <!-- Control lines (tethers) -->
-            <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
-                      stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
-            <polyline id="control-2-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
-                      stroke-dasharray="4, 2" points="330,0 297,16.35"></polyline>
-            <!-- Cubic bezier curve -->
-            <path id="bezierCurve" d="M 0,330 C 33,198 297,16.35 330,0" fill="none"
-                      stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      stroke-width="5" stroke-linecap="round"></path>
-            <!-- Control points -->
-            <!-- Hit areas for easier interaction (placed first for proper event handling) -->
-            <circle id="control-1-hit" class="control-point-hit" r="40" cx="33" cy="198" fill="transparent"
-                      style="touch-action:none; pointer-events: auto;"></circle>
-            <circle id="control-2-hit" class="control-point-hit" r="40" cx="297" cy="16.35" fill="transparent"
-                      style="touch-action:none; pointer-events: auto;"></circle>
-            <!-- Visible control point circles -->
-            <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
-                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      style="touch-action:none;"></circle>
-            <circle id="control-2" class="control-point control-point-circle" r="12" cx="297" cy="16.35"
-                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      style="touch-action:none;"></circle>
-          </svg>
-        </div>
+        <div id="easingEditor" class="editor-content active">
+          <div class="canvas-wrapper">
 
-        <div class="output-section">
-          <h3>Duration</h3>
-          <div class="duration-control">
-            <label for="durationSlider">Duration:</label>
-            <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
-            <div class="duration-value" id="durationValue">1s</div>
+            <svg id="easeCanvas" viewBox="0 0 330 330">
+              <!-- Grid -->
+              <g id="grid" opacity="0.1"></g>
+              <!-- Axes -->
+              <polyline fill="none" stroke="#333" stroke-width="2" points="0,0 0,330"></polyline>
+              <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 330,330"></polyline>
+              <!-- Control lines (tethers) -->
+              <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                        stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
+              <polyline id="control-2-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                        stroke-dasharray="4, 2" points="330,0 297,16.35"></polyline>
+              <!-- Cubic bezier curve -->
+              <path id="bezierCurve" d="M 0,330 C 33,198 297,16.35 330,0" fill="none"
+                        stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        stroke-width="5" stroke-linecap="round"></path>
+              <!-- Control points -->
+              <!-- Hit areas for easier interaction (placed first for proper event handling) -->
+              <circle id="control-1-hit" class="control-point-hit" r="40" cx="33" cy="198" fill="transparent"
+                        style="touch-action:none; pointer-events: auto;"></circle>
+              <circle id="control-2-hit" class="control-point-hit" r="40" cx="297" cy="16.35" fill="transparent"
+                        style="touch-action:none; pointer-events: auto;"></circle>
+              <!-- Visible control point circles -->
+              <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        style="touch-action:none;"></circle>
+              <circle id="control-2" class="control-point control-point-circle" r="12" cx="297" cy="16.35"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        style="touch-action:none;"></circle>
+            </svg>
           </div>
 
-          <h3 style="margin-top: 15px;">CSS Output</h3>
-          <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
-          <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+          <div class="output-section">
+            <h3>Duration</h3>
+            <div class="duration-control">
+              <label for="durationSlider">Duration:</label>
+              <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
+              <div class="duration-value" id="durationValue">1s</div>
+            </div>
 
-          <h3 style="margin-top: 15px;">Preview</h3>
-          <div id="preview" style="
+            <h3 style="margin-top: 15px;">CSS Output</h3>
+            <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
+            <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+
+            <h3 style="margin-top: 15px;">Preview</h3>
+            <div id="preview" style="
 					width: 100%;
 					height: 60px;
 					background: var(--vscode-editor-background, var(--fallback-editor-background));
@@ -384,17 +424,84 @@
 					align-items: center;
 					overflow: hidden;
 				">
-            <div id="previewBox" style="
+              <div id="previewBox" style="
 						width: 30px;
 						height: 30px;
 						background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
 						margin-left: 10px;
 						border-radius: 2px;
 					"></div>
-          </div>
+            </div>
 
-          <h3 style="margin-top: 15px;">Control Points</h3>
-          <div class="point-list" id="pointList"></div>
+            <h3 style="margin-top: 15px;">Control Points</h3>
+            <div class="point-list" id="pointList"></div>
+          </div>
+        </div>
+
+        <div id="springEditor" class="editor-content">
+          <div class="canvas-wrapper">
+            <svg id="springCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
+              <path d="M184 0 L184 300" fill="transparent"
+                        stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))"
+                        stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path id="springPath" d="M0 150L1 150L2 150" fill="transparent"
+                        stroke="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))" stroke-width="7"
+                        stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </div>
+          <div class="output-section">
+            <h3>Duration</h3>
+            <div class="duration-control">
+              <label for="springDuration">Duration:</label>
+              <input type="range" id="springDuration" min="0.1" max="10" step="0.1" value="1">
+              <div class="duration-value" id="springDurationValue">1s</div>
+            </div>
+
+            <h3 style="margin-top: 15px;">Stiffness</h3>
+            <div class="duration-control">
+              <label for="stiffness">Stiffness:</label>
+              <input type="range" id="stiffness" min="10" max="500" step="10" value="100">
+              <div class="duration-value" id="stiffnessValue">100</div>
+            </div>
+
+            <h3 style="margin-top: 15px;">Damping</h3>
+            <div class="duration-control">
+              <label for="damping">Damping:</label>
+              <input type="range" id="damping" min="1" max="100" step="1" value="10">
+              <div class="duration-value" id="dampingValue">10</div>
+            </div>
+
+            <h3 style="margin-top: 15px;">Mass</h3>
+            <div class="duration-control">
+              <label for="mass">Mass:</label>
+              <input type="range" id="mass" min="0.1" max="10" step="0.1" value="1">
+              <div class="duration-value" id="massValue">1</div>
+            </div>
+
+            <h3 style="margin-top: 15px;">CSS Output</h3>
+            <div class="code-block" id="springCssOutput">animation: spring 1s</div>
+            <button class="copy-btn" id="springCopyBtn">Copy to Clipboard</button>
+
+            <h3 style="margin-top: 15px;">Preview</h3>
+            <div id="springPreview" style="
+              width: 100%;
+              height: 60px;
+              background: var(--vscode-editor-background, var(--fallback-editor-background));
+              border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+              border-radius: 2px;
+              display: flex;
+              align-items: center;
+              overflow: hidden;
+            ">
+              <div id="springPreviewBox" style="
+                width: 30px;
+                height: 30px;
+                background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+                margin-left: 10px;
+                border-radius: 2px;
+              "></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -413,6 +520,32 @@
         }
       };
       handleVscodeAssignment();
+
+      // Tab switching functionality
+      const easingTab = document.getElementById( 'easingTab' );
+      const springTab = document.getElementById( 'springTab' );
+      const easingEditor = document.getElementById( 'easingEditor' );
+      const springEditor = document.getElementById( 'springEditor' );
+
+      function switchTab ( tabName )
+      {
+        if ( tabName === 'easing' )
+        {
+          easingEditor.classList.add( 'active' );
+          springEditor.classList.remove( 'active' );
+          easingTab.classList.add( 'active' );
+          springTab.classList.remove( 'active' );
+        } else
+        {
+          springEditor.classList.add( 'active' );
+          easingEditor.classList.remove( 'active' );
+          springTab.classList.add( 'active' );
+          easingTab.classList.remove( 'active' );
+        }
+      }
+
+      easingTab.addEventListener( 'click', () => switchTab( 'easing' ) );
+      springTab.addEventListener( 'click', () => switchTab( 'spring' ) );
 
       const svg = document.getElementById( 'easeCanvas' );
       const cssOutput = document.getElementById( 'cssOutput' );
@@ -697,6 +830,7 @@
 
       // Add animation for preview
       const style = document.createElement( 'style' );
+      style.id = 'animation-styles';
       style.textContent = `
         @keyframes slide {
           from { margin-left: 10px; }
@@ -704,6 +838,212 @@
         }
       `;
       document.head.appendChild( style );
+
+      // Dynamic keyframes style for spring
+      let springKeyframesStyle = document.createElement( 'style' );
+      springKeyframesStyle.id = 'spring-keyframes';
+      document.head.appendChild( springKeyframesStyle );
+
+      // Spring editor functionality
+      const springCanvas = document.getElementById( 'springCanvas' );
+      const springDuration = document.getElementById( 'springDuration' );
+      const springDurationValue = document.getElementById( 'springDurationValue' );
+      const stiffnessSlider = document.getElementById( 'stiffness' );
+      const stiffnessValue = document.getElementById( 'stiffnessValue' );
+      const dampingSlider = document.getElementById( 'damping' );
+      const dampingValue = document.getElementById( 'dampingValue' );
+      const massSlider = document.getElementById( 'mass' );
+      const massValue = document.getElementById( 'massValue' );
+      const springCssOutput = document.getElementById( 'springCssOutput' );
+      const springCopyBtn = document.getElementById( 'springCopyBtn' );
+      const springPreviewBox = document.getElementById( 'springPreviewBox' );
+
+      let springParams = {
+        duration: 1,
+        stiffness: 100,
+        damping: 10,
+        mass: 1
+      };
+
+      function generateSpringCurve ( stiffness, damping, mass, duration )
+      {
+        const points = [];
+        const timeStep = 1 / 100; // 100 samples per unit time
+        const totalTime = duration;
+
+        for ( let t = 0; t <= totalTime; t += timeStep )
+        {
+          // Simplified spring oscillation formula
+          const omega = Math.sqrt( stiffness / mass );
+          const gamma = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+          let y;
+          if ( gamma < 1 )
+          {
+            // Underdamped oscillation
+            const wd = omega * Math.sqrt( 1 - gamma * gamma );
+            y = Math.exp( -gamma * omega * t ) * ( Math.cos( wd * t ) + ( gamma * omega / wd ) * Math.sin( wd * t ) );
+          } else if ( gamma === 1 )
+          {
+            // Critically damped
+            y = ( 1 + omega * t ) * Math.exp( -omega * t );
+          } else
+          {
+            // Overdamped
+            const r1 = -omega * ( gamma - Math.sqrt( gamma * gamma - 1 ) );
+            const r2 = -omega * ( gamma + Math.sqrt( gamma * gamma - 1 ) );
+            y = ( ( r2 * Math.exp( r1 * t ) - r1 * Math.exp( r2 * t ) ) / ( r2 - r1 ) );
+          }
+
+          const x = ( t / totalTime ) * 500;
+          const svgY = 150 - ( y * 100 ); // Center around 150
+          points.push( `${ x } ${ svgY }` );
+        }
+
+        return `M${ points.join( 'L' ) }`;
+      }
+
+      function updateSpringVisualization ()
+      {
+        const path = generateSpringCurve(
+          springParams.stiffness,
+          springParams.damping,
+          springParams.mass,
+          springParams.duration
+        );
+        document.getElementById( 'springPath' ).setAttribute( 'd', path );
+      }
+
+      function updateSpringOutput ()
+      {
+        const keyframes = generateSpringKeyframes(
+          springParams.stiffness,
+          springParams.damping,
+          springParams.mass
+        );
+
+        // Inject keyframes into style
+        const springKeyframesStyle = document.getElementById( 'spring-keyframes' );
+        springKeyframesStyle.textContent = `@keyframes spring-bounce {\n${ keyframes }\n}`;
+
+        const css = `@keyframes spring-bounce {
+${ keyframes }
+}
+
+animation: spring-bounce ${ springParams.duration }s ease-out forwards;`;
+        springCssOutput.textContent = css;
+      }
+
+      function generateSpringKeyframes ( stiffness, damping, mass )
+      {
+        const keyframePoints = [];
+        const timeStep = 0.01; // Sample 100 points
+        let maxDisplacement = 0;
+        let displacements = [];
+
+        // Calculate spring motion
+        for ( let t = 0; t <= 1; t += timeStep )
+        {
+          const omega = Math.sqrt( stiffness / mass );
+          const gamma = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+          let y;
+          if ( gamma < 1 )
+          {
+            // Underdamped oscillation - creates bounce
+            const wd = omega * Math.sqrt( 1 - gamma * gamma );
+            y = Math.exp( -gamma * omega * t ) * ( Math.cos( wd * t ) + ( gamma * omega / wd ) * Math.sin( wd * t ) );
+          } else if ( gamma === 1 )
+          {
+            // Critically damped
+            y = ( 1 + omega * t ) * Math.exp( -omega * t );
+          } else
+          {
+            // Overdamped
+            const r1 = -omega * ( gamma - Math.sqrt( gamma * gamma - 1 ) );
+            const r2 = -omega * ( gamma + Math.sqrt( gamma * gamma - 1 ) );
+            y = ( ( r2 * Math.exp( r1 * t ) - r1 * Math.exp( r2 * t ) ) / ( r2 - r1 ) );
+          }
+
+          displacements.push( { time: t, displacement: y } );
+          if ( Math.abs( y ) > Math.abs( maxDisplacement ) )
+          {
+            maxDisplacement = y;
+          }
+        }
+
+        // Generate keyframes
+        for ( let i = 0; i < displacements.length; i += 2 )
+        {
+          const data = displacements[ i ];
+          const percent = ( data.time * 100 ).toFixed( 1 );
+          // Map displacement to pixel movement (1 - displacement because spring pushes forward then bounces back)
+          const position = ( 1 - Math.max( 0, data.displacement ) ) * 100;
+          keyframePoints.push( `  ${ percent }% { transform: translateX(calc(${ position }% * (100% - 40px))); }` );
+        }
+
+        return keyframePoints.join( '\n' );
+      }
+
+      function updateSpringPreview ()
+      {
+        springPreviewBox.style.animation = 'none';
+        springPreviewBox.style.transform = 'translateX(0)';
+        springPreviewBox.style.marginLeft = '10px';
+
+        setTimeout( () =>
+        {
+          springPreviewBox.style.animation = `spring-bounce ${ springParams.duration }s ease-out forwards`;
+        }, 10 );
+      }
+
+      springDuration.addEventListener( 'input', ( e ) =>
+      {
+        springParams.duration = parseFloat( e.target.value );
+        springDurationValue.textContent = `${ springParams.duration.toFixed( 1 ) }s`;
+        updateSpringVisualization();
+        updateSpringOutput();
+        updateSpringPreview();
+      } );
+
+      stiffnessSlider.addEventListener( 'input', ( e ) =>
+      {
+        springParams.stiffness = parseFloat( e.target.value );
+        stiffnessValue.textContent = springParams.stiffness;
+        updateSpringVisualization();
+        updateSpringOutput();
+        updateSpringPreview();
+      } );
+
+      dampingSlider.addEventListener( 'input', ( e ) =>
+      {
+        springParams.damping = parseFloat( e.target.value );
+        dampingValue.textContent = springParams.damping;
+        updateSpringVisualization();
+        updateSpringOutput();
+        updateSpringPreview();
+      } );
+
+      massSlider.addEventListener( 'input', ( e ) =>
+      {
+        springParams.mass = parseFloat( e.target.value );
+        massValue.textContent = springParams.mass.toFixed( 1 );
+        updateSpringVisualization();
+        updateSpringOutput();
+        updateSpringPreview();
+      } );
+
+      springCopyBtn.addEventListener( 'click', () =>
+      {
+        vscode.postMessage( {
+          command: 'copyToClipboard',
+          value: springCssOutput.textContent
+        } );
+      } );
+
+      // Initial spring visualization
+      updateSpringVisualization();
+      updateSpringOutput();
 
       // Initial SVG update
       updateSvg();
