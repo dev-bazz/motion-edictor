@@ -72,7 +72,7 @@ console.table(frames);
 console.log("\n=== Example 5: SVG Path Data ===");
 
 const svgPath = generateSpringCurvePathData(
-	SPRING_PRESETS.bouncy,
+	SPRING_PRESETS.snappy,
 	1,
 	500, // SVG width
 	300, // SVG height
@@ -156,7 +156,6 @@ const configs = [
 	{ name: "Gentle", config: SPRING_PRESETS.gentle },
 	{ name: "Standard", config: SPRING_PRESETS.standard },
 	{ name: "Snappy", config: SPRING_PRESETS.snappy },
-	{ name: "Bouncy", config: SPRING_PRESETS.bouncy },
 ];
 
 console.table(

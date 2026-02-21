@@ -25,7 +25,7 @@
  */
 
 export interface SpringConfig {
-	/** Stiffness of the spring (50-500, typical: 170) */
+	/** Stiffness of the spring (50-1500, typical: 170) */
 	stiffness: number;
 	/** Damping coefficient (5-100, typical: 26) */
 	damping: number;
@@ -243,30 +243,9 @@ export const SPRING_PRESETS = {
 
 	/** Snappy spring - quick and responsive */
 	snappy: {
-		stiffness: 210,
-		damping: 20,
+		stiffness: 280,
+		damping: 60,
 		mass: 1,
-	},
-
-	/** Bouncy spring - playful with more oscillation */
-	bouncy: {
-		stiffness: 180,
-		damping: 15,
-		mass: 1,
-	},
-
-	/** Molasses spring - very damped, slow settling */
-	molasses: {
-		stiffness: 100,
-		damping: 40,
-		mass: 1,
-	},
-
-	/** Springy - modern, with slight bounce */
-	springy: {
-		stiffness: 150,
-		damping: 20,
-		mass: 0.9,
 	},
 };
 

@@ -247,7 +247,7 @@
       /* Preset Buttons */
       .preset-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 6px;
         margin-bottom: 12px;
       }
@@ -1003,7 +1003,7 @@
           </div>
           <div class="output-section">
             <div class="info-banner">
-              <strong>Pro Tip:</strong> Adjust parameters or click presets to see spring behavior in real-time
+              <strong>Pro Tip:</strong> Adjust bounciness and duration to fine-tune your spring animation
             </div>
 
             <h3 style="margin-top: 15px;">Preview</h3>
@@ -1017,42 +1017,24 @@
             </div>
             <div class="preview-info" id="springPreviewInfo">Motion: Smooth | Settling: 0.95s</div>
 
-            <h3>Presets</h3>
-            <div class="preset-grid">
-              <button class="preset-btn" data-preset="gentle">Gentle</button>
-              <button class="preset-btn active" data-preset="standard">Standard</button>
-              <button class="preset-btn" data-preset="snappy">Snappy</button>
-              <button class="preset-btn" data-preset="bouncy">Bouncy</button>
-              <button class="preset-btn" data-preset="molasses">Molasses</button>
-              <button class="preset-btn" data-preset="springy">Springy</button>
-            </div>
-
             <h3>Parameters</h3>
             <div class="duration-control">
               <label for="springDuration">Duration:
                 <span class="param-info" data-tooltip="Total animation time in seconds">?</span>
               </label>
-              <input type="range" id="springDuration" min="0.1" max="10" step="0.1" value="1">
+              <input type="range" id="springDuration" min="0.1" max="2" step="0.1" value="1">
               <div class="duration-value" id="springDurationValue">1s</div>
             </div>
 
             <div class="duration-control">
-              <label for="stiffness">Stiffness:
-                <span class="param-info" data-tooltip="Higher = tighter spring, faster response">?</span>
+              <label for="bounciness">Bounciness:
+                <span class="param-info" data-tooltip="0 = smooth, 100 = bouncy">?</span>
               </label>
-              <input type="range" id="stiffness" min="50" max="500" step="10" value="170">
-              <div class="duration-value" id="stiffnessValue">170</div>
+              <input type="range" id="bounciness" min="0" max="100" step="5" value="50">
+              <div class="duration-value" id="bouncinessValue">50</div>
             </div>
 
-            <div class="duration-control">
-              <label for="damping">Damping:
-                <span class="param-info" data-tooltip="Higher = more friction, less bounce">?</span>
-              </label>
-              <input type="range" id="damping" min="5" max="100" step="1" value="26">
-              <div class="duration-value" id="dampingValue">26</div>
-            </div>
-
-            <div class="duration-control">
+            <div class="duration-control" style="display: none;">
               <label for="mass">Mass:
                 <span class="param-info" data-tooltip="Higher = more momentum, slower settling">?</span>
               </label>
@@ -1081,11 +1063,11 @@
             </div>
 
             <div class="spring-tips">
-              <strong>💡 Spring Tips:</strong>
+              <strong>💡 How it works:</strong>
               <ul>
-                <li><strong>Stiffness ↑</strong> = faster response</li>
-                <li><strong>Damping ↑</strong> = less bounce</li>
-                <li><strong>Mass ↑</strong> = slower settling</li>
+                <li><strong>Bounciness = 0</strong> = smooth, no overshoot</li>
+                <li><strong>Bounciness = 50</strong> = natural, balanced feel</li>
+                <li><strong>Bounciness = 100</strong> = lively, lots of bounce</li>
               </ul>
             </div>
 
@@ -1180,6 +1162,7 @@
         };
       }
 
+      // Quick duration helper
       // Show UI indicator pulse
       function showUpdateIndicator ()
       {
@@ -1452,34 +1435,52 @@
       const springCanvas = document.getElementById( 'springCanvas' );
       const springDuration = document.getElementById( 'springDuration' );
       const springDurationValue = document.getElementById( 'springDurationValue' );
-      const stiffnessSlider = document.getElementById( 'stiffness' );
-      const stiffnessValue = document.getElementById( 'stiffnessValue' );
-      const dampingSlider = document.getElementById( 'damping' );
-      const dampingValue = document.getElementById( 'dampingValue' );
-      const massSlider = document.getElementById( 'mass' );
-      const massValue = document.getElementById( 'massValue' );
+      const bouncinessSlider = document.getElementById( 'bounciness' );
+      const bouncinessValue = document.getElementById( 'bouncinessValue' );
       const springCssOutput = document.getElementById( 'springCssOutput' );
       const springCopyBtn = document.getElementById( 'springCopyBtn' );
       const springPreviewBox = document.getElementById( 'springPreviewBox' );
 
       let springParams = {
         duration: 1,
+        bounciness: 50,
         stiffness: 170,
         damping: 26,
         mass: 1
       };
 
-      // Spring presets
-      const SPRING_PRESETS = {
-        gentle: { stiffness: 120, damping: 30, mass: 1, label: 'Gentle', type: 'gentle' },
-        standard: { stiffness: 170, damping: 26, mass: 1, label: 'Standard', type: 'standard' },
-        snappy: { stiffness: 210, damping: 20, mass: 1, label: 'Snappy', type: 'snappy' },
-        bouncy: { stiffness: 180, damping: 15, mass: 1, label: 'Bouncy', type: 'bouncy' },
-        molasses: { stiffness: 100, damping: 40, mass: 1, label: 'Molasses', type: 'molasses' },
-        springy: { stiffness: 150, damping: 20, mass: 0.9, label: 'Springy', type: 'springy' }
-      };
+      // Convert bounciness (0-100) to stiffness and damping values
+      function bouncinessToSpringParams ( bounciness )
+      {
+        // Normalize bounciness to 0-1 range
+        const normalized = bounciness / 100;
 
-      let currentPreset = 'standard';
+        // Smooth mapping using easing function
+        // Low bounciness (0) = high damping (smooth, no bounce)
+        // High bounciness (100) = low damping (oscillatory, bouncy)
+
+        // Stiffness: increase with bounciness for faster response
+        const stiffness = 80 + normalized * 420; // 80-500 range
+
+        // Damping: decrease with bounciness for more bounce
+        // Map bounciness to damping ratio (0-1 where 1 = critically damped)
+        let dampingRatio;
+        if ( normalized < 0.5 )
+        {
+          // Smooth (0-50): damping ratio 1.0 to 0.7
+          dampingRatio = 1.0 - ( normalized * 2 ) * 0.3;
+        } else
+        {
+          // Bouncy (50-100): damping ratio 0.7 to 0.3
+          dampingRatio = 0.7 - ( ( normalized - 0.5 ) * 2 ) * 0.4;
+        }
+
+        // Calculate damping from damping ratio: c = ζ * 2√(km)
+        const damping = dampingRatio * 2 * Math.sqrt( stiffness * 1 ); // mass = 1
+
+        return { stiffness, damping };
+      }
+
       let springPreviewUpdateTimeout;
 
       // Debounced spring preview update (300ms)
@@ -1546,7 +1547,9 @@
       {
         const points = [];
         const values = [];
-        const timeStep = 0.005; // 200 samples per unit time for smoother curves
+        // Adaptive sampling: higher stiffness needs finer sampling for smooth curves
+        const samplesPerSecond = Math.min( 1000, Math.max( 200, stiffness / 2 ) );
+        const timeStep = 1 / samplesPerSecond; // Adaptive sampling based on stiffness
 
         // First pass: collect all values to find max overshoot
         for ( let t = 0; t <= 1; t += timeStep )
@@ -1555,34 +1558,46 @@
           values.push( value );
         }
 
-        // Fixed grid system for better visual consistency
-        // Y-axis: 270px = 0, 30px = 1 (240px range)
-        const yMin = 270; // 0 value
-        const yMax = 30;  // 1 value
-        const yRange = yMin - yMax; // 240px
+        // Calculate min and max values for adaptive scaling
+        const minValue = Math.min( ...values, 0 );
+        const maxValue = Math.max( ...values, 1 );
+        const range = maxValue - minValue;
+
+        // Ensure minimum range for the graph
+        const padding = 0.1;
+        const scaledMin = minValue - ( range * padding );
+        const scaledMax = maxValue + ( range * padding );
+        const scaledRange = scaledMax - scaledMin;
+
+        // Adaptive Y-axis scaled to content
+        // SVG viewBox is 0 0 500 300, so Y goes 0 to 300
+        const graphHeight = 280; // Leave space for axis labels
+        const graphTopPad = 10;
 
         // X-axis: 0 to 500px represents time 0 to 1
         const xRange = 500;
 
-        // Create path points using fixed coordinate system
+        // Create path points using adaptive scaling
         for ( let i = 0; i < values.length; i++ )
         {
           const t = i * timeStep;
-          const value = Math.max( -0.5, Math.min( 2, values[ i ] ) ); // Clamp to prevent extreme overshoot from misscaling
+          const value = values[ i ];
           const x = t * xRange;
-          const y = yMin - ( value * yRange );
+          const normalizedValue = ( value - scaledMin ) / scaledRange;
+          const y = graphTopPad + ( 1 - normalizedValue ) * graphHeight;
           points.push( `${ x.toFixed( 2 ) } ${ y.toFixed( 2 ) }` );
         }
 
         // Calculate overshoot visualization
-        const maxValue = Math.max( ...values );
         const overshootPercentage = Math.max( 0, ( maxValue - 1 ) * 100 );
 
         if ( overshootPercentage > 0.5 )
         {
-          // Draw overshoot area overlay
-          const overshootY = yMin - ( 1 * yRange );
-          const overshootPeakY = yMin - ( maxValue * yRange );
+          // Draw overshoot area overlay using adaptive scaling
+          const normalizedOne = ( 1 - scaledMin ) / scaledRange;
+          const normalizedMax = ( maxValue - scaledMin ) / scaledRange;
+          const overshootY = graphTopPad + ( 1 - normalizedOne ) * graphHeight; // y at value=1
+          const overshootPeakY = graphTopPad + ( 1 - normalizedMax ) * graphHeight; // y at max value
           const overshootPath = `M0 ${ overshootY } L${ xRange } ${ overshootY } L${ xRange } ${ overshootPeakY } L0 ${ overshootPeakY } Z`;
           document.getElementById( 'overshootArea' ).setAttribute( 'd', overshootPath );
         } else
@@ -1590,10 +1605,9 @@
           document.getElementById( 'overshootArea' ).setAttribute( 'd', '' );
         }
 
-        // Update settlement indicator line
+        // Update settlement indicator line using adaptive scaling
         // Calculate approximate settling time (2% threshold)
         const settlingThreshold = 0.02;
-        const settlingDuration = duration;
         let settlingTimeNorm = 1;
         for ( let t = 0; t <= 1; t += 0.01 )
         {
@@ -1627,7 +1641,46 @@
       function generateSpringLinearEasing ( stiffness, damping, mass, duration )
       {
         const keyframes = [];
-        const timeStep = 0.01; // Sample ~100 points
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let timeStep;
+
+        // Determine sampling strategy based on damping type
+        if ( dampingRatio >= 1 )
+        {
+          // Overdamped (smooth, no oscillation): use proportional sampling
+          const numSamples = Math.max( 3, Math.ceil( duration * 30 ) );
+          timeStep = 1 / numSamples;
+        } else
+        {
+          // Underdamped (oscillatory): sample based on actual oscillations
+          const omegad = omega0 * Math.sqrt( Math.max( 0, 1 - dampingRatio * dampingRatio ) );
+          const oscillationPeriod = ( 2 * Math.PI ) / omegad;
+
+          // Calculate actual number of oscillations (not clamped to 1)
+          const oscillationCount = duration / oscillationPeriod;
+
+          // Use adaptive sampling: 8-12 samples per oscillation
+          let samplesPerOscillation;
+          if ( oscillationCount < 0.5 )
+          {
+            // Less than half an oscillation: minimal sampling
+            samplesPerOscillation = 4;
+          } else if ( oscillationCount < 2 )
+          {
+            // Partial to a couple oscillations: moderate sampling
+            samplesPerOscillation = 8;
+          } else
+          {
+            // Multiple oscillations: good sampling
+            samplesPerOscillation = 12;
+          }
+
+          const totalSamples = Math.max( 3, Math.ceil( oscillationCount * samplesPerOscillation ) );
+          timeStep = 1 / totalSamples;
+        }
+
         const points = [];
 
         // Generate spring keyframes with proper physics
@@ -1637,14 +1690,20 @@
           points.push( { time: t, value } );
         }
 
-        // Generate linear() easing string with time percentages
+        // Always ensure the final point is included
+        const lastPoint = points[ points.length - 1 ];
+        if ( lastPoint.time < 1 )
+        {
+          const finalValue = generateSpringValue( 1, stiffness, damping, mass, duration );
+          points.push( { time: 1, value: finalValue } );
+        }
+
+        // Generate linear() easing string without time percentages
         for ( let i = 0; i < points.length; i++ )
         {
           const point = points[ i ];
-          const percent = ( point.time * 100 ).toFixed( 1 );
           const value = point.value.toFixed( 4 );
 
-          // Skip percentage for first point (0%) and last point (100%)
           if ( i === 0 )
           {
             keyframes.push( value );
@@ -1653,8 +1712,8 @@
             keyframes.push( '1' );
           } else
           {
-            // Add percentage for all other points
-            keyframes.push( `${ value } ${ percent }%` );
+            // Add value without percentage
+            keyframes.push( value );
           }
         }
 
@@ -1813,48 +1872,10 @@
         }
       }
 
-      // Apply spring preset
-      function applyPreset ( presetName )
-      {
-        const preset = SPRING_PRESETS[ presetName ];
-        if ( !preset ) return;
-
-        currentPreset = presetName;
-
-        // Update params
-        springParams.stiffness = preset.stiffness;
-        springParams.damping = preset.damping;
-        springParams.mass = preset.mass;
-
-        // Update UI sliders and values
-        stiffnessSlider.value = preset.stiffness;
-        stiffnessValue.textContent = preset.stiffness.toFixed( 0 );
-
-        dampingSlider.value = preset.damping;
-        dampingValue.textContent = preset.damping.toFixed( 0 );
-
-        massSlider.value = preset.mass;
-        massValue.textContent = preset.mass.toFixed( 1 );
-
-        // Update preset buttons
-        document.querySelectorAll( '.preset-btn' ).forEach( btn =>
-        {
-          btn.classList.toggle( 'active', btn.dataset.preset === presetName );
-        } );
-
-        // Update visualizations
-        updateSpringVisualization();
-        updateSpringOutput();
-        analyzeSpring();
-        showSpringUpdateIndicator();
-        updateSpringPreview();
-      }
-
       // Export configuration as JSON
       function exportConfig ()
       {
         const config = {
-          preset: currentPreset,
           duration: springParams.duration,
           stiffness: springParams.stiffness,
           damping: springParams.damping,
@@ -1868,15 +1889,6 @@
           value: jsonStr
         } );
       }
-
-      // Event listeners for presets
-      document.querySelectorAll( '.preset-btn' ).forEach( btn =>
-      {
-        btn.addEventListener( 'click', () =>
-        {
-          applyPreset( btn.dataset.preset );
-        } );
-      } );
 
       // Export button
       const springExportBtn = document.getElementById( 'springExportBtn' );
@@ -1892,33 +1904,16 @@
         debouncedSpringPreviewUpdate();
       } );
 
-      stiffnessSlider.addEventListener( 'input', ( e ) =>
+      bouncinessSlider.addEventListener( 'input', ( e ) =>
       {
-        springParams.stiffness = parseFloat( e.target.value );
-        stiffnessValue.textContent = springParams.stiffness.toFixed( 0 );
-        currentPreset = 'custom';
-        updateSpringVisualization();
-        updateSpringOutput();
-        analyzeSpring();
-        debouncedSpringPreviewUpdate();
-      } );
+        springParams.bounciness = parseFloat( e.target.value );
+        bouncinessValue.textContent = springParams.bounciness.toFixed( 0 );
 
-      dampingSlider.addEventListener( 'input', ( e ) =>
-      {
-        springParams.damping = parseFloat( e.target.value );
-        dampingValue.textContent = springParams.damping.toFixed( 0 );
-        currentPreset = 'custom';
-        updateSpringVisualization();
-        updateSpringOutput();
-        analyzeSpring();
-        debouncedSpringPreviewUpdate();
-      } );
+        // Calculate spring params from bounciness
+        const params = bouncinessToSpringParams( springParams.bounciness );
+        springParams.stiffness = params.stiffness;
+        springParams.damping = params.damping;
 
-      massSlider.addEventListener( 'input', ( e ) =>
-      {
-        springParams.mass = parseFloat( e.target.value );
-        massValue.textContent = springParams.mass.toFixed( 1 );
-        currentPreset = 'custom';
         updateSpringVisualization();
         updateSpringOutput();
         analyzeSpring();
@@ -1941,6 +1936,11 @@
       } );
 
       // Initial spring visualization and analysis
+      // Initialize stiffness and damping from default bounciness
+      const initialParams = bouncinessToSpringParams( springParams.bounciness );
+      springParams.stiffness = initialParams.stiffness;
+      springParams.damping = initialParams.damping;
+
       updateSpringVisualization();
       updateSpringOutput();
       analyzeSpring();
