@@ -2,6 +2,7 @@
   "name": "motion-graph-edictor",
   "displayName": "Motion by BaZz",
   "description": "Visually design CSS animations with cubic-bezier curves or spring physics - generate production-ready code with instant previews",
+  "icon": "media/brand-log.png",
   "version": "0.0.1",
   "repository": "https://github.com/dev-bazz/motion-edictor",
   "engines": {
