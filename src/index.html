@@ -116,15 +116,18 @@
 
       .control-point {
         cursor: grab;
-        transition: r 0.2s ease, filter 0.2s ease;
+        transition: r 0.15s ease, filter 0.15s ease;
+        will-change: cx, cy;
       }
 
       .control-point:hover {
-        filter: brightness(1.3) drop-shadow(0 0 4px rgba(0, 168, 255, 0.5));
+        filter: brightness(1.4) drop-shadow(0 0 6px rgba(0, 168, 255, 0.6));
+        r: 14;
       }
 
       .control-point:active {
         cursor: grabbing;
+        filter: brightness(1.5) drop-shadow(0 0 8px rgba(0, 168, 255, 0.8));
       }
 
       .control-point-circle {
@@ -133,10 +136,22 @@
 
       .control-point-hit {
         cursor: grab;
+        touch-action: none;
       }
 
       .control-point-hit:hover {
         cursor: grab;
+      }
+
+      #control-1-hit,
+      #control-2-hit {
+        transition: r 0.15s ease;
+      }
+
+      #control-1-hit:hover,
+      #control-2-hit:hover {
+        r: 40;
+        filter: drop-shadow(0 0 4px rgba(0, 168, 255, 0.3));
       }
 
       .output-section {
@@ -332,10 +347,10 @@
                       stroke-width="5" stroke-linecap="round"></path>
             <!-- Control points -->
             <!-- Hit areas for easier interaction (placed first for proper event handling) -->
-            <circle id="control-1-hit" class="control-point-hit" r="30" cx="33" cy="198" fill="transparent"
-                      style="touch-action:none;"></circle>
-            <circle id="control-2-hit" class="control-point-hit" r="30" cx="297" cy="16.35" fill="transparent"
-                      style="touch-action:none;"></circle>
+            <circle id="control-1-hit" class="control-point-hit" r="40" cx="33" cy="198" fill="transparent"
+                      style="touch-action:none; pointer-events: auto;"></circle>
+            <circle id="control-2-hit" class="control-point-hit" r="40" cx="297" cy="16.35" fill="transparent"
+                      style="touch-action:none; pointer-events: auto;"></circle>
             <!-- Visible control point circles -->
             <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
                       fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
@@ -551,7 +566,14 @@
       }
 
       // SVG event handling - Setup hit areas with improved interaction
-      function handleDragStart ( pointIndex )
+      const control1Hit = document.getElementById( 'control-1-hit' );
+      const control2Hit = document.getElementById( 'control-2-hit' );
+      const control1 = document.getElementById( 'control-1' );
+      const control2 = document.getElementById( 'control-2' );
+
+      let pendingDragUpdate = null;
+
+      function handleDragStart ( pointIndex, hitElement, pointElement )
       {
         return ( e ) =>
         {
@@ -559,14 +581,8 @@
 
           // Calculate the offset between mouse position and point's current SVG position
           const rect = svg.getBoundingClientRect();
-          let clientX = e.clientX;
-          let clientY = e.clientY;
-
-          if ( e.touches )
-          {
-            clientX = e.touches[ 0 ].clientX;
-            clientY = e.touches[ 0 ].clientY;
-          }
+          let clientX = e.clientX || e.touches?.[ 0 ].clientX;
+          let clientY = e.clientY || e.touches?.[ 0 ].clientY;
 
           const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
           const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
@@ -579,38 +595,15 @@
           isDrawing = true;
           selectedPoint = pointIndex;
           svg.style.cursor = 'grabbing';
+          hitElement.style.r = '45';
+          pointElement.style.filter = 'brightness(1.5) drop-shadow(0 0 8px rgba(0, 168, 255, 0.8))';
         };
       }
 
-      const control1Hit = document.getElementById( 'control-1-hit' );
-      const control2Hit = document.getElementById( 'control-2-hit' );
-
-      control1Hit.addEventListener( 'mousedown', handleDragStart( 0 ) );
-      control2Hit.addEventListener( 'mousedown', handleDragStart( 1 ) );
-
-      // Touch support
-      control1Hit.addEventListener( 'touchstart', handleDragStart( 0 ) );
-      control2Hit.addEventListener( 'touchstart', handleDragStart( 1 ) );
-
-      function handleDragMove ( e )
+      function performDragUpdate ( mouseX, mouseY )
       {
         if ( !isDrawing || selectedPoint === -1 ) return;
 
-        const rect = svg.getBoundingClientRect();
-        let clientX = e.clientX;
-        let clientY = e.clientY;
-
-        // Handle touch events
-        if ( e.touches )
-        {
-          clientX = e.touches[ 0 ].clientX;
-          clientY = e.touches[ 0 ].clientY;
-        }
-
-        const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
-        const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
-
-        // Apply the offset so point stays under cursor relative to click position
         const svgX = mouseX + dragOffset.x;
         const svgY = mouseY + dragOffset.y;
 
@@ -620,19 +613,74 @@
         normalized.x = Math.max( 0, Math.min( 1, normalized.x ) );
         normalized.y = Math.max( 0, Math.min( 1, normalized.y ) );
 
-        controlPoints[ selectedPoint ] = normalized;
-        updateSvg();
+        // Only update if values actually changed
+        if ( controlPoints[ selectedPoint ].x !== normalized.x || controlPoints[ selectedPoint ].y !== normalized.y )
+        {
+          controlPoints[ selectedPoint ] = normalized;
+          updateSvg();
+        }
       }
 
-      function handleDragEnd ()
+      function handleDragMove ( e )
       {
+        if ( !isDrawing || selectedPoint === -1 ) return;
+
+        e.preventDefault();
+
+        const rect = svg.getBoundingClientRect();
+        let clientX = e.clientX || e.touches?.[ 0 ].clientX;
+        let clientY = e.clientY || e.touches?.[ 0 ].clientY;
+
+        const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
+        const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
+
+        // Cancel previous pending update and schedule new one
+        if ( pendingDragUpdate )
+        {
+          cancelAnimationFrame( pendingDragUpdate );
+        }
+
+        // Use requestAnimationFrame for smooth, performant updates
+        pendingDragUpdate = requestAnimationFrame( () =>
+        {
+          performDragUpdate( mouseX, mouseY );
+          pendingDragUpdate = null;
+        } );
+      }
+
+      function handleDragEnd ( e )
+      {
+        if ( !isDrawing ) return;
+
+        if ( pendingDragUpdate )
+        {
+          cancelAnimationFrame( pendingDragUpdate );
+          pendingDragUpdate = null;
+        }
+
+        const hitElement = selectedPoint === 0 ? control1Hit : control2Hit;
+        const pointElement = selectedPoint === 0 ? control1 : control2;
+
         isDrawing = false;
         selectedPoint = -1;
         svg.style.cursor = 'default';
+        hitElement.style.r = '40';
+        pointElement.style.filter = '';
       }
 
-      document.addEventListener( 'mousemove', handleDragMove );
-      document.addEventListener( 'touchmove', handleDragMove );
+      control1Hit.addEventListener( 'mousedown', handleDragStart( 0, control1Hit, control1 ), { passive: false } );
+      control2Hit.addEventListener( 'mousedown', handleDragStart( 1, control2Hit, control2 ), { passive: false } );
+
+      // Touch support
+      control1Hit.addEventListener( 'touchstart', handleDragStart( 0, control1Hit, control1 ), { passive: false } );
+      control2Hit.addEventListener( 'touchstart', handleDragStart( 1, control2Hit, control2 ), { passive: false } );
+
+      // Use pointer events for better performance on modern browsers
+      document.addEventListener( 'pointermove', handleDragMove, { passive: false } );
+      document.addEventListener( 'pointerup', handleDragEnd );
+      // Fallback for older browsers
+      document.addEventListener( 'mousemove', handleDragMove, { passive: false } );
+      document.addEventListener( 'touchmove', handleDragMove, { passive: false } );
       document.addEventListener( 'mouseup', handleDragEnd );
       document.addEventListener( 'touchend', handleDragEnd );
 
