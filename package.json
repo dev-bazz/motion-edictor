@@ -1,7 +1,7 @@
 {
-  "name": "css-ease-generator",
-  "displayName": "CSS Ease Generator",
-  "description": "Generate CSS ease values from motion editor graph",
+  "name": "motion-graph-edictor",
+  "displayName": "Motion by BaZz",
+  "description": "Visually design CSS animations with cubic-bezier curves or spring physics - generate production-ready code with instant previews",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
@@ -10,7 +10,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:css-ease-generator.openEditor",
     "onView:easeGeneratorView"
   ],
   "main": "./out/extension.js",
@@ -32,13 +31,7 @@
           "type": "webview"
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "css-ease-generator.openEditor",
-        "title": "Open CSS Ease Generator"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
