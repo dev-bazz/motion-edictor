@@ -191,6 +191,40 @@
         flex-shrink: 0;
       }
 
+      .duration-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+
+      .duration-control label {
+        font-size: 12px;
+        font-weight: 500;
+        min-width: 60px;
+      }
+
+      .duration-control input[type="range"] {
+        flex: 1;
+        min-height: 4px;
+        cursor: pointer;
+      }
+
+      .duration-value {
+        font-family: monospace;
+        font-size: 12px;
+        min-width: 50px;
+        text-align: right;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        padding: 4px 8px;
+      }
+
       .point-item {
         padding: 3px;
         background: transparent;
@@ -282,8 +316,15 @@
         </div>
 
         <div class="output-section">
-          <h3>CSS Output</h3>
-          <div class="code-block" id="cssOutput">cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
+          <h3>Duration</h3>
+          <div class="duration-control">
+            <label for="durationSlider">Duration:</label>
+            <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="3.4">
+            <div class="duration-value" id="durationValue">3.4s</div>
+          </div>
+
+          <h3 style="margin-top: 15px;">CSS Output</h3>
+          <div class="code-block" id="cssOutput">3.4s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
           <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
 
           <h3 style="margin-top: 15px;">Preview</h3>
@@ -333,6 +374,8 @@
       const resetBtn = document.getElementById( 'resetBtn' );
       const pointList = document.getElementById( 'pointList' );
       const previewBox = document.getElementById( 'previewBox' );
+      const durationSlider = document.getElementById( 'durationSlider' );
+      const durationValue = document.getElementById( 'durationValue' );
 
       // SVG viewBox dimensions (used for scaling)
       const SVG_SIZE = 330;
@@ -343,6 +386,8 @@
         { x: 0, y: 0.5 }, // Point 1
         { x: 1, y: 0.5 }  // Point 2
       ];
+
+      let duration = 3.4; // Duration in seconds
 
       let isDrawing = false;
       let selectedPoint = -1;
@@ -418,7 +463,7 @@
         const y1 = controlPoints[ 0 ].y.toFixed( 3 );
         const x2 = controlPoints[ 1 ].x.toFixed( 3 );
         const y2 = controlPoints[ 1 ].y.toFixed( 3 );
-        const cubic = `cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 })`;
+        const cubic = `${ duration.toFixed( 1 ) }s cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 })`;
         cssOutput.textContent = cubic;
 
         // Update point list
@@ -438,7 +483,7 @@
         previewBox.style.animation = 'none';
         setTimeout( () =>
         {
-          previewBox.style.animation = `slide 2s cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 }) infinite`;
+          previewBox.style.animation = `slide ${ duration }s cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 }) infinite`;
         }, 10 );
       }
 
@@ -528,6 +573,15 @@
       document.addEventListener( 'mouseup', handleDragEnd );
       document.addEventListener( 'touchend', handleDragEnd );
 
+      // Duration slider event listener
+      durationSlider.addEventListener( 'input', ( e ) =>
+      {
+        duration = parseFloat( e.target.value );
+        durationValue.textContent = `${ duration.toFixed( 1 ) }s`;
+        updateCSSOutput();
+        updatePreview();
+      } );
+
       copyBtn.addEventListener( 'click', () =>
       {
         vscode.postMessage( {
@@ -538,7 +592,9 @@
 
       resetBtn.addEventListener( 'click', () =>
       {
-
+        duration = 3.4;
+        durationSlider.value = 3.4;
+        durationValue.textContent = '3.4s';
         controlPoints = [
           { x: 0, y: 0.5 }, // Point 1
           { x: 1, y: 0.5 }  // Point 2
