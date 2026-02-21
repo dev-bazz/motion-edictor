@@ -10,10 +10,29 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:css-ease-generator.openEditor"
+    "onCommand:css-ease-generator.openEditor",
+    "onView:easeGeneratorView"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "easeGenerator",
+          "title": "CSS Ease Generator",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "easeGenerator": [
+        {
+          "id": "easeGeneratorView",
+          "name": "Ease Generator",
+          "type": "webview"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "css-ease-generator.openEditor",
