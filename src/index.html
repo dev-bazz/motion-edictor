@@ -516,6 +516,194 @@
 
       #preview {
         position: relative;
+        width: 100%;
+        height: 60px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      #previewBox {
+        width: 30px;
+        height: 30px;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        border-radius: 2px;
+        margin-left: 10px;
+        flex-shrink: 0;
+      }
+
+      #springPreview {
+        position: relative;
+        width: 100%;
+        height: 60px;
+        background: linear-gradient(to right,
+            var(--vscode-editor-background, var(--fallback-editor-background)),
+            var(--vscode-input-background, var(--fallback-input-background)) 10%,
+            var(--vscode-editor-background, var(--fallback-editor-background)) 90%);
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 2px;
+        display: grid;
+        grid-template-columns: 20px 1fr 20px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 8px;
+      }
+
+      #springPreview::before {
+        content: '';
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 50%;
+        height: 1px;
+        background: var(--vscode-input-border, var(--fallback-input-border));
+        transform: translateY(-50%);
+        opacity: 0.3;
+      }
+
+      .spring-preview-start,
+      .spring-preview-end {
+        font-size: 9px;
+        opacity: 0.5;
+        text-align: center;
+        z-index: 1;
+      }
+
+      .spring-preview-container {
+        position: relative;
+        height: 100%;
+        flex: 1;
+        z-index: 1;
+      }
+
+      #springPreviewBox {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 24px;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 168, 255, 0.3);
+        transition: none;
+        flex-shrink: 0;
+      }
+
+      #preview.preview-updating {
+        animation: previewPulse 0.5s ease-out;
+      }
+
+      @keyframes previewPulse {
+        0% {
+          box-shadow: 0 0 0 2px var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+          opacity: 1;
+        }
+
+        100% {
+          box-shadow: 0 0 0 8px transparent;
+          opacity: 1;
+        }
+      }
+
+      /* Spring Preview Animation Feedback */
+      #springPreview.preview-updating {
+        animation: springPreviewPulse 0.4s ease-out;
+      }
+
+      @keyframes springPreviewPulse {
+        0% {
+          filter: brightness(1.2);
+        }
+
+        100% {
+          filter: brightness(1);
+        }
+      }
+
+      .preview-info {
+        font-size: 9px;
+        opacity: 0.6;
+        text-align: center;
+        margin-top: 2px;
+        font-family: monospace;
+      }
+
+      /* Enhanced Easing Canvas */
+      .easing-info-overlay {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.6);
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-family: monospace;
+        pointer-events: none;
+        max-width: 120px;
+        z-index: 10;
+      }
+
+      .easing-grid-helper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .easing-grid-lines {
+        stroke: var(--vscode-input-border, var(--fallback-input-border));
+        stroke-width: 0.5;
+        opacity: 0.15;
+      }
+
+      .easing-grid-thick {
+        stroke: var(--vscode-input-border, var(--fallback-input-border));
+        stroke-width: 1;
+        opacity: 0.1;
+      }
+
+      .easing-guide-text {
+        font-size: 9px;
+        opacity: 0.3;
+        fill: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .control-point-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: #0a8;
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-family: monospace;
+        pointer-events: none;
+        z-index: 20;
+        white-space: nowrap;
+        left: 0;
+        top: 0;
+      }
+
+      .easing-tips {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px;
+        font-size: 9px;
+        line-height: 1.3;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        margin-top: 8px;
+      }
+
+      .easing-tips strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
       }
 
       .preview-updating::after {
@@ -596,8 +784,60 @@
 
         <div id="easingEditor" class="editor-content active">
           <div class="canvas-wrapper">
-
             <svg id="easeCanvas" viewBox="0 0 330 330">
+              <!-- Grid lines (light) -->
+              <g class="easing-grid-lines">
+                <line x1="16.5" y1="0" x2="16.5" y2="330" />
+                <line x1="33" y1="0" x2="33" y2="330" />
+                <line x1="49.5" y1="0" x2="49.5" y2="330" />
+                <line x1="66" y1="0" x2="66" y2="330" />
+                <line x1="82.5" y1="0" x2="82.5" y2="330" />
+                <line x1="99" y1="0" x2="99" y2="330" />
+                <line x1="115.5" y1="0" x2="115.5" y2="330" />
+                <line x1="132" y1="0" x2="132" y2="330" />
+                <line x1="148.5" y1="0" x2="148.5" y2="330" />
+                <line x1="165" y1="0" x2="165" y2="330" />
+                <line x1="181.5" y1="0" x2="181.5" y2="330" />
+                <line x1="198" y1="0" x2="198" y2="330" />
+                <line x1="214.5" y1="0" x2="214.5" y2="330" />
+                <line x1="231" y1="0" x2="231" y2="330" />
+                <line x1="247.5" y1="0" x2="247.5" y2="330" />
+                <line x1="264" y1="0" x2="264" y2="330" />
+                <line x1="280.5" y1="0" x2="280.5" y2="330" />
+                <line x1="297" y1="0" x2="297" y2="330" />
+                <line x1="313.5" y1="0" x2="313.5" y2="330" />
+                <!-- Horizontal grid -->
+                <line x1="0" y1="16.5" x2="330" y2="16.5" />
+                <line x1="0" y1="33" x2="330" y2="33" />
+                <line x1="0" y1="49.5" x2="330" y2="49.5" />
+                <line x1="0" y1="66" x2="330" y2="66" />
+                <line x1="0" y1="82.5" x2="330" y2="82.5" />
+                <line x1="0" y1="99" x2="330" y2="99" />
+                <line x1="0" y1="115.5" x2="330" y2="115.5" />
+                <line x1="0" y1="132" x2="330" y2="132" />
+                <line x1="0" y1="148.5" x2="330" y2="148.5" />
+                <line x1="0" y1="165" x2="330" y2="165" />
+                <line x1="0" y1="181.5" x2="330" y2="181.5" />
+                <line x1="0" y1="198" x2="330" y2="198" />
+                <line x1="0" y1="214.5" x2="330" y2="214.5" />
+                <line x1="0" y1="231" x2="330" y2="231" />
+                <line x1="0" y1="247.5" x2="330" y2="247.5" />
+                <line x1="0" y1="264" x2="330" y2="264" />
+                <line x1="0" y1="280.5" x2="330" y2="280.5" />
+                <line x1="0" y1="297" x2="330" y2="297" />
+                <line x1="0" y1="313.5" x2="330" y2="313.5" />
+              </g>
+              <!-- Thicker grid marks -->
+              <g class="easing-grid-thick">
+                <line x1="0" y1="165" x2="330" y2="165" />
+                <line x1="165" y1="0" x2="165" y2="330" />
+              </g>
+              <!-- Guide labels -->
+              <g class="easing-guide-text">
+                <text x="5" y="12" text-anchor="start">1.0</text>
+                <text x="5" y="325" text-anchor="start">0.0</text>
+                <text x="325" y="325" text-anchor="end">1.0</text>
+              </g>
               <!-- Grid -->
               <g id="grid" opacity="0.1"></g>
               <!-- Axes -->
@@ -636,28 +876,19 @@
               <div class="duration-value" id="durationValue">1s</div>
             </div>
 
+            <div class="easing-tips">
+              <strong>💡 Drag Tips:</strong>
+              Top-right = ease-out (quick start, slow end) •
+              Bottom-left = ease-in (slow start, quick end)
+            </div>
+
             <h3 style="margin-top: 15px;">CSS Output</h3>
             <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
-            <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+            <button class="copy-btn" id="copyBtn">📋 Copy to Clipboard</button>
 
             <h3 style="margin-top: 15px;">Preview</h3>
-            <div id="preview" style="
-					width: 100%;
-					height: 60px;
-					background: var(--vscode-editor-background, var(--fallback-editor-background));
-					border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
-					border-radius: 2px;
-					display: flex;
-					align-items: center;
-					overflow: hidden;
-				">
-              <div id="previewBox" style="
-						width: 30px;
-						height: 30px;
-						background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-						margin-left: 10px;
-						border-radius: 2px;
-					"></div>
+            <div id="preview">
+              <div id="previewBox"></div>
             </div>
 
             <h3 style="margin-top: 15px;">Control Points</h3>
@@ -667,24 +898,14 @@
 
         <div id="springEditor" class="editor-content">
           <div class="canvas-wrapper">
-            <div id="springPreview" style="
-                            width: 100%;
-                            height: 60px;
-                            background: var(--vscode-editor-background, var(--fallback-editor-background));
-                            border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
-                            border-radius: 2px;
-                            display: flex;
-                            align-items: center;
-                            overflow: hidden;
-                          ">
-              <div id="springPreviewBox" style="
-                              width: 30px;
-                              height: 30px;
-                              background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-                              margin-left: 10px;
-                              border-radius: 2px;
-                            "></div>
+            <div id="springPreview">
+              <div class="spring-preview-start">●</div>
+              <div class="spring-preview-container">
+                <div id="springPreviewBox"></div>
+              </div>
+              <div class="spring-preview-end">✓</div>
             </div>
+            <div class="preview-info" id="springPreviewInfo">Motion: Smooth | Settling: 0.95s</div>
             <svg id="springCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
               <path d="M184 0 L184 300" fill="transparent"
                         stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))"
@@ -1079,6 +1300,13 @@
           command: 'copyToClipboard',
           value: cssOutput.textContent
         } );
+        // Visual feedback
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout( () =>
+        {
+          copyBtn.textContent = originalText;
+        }, 1500 );
       } );
 
       resetBtn.addEventListener( 'click', () =>
@@ -1101,6 +1329,10 @@
         @keyframes slide {
           from { margin-left: 10px; }
           to { margin-left: calc(100% - 40px); }
+        }
+        @keyframes springSlide {
+          from { left: 0%; }
+          to { left: calc(100% - 24px); }
         }
       `;
       document.head.appendChild( style );
@@ -1305,13 +1537,60 @@
         const linearEasing = generateSpringLinearEasing( springParams.stiffness, springParams.damping, springParams.mass, springParams.duration );
 
         springPreviewBox.style.animation = 'none';
-        springPreviewBox.style.marginLeft = '10px';
+        springPreviewBox.style.left = '0%';
 
         setTimeout( () =>
         {
           const easing = `linear(${ linearEasing })`;
-          springPreviewBox.style.animation = `slide ${ springParams.duration }s ${ easing } forwards`;
+          springPreviewBox.style.animation = `none`;
+          springPreviewBox.style.left = '0%';
+
+          // Trigger reflow to restart animation
+          void springPreviewBox.offsetWidth;
+
+          springPreviewBox.style.animation = `springSlide ${ springParams.duration }s ${ easing } forwards`;
         }, 10 );
+
+        // Update preview info
+        updateSpringPreviewInfo();
+      }
+
+      function updateSpringPreviewInfo ()
+      {
+        const { stiffness, damping, mass, duration } = springParams;
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let motionType = 'Smooth';
+        if ( dampingRatio < 0.65 )
+        {
+          motionType = 'Bouncy';
+        } else if ( dampingRatio < 0.95 )
+        {
+          motionType = 'Natural';
+        } else if ( dampingRatio >= 1 )
+        {
+          motionType = 'Smooth';
+        }
+
+        // Calculate settling time
+        let settlingTime = duration;
+        for ( let t = 0; t <= duration; t += 0.01 )
+        {
+          const normalizedT = t / duration;
+          const value = generateSpringValue( normalizedT, stiffness, damping, mass, duration );
+          if ( value >= 0.99 )
+          {
+            settlingTime = t;
+            break;
+          }
+        }
+
+        const infoEl = document.getElementById( 'springPreviewInfo' );
+        if ( infoEl )
+        {
+          infoEl.textContent = `Motion: ${ motionType } | Settling: ${ settlingTime.toFixed( 2 ) }s`;
+        }
       }
 
       // Analyze spring behavior
@@ -1489,6 +1768,13 @@
           command: 'copyToClipboard',
           value: springCssOutput.textContent
         } );
+        // Visual feedback
+        const originalText = springCopyBtn.textContent;
+        springCopyBtn.textContent = '✓ Copied!';
+        setTimeout( () =>
+        {
+          springCopyBtn.textContent = originalText;
+        }, 1500 );
       } );
 
       // Initial spring visualization and analysis
