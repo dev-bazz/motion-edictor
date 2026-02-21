@@ -167,6 +167,9 @@
         font-size: 12px;
         font-weight: 600;
         flex-shrink: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
       }
 
       .code-block {
@@ -179,12 +182,23 @@
         word-break: break-all;
         color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
         flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+
+      .code-block:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.1);
       }
 
       .copy-btn {
         width: 100%;
         padding: 6px 8px;
         flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+
+      .copy-btn:active {
+        transform: scale(0.98);
       }
 
       .info-text {
@@ -200,7 +214,220 @@
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 2px;
         padding: 6px;
-        flex-shrink: 0;
+        max-height: 100px;
+      }
+
+      /* Spring Editor Specific Styles */
+      .duration-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .duration-control label {
+        font-size: 11px;
+        min-width: 55px;
+      }
+
+      .duration-control input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .duration-value {
+        font-size: 11px;
+        font-weight: 500;
+        min-width: 45px;
+        text-align: right;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      /* Preset Buttons */
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .preset-btn {
+        padding: 6px 8px;
+        font-size: 10px;
+        text-align: center;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .preset-btn:hover {
+        border-color: var(--vscode-button-background, var(--fallback-button-background));
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+      }
+
+      .preset-btn.active {
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+        border-color: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.3);
+      }
+
+      /* Spring Analysis Card */
+      .analysis-card {
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        padding: 8px;
+        margin-top: 8px;
+        font-size: 10px;
+      }
+
+      .analysis-card h4 {
+        margin: 0 0 6px 0;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .analysis-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+        border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+      }
+
+      .analysis-row:last-child {
+        border-bottom: none;
+      }
+
+      .analysis-label {
+        opacity: 0.7;
+      }
+
+      .analysis-value {
+        font-weight: 600;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .damping-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .damping-badge.underdamped {
+        background: rgba(255, 100, 100, 0.3);
+        color: #ff6464;
+      }
+
+      .damping-badge.critical {
+        background: rgba(255, 200, 0, 0.3);
+        color: #ffc800;
+      }
+
+      .damping-badge.overdamped {
+        background: rgba(100, 200, 255, 0.3);
+        color: #64c8ff;
+      }
+
+      /* Parameter Info Tooltip */
+      .param-info {
+        position: relative;
+        display: inline-block;
+        margin-left: 4px;
+        width: 14px;
+        height: 14px;
+        line-height: 14px;
+        text-align: center;
+        border-radius: 50%;
+        background: rgba(0, 168, 255, 0.2);
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        font-size: 9px;
+        font-weight: bold;
+        cursor: help;
+        transition: all 0.2s ease;
+      }
+
+      .param-info:hover {
+        background: rgba(0, 168, 255, 0.4);
+      }
+
+      .param-info::after {
+        content: attr(data-tooltip);
+        visibility: hidden;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 10px;
+        font-weight: normal;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+
+      .param-info:hover::after {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Export Button */
+      .export-btn {
+        width: 100%;
+        padding: 6px 8px;
+        margin-top: 8px;
+        font-size: 11px;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .export-btn:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+      }
+
+      /* Info banner */
+      .info-banner {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px 8px;
+        font-size: 10px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      .info-banner strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      border-radius: 2px;
+      padding: 6px;
+      flex-shrink: 0;
       }
 
       .duration-control {
@@ -468,40 +695,77 @@
             </svg>
           </div>
           <div class="output-section">
-            <h3>Duration</h3>
+            <div class="info-banner">
+              <strong>Pro Tip:</strong> Adjust parameters or click presets to see spring behavior in real-time
+            </div>
+
+            <h3>Presets</h3>
+            <div class="preset-grid">
+              <button class="preset-btn" data-preset="gentle">Gentle</button>
+              <button class="preset-btn active" data-preset="standard">Standard</button>
+              <button class="preset-btn" data-preset="snappy">Snappy</button>
+              <button class="preset-btn" data-preset="bouncy">Bouncy</button>
+              <button class="preset-btn" data-preset="molasses">Molasses</button>
+              <button class="preset-btn" data-preset="springy">Springy</button>
+            </div>
+
+            <h3>Parameters</h3>
             <div class="duration-control">
-              <label for="springDuration">Duration:</label>
+              <label for="springDuration">Duration:
+                <span class="param-info" data-tooltip="Total animation time in seconds">?</span>
+              </label>
               <input type="range" id="springDuration" min="0.1" max="10" step="0.1" value="1">
               <div class="duration-value" id="springDurationValue">1s</div>
             </div>
 
-            <h3 style="margin-top: 15px;">Stiffness</h3>
             <div class="duration-control">
-              <label for="stiffness">Stiffness:</label>
+              <label for="stiffness">Stiffness:
+                <span class="param-info" data-tooltip="Higher = tighter spring, faster response">?</span>
+              </label>
               <input type="range" id="stiffness" min="50" max="500" step="10" value="170">
               <div class="duration-value" id="stiffnessValue">170</div>
             </div>
 
-            <h3 style="margin-top: 15px;">Damping</h3>
             <div class="duration-control">
-              <label for="damping">Damping:</label>
+              <label for="damping">Damping:
+                <span class="param-info" data-tooltip="Higher = more friction, less bounce">?</span>
+              </label>
               <input type="range" id="damping" min="5" max="100" step="1" value="26">
               <div class="duration-value" id="dampingValue">26</div>
             </div>
 
-            <h3 style="margin-top: 15px;">Mass</h3>
             <div class="duration-control">
-              <label for="mass">Mass:</label>
+              <label for="mass">Mass:
+                <span class="param-info" data-tooltip="Higher = more momentum, slower settling">?</span>
+              </label>
               <input type="range" id="mass" min="0.1" max="5" step="0.1" value="1">
               <div class="duration-value" id="massValue">1.0</div>
             </div>
 
-
+            <div class="analysis-card" id="springAnalysis">
+              <h4>Spring Analysis</h4>
+              <div class="analysis-row">
+                <span class="analysis-label">Type:</span>
+                <span class="analysis-value"><span class="damping-badge standard">Standard</span></span>
+              </div>
+              <div class="analysis-row">
+                <span class="analysis-label">Oscillations:</span>
+                <span class="analysis-value" id="oscillationsValue">2</span>
+              </div>
+              <div class="analysis-row">
+                <span class="analysis-label">Settling Time:</span>
+                <span class="analysis-value" id="settlingTimeValue">0.95s</span>
+              </div>
+              <div class="analysis-row">
+                <span class="analysis-label">Max Overshoot:</span>
+                <span class="analysis-value" id="overshotValue">8.0%</span>
+              </div>
+            </div>
 
             <h3 style="margin-top: 15px;">CSS Output</h3>
-            <div class="code-block" id="springCssOutput">animation: spring 1s</div>
-            <button class="copy-btn" id="springCopyBtn">Copy to Clipboard</button>
-
+            <div class="code-block" id="springCssOutput">animation: slide 1000ms linear(0, ...)</div>
+            <button class="copy-btn" id="springCopyBtn">📋 Copy CSS to Clipboard</button>
+            <button class="export-btn" id="springExportBtn">📥 Export Config (JSON)</button>
 
           </div>
         </div>
@@ -862,11 +1126,22 @@
 
       let springParams = {
         duration: 1,
-        stiffness: 300,
-        damping: 8,
-        mass: 0.7
+        stiffness: 170,
+        damping: 26,
+        mass: 1
       };
 
+      // Spring presets
+      const SPRING_PRESETS = {
+        gentle: { stiffness: 120, damping: 30, mass: 1, label: 'Gentle', type: 'gentle' },
+        standard: { stiffness: 170, damping: 26, mass: 1, label: 'Standard', type: 'standard' },
+        snappy: { stiffness: 210, damping: 20, mass: 1, label: 'Snappy', type: 'snappy' },
+        bouncy: { stiffness: 180, damping: 15, mass: 1, label: 'Bouncy', type: 'bouncy' },
+        molasses: { stiffness: 100, damping: 40, mass: 1, label: 'Molasses', type: 'molasses' },
+        springy: { stiffness: 150, damping: 20, mass: 0.9, label: 'Springy', type: 'springy' }
+      };
+
+      let currentPreset = 'standard';
       let springPreviewUpdateTimeout;
 
       // Debounced spring preview update (300ms)
@@ -1039,6 +1314,133 @@
         }, 10 );
       }
 
+      // Analyze spring behavior
+      function analyzeSpring ()
+      {
+        const { stiffness, damping, mass, duration } = springParams;
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let dampingType = 'underdamped';
+        let dampingClass = 'underdamped';
+        if ( dampingRatio >= 1 )
+        {
+          dampingType = 'Critically Damped';
+          dampingClass = 'critical';
+        } else if ( dampingRatio > 0.8 )
+        {
+          dampingType = 'Underdamped';
+          dampingClass = 'underdamped';
+        } else
+        {
+          dampingType = dampingRatio > 0.5 ? 'Underdamped' : 'Oscillating';
+          dampingClass = 'underdamped';
+        }
+
+        // Count oscillations
+        let oscillations = 0;
+        if ( dampingRatio < 1 )
+        {
+          const omegad = omega0 * Math.sqrt( Math.max( 0, 1 - dampingRatio * dampingRatio ) );
+          oscillations = Math.floor( ( duration * omegad ) / ( 2 * Math.PI ) );
+        }
+
+        // Calculate settling time and max overshoot
+        let settlingTime = duration;
+        let maxOvershoot = 0;
+
+        for ( let t = 0; t <= duration; t += 0.01 )
+        {
+          const normalizedT = t / duration;
+          const value = generateSpringValue( normalizedT, stiffness, damping, mass, duration );
+          if ( value >= 0.99 && settlingTime === duration )
+          {
+            settlingTime = t;
+          }
+          if ( value > 1 )
+          {
+            maxOvershoot = Math.max( maxOvershoot, ( value - 1 ) * 100 );
+          }
+        }
+
+        // Update UI
+        document.querySelector( '.damping-badge' ).className = `damping-badge ${ dampingClass }`;
+        document.querySelector( '.damping-badge' ).textContent = dampingType.toUpperCase();
+        document.getElementById( 'oscillationsValue' ).textContent = oscillations;
+        document.getElementById( 'settlingTimeValue' ).textContent = `${ settlingTime.toFixed( 2 ) }s`;
+        document.getElementById( 'overshotValue' ).textContent = `${ maxOvershoot.toFixed( 1 ) }%`;
+      }
+
+      // Apply spring preset
+      function applyPreset ( presetName )
+      {
+        const preset = SPRING_PRESETS[ presetName ];
+        if ( !preset ) return;
+
+        currentPreset = presetName;
+
+        // Update params
+        springParams.stiffness = preset.stiffness;
+        springParams.damping = preset.damping;
+        springParams.mass = preset.mass;
+
+        // Update UI sliders and values
+        stiffnessSlider.value = preset.stiffness;
+        stiffnessValue.textContent = preset.stiffness.toFixed( 0 );
+
+        dampingSlider.value = preset.damping;
+        dampingValue.textContent = preset.damping.toFixed( 0 );
+
+        massSlider.value = preset.mass;
+        massValue.textContent = preset.mass.toFixed( 1 );
+
+        // Update preset buttons
+        document.querySelectorAll( '.preset-btn' ).forEach( btn =>
+        {
+          btn.classList.toggle( 'active', btn.dataset.preset === presetName );
+        } );
+
+        // Update visualizations
+        updateSpringVisualization();
+        updateSpringOutput();
+        analyzeSpring();
+        showSpringUpdateIndicator();
+        updateSpringPreview();
+      }
+
+      // Export configuration as JSON
+      function exportConfig ()
+      {
+        const config = {
+          preset: currentPreset,
+          duration: springParams.duration,
+          stiffness: springParams.stiffness,
+          damping: springParams.damping,
+          mass: springParams.mass,
+          exportedAt: new Date().toISOString()
+        };
+
+        const jsonStr = JSON.stringify( config, null, 2 );
+        vscode.postMessage( {
+          command: 'copyToClipboard',
+          value: jsonStr
+        } );
+      }
+
+      // Event listeners for presets
+      document.querySelectorAll( '.preset-btn' ).forEach( btn =>
+      {
+        btn.addEventListener( 'click', () =>
+        {
+          applyPreset( btn.dataset.preset );
+        } );
+      } );
+
+      // Export button
+      const springExportBtn = document.getElementById( 'springExportBtn' );
+      springExportBtn?.addEventListener( 'click', exportConfig );
+
+
       springDuration.addEventListener( 'input', ( e ) =>
       {
         springParams.duration = parseFloat( e.target.value );
@@ -1052,8 +1454,10 @@
       {
         springParams.stiffness = parseFloat( e.target.value );
         stiffnessValue.textContent = springParams.stiffness.toFixed( 0 );
+        currentPreset = 'custom';
         updateSpringVisualization();
         updateSpringOutput();
+        analyzeSpring();
         debouncedSpringPreviewUpdate();
       } );
 
@@ -1061,8 +1465,10 @@
       {
         springParams.damping = parseFloat( e.target.value );
         dampingValue.textContent = springParams.damping.toFixed( 0 );
+        currentPreset = 'custom';
         updateSpringVisualization();
         updateSpringOutput();
+        analyzeSpring();
         debouncedSpringPreviewUpdate();
       } );
 
@@ -1070,8 +1476,10 @@
       {
         springParams.mass = parseFloat( e.target.value );
         massValue.textContent = springParams.mass.toFixed( 1 );
+        currentPreset = 'custom';
         updateSpringVisualization();
         updateSpringOutput();
+        analyzeSpring();
         debouncedSpringPreviewUpdate();
       } );
 
@@ -1083,9 +1491,10 @@
         } );
       } );
 
-      // Initial spring visualization
+      // Initial spring visualization and analysis
       updateSpringVisualization();
       updateSpringOutput();
+      analyzeSpring();
 
       // Initial SVG update
       updateSvg();

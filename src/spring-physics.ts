@@ -8,6 +8,20 @@
  * - Angular frequency: ω₀ = √(k/m)
  * - Damping ratio: ζ (zeta) = c / (2√(km))
  * - Displacement: x(t) = 1 - e^(-ζω₀t)[cos(ωdt) + (ζω₀/ωd)sin(ωdt)]
+ *
+ * @example
+ * ```typescript
+ * import { generateCSSCode, SPRING_PRESETS, analyzeSpring } from './spring-physics';
+ *
+ * // Use a preset
+ * const css = generateCSSCode(SPRING_PRESETS.snappy, 0.8);
+ *
+ * // Or custom config
+ * const config = { stiffness: 200, damping: 20, mass: 1 };
+ * const css = generateCSSCode(config, 0.8);
+ * console.log(css);
+ * // Output: animation: slide 800ms linear(...) forwards;
+ * ```
  */
 
 export interface SpringConfig {
