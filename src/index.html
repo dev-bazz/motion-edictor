@@ -869,74 +869,73 @@
         if ( t <= 0 ) return 0;
         if ( t >= 1 ) return 1;
 
-        // Spring physics parameters
-        // bounce controls the damping ratio (lower = more damped, higher = less damped/bouncier)
-        // duration affects the natural frequency
+        // Damping ratio based on bounce
+        // Higher bounce = lower damping = more oscillation
+        const zeta = Math.max( 0.05, 1.0 - bounce * 0.95 );
 
-        // Damping ratio based on bounce:
-        // - bounce 0 = heavily damped (zeta ~1.0)
-        // - bounce 1 = lightly damped (zeta ~0.1)
-        const zeta = Math.max( 0.08, 1.0 - bounce * 0.9 );
+        // Natural frequency - adjusted for better responsiveness
+        const omega = 10 / Math.max( 0.1, duration );
 
-        // Natural frequency based on duration:
-        // - shorter duration = higher frequency (faster oscillations)
-        // - longer duration = lower frequency (slower oscillations)
-        const omega = ( 10 / duration ) * ( 1 + bounce * 0.5 );
-
-        // Calculate damped frequency
+        // Damped frequency
         const wd = omega * Math.sqrt( Math.max( 0, 1 - zeta * zeta ) );
 
-        if ( wd === 0 )
+        if ( wd === 0 || zeta >= 1 )
         {
-          // Over-damped case
-          return 1 - ( 1 + omega * t ) * Math.exp( -omega * t );
+          const factor = zeta * omega;
+          return 1 - ( 1 + factor * t ) * Math.exp( -factor * t );
         }
 
-        // Under-damped spring response with zero initial velocity, unit step input
-        // x(t) = 1 - e^(-zeta*omega*t) * (cos(wd*t) + (zeta*omega/wd)*sin(wd*t))
         const exponentialDecay = Math.exp( -zeta * omega * t );
         const cosTerm = Math.cos( wd * t );
         const sinTerm = ( zeta * omega / wd ) * Math.sin( wd * t );
-
         const displacement = 1 - exponentialDecay * ( cosTerm + sinTerm );
 
-        return displacement;
+        // Allow overshoots but prevent going significantly negative
+        return Math.max( -0.1, displacement );
       }
 
       function generateSpringCurve ( bounce, duration )
       {
         const points = [];
         const values = [];
-        const timeStep = 0.01; // 100 samples per unit time
+        const timeStep = 0.005; // 200 samples per unit time for smoother curves
 
-        // First pass: collect all values to find min/max for centering
+        // First pass: collect all values
         for ( let t = 0; t <= 1; t += timeStep )
         {
           const value = generateSpringValue( t, bounce, duration );
           values.push( value );
         }
 
-        // Find min and max values
+        // Find min and max values for scaling
         const minValue = Math.min( ...values );
         const maxValue = Math.max( ...values );
 
-        // Calculate range and center point
+        // Determine scale based on actual oscillation range
+        // We want to show the full oscillation within the canvas
         const range = maxValue - minValue;
-        const centerValue = ( minValue + maxValue ) / 2;
+        const topPadding = 20; // pixels
+        const bottomPadding = 50; // pixels
+        const canvasHeight = 300 - topPadding - bottomPadding;
 
-        // Scale to fit vertically with padding (use 80 pixels for upper/lower bounds)
-        const maxVerticalRange = 80;
-        const scale = range > 0 ? maxVerticalRange / range : 1;
+        // Scale factor to fit all oscillations in canvas
+        const scale = range > 0 ? canvasHeight / range : canvasHeight;
 
-        // Second pass: create path with centered values
+        // Reference points for scaling
+        const minY = topPadding;
+        const maxY = 300 - bottomPadding;
+
+        // Second pass: create path with proper scaling
         for ( let i = 0; i < values.length; i++ )
         {
           const t = i * timeStep;
           const value = values[ i ];
           const x = t * 500;
-          // Center the value around y=150
-          const centeredValue = ( value - centerValue ) * scale;
-          const svgY = 150 - centeredValue;
+
+          // Map value to canvas coordinates
+          // value = minValue -> y = maxY (bottom)
+          // value = maxValue -> y = minY (top)
+          const svgY = maxY - ( ( value - minValue ) * scale );
           points.push( `${ x } ${ svgY }` );
         }
 
@@ -952,8 +951,8 @@
       function updateSpringOutput ()
       {
         const linearEasing = generateSpringLinearEasing( springParams.bounce, springParams.duration );
-        const durationS = springParams.duration.toFixed( 1 );
-        const css = `${ durationS }s linear(${ linearEasing })`;
+        const durationMs = ( springParams.duration * 1000 ).toFixed( 0 );
+        const css = `${ durationMs }ms linear(${ linearEasing })`;
         springCssOutput.textContent = css;
       }
 
