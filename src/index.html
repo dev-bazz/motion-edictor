@@ -555,17 +555,26 @@
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 168, 255, 0.15);
       }
 
+      .easing-preview-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+      }
+
       #previewBox {
-        width: 32px;
-        height: 32px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
         background: linear-gradient(135deg,
             var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
-            rgba(0, 168, 255, 0.7));
-        border-radius: 4px;
-        margin-left: 12px;
+            rgba(0, 168, 255, 0.6));
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        transition: none;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 168, 255, 0.4);
-        transition: box-shadow 0.2s ease;
       }
 
       #springPreview {
@@ -636,18 +645,16 @@
       }
 
       #preview.preview-updating {
-        animation: previewPulse 0.5s ease-out;
+        animation: previewPulse 0.4s ease-out;
       }
 
       @keyframes previewPulse {
         0% {
-          box-shadow: 0 0 0 2px var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-          opacity: 1;
+          filter: brightness(1.2);
         }
 
         100% {
-          box-shadow: 0 0 0 8px transparent;
-          opacity: 1;
+          filter: brightness(1);
         }
       }
 
@@ -926,7 +933,9 @@
           <div class="output-section">
             <h3 style="margin-top: 15px;">Preview</h3>
             <div id="preview">
-              <div id="previewBox"></div>
+              <div class="easing-preview-container">
+                <div id="previewBox"></div>
+              </div>
             </div>
             <h3>Duration</h3>
             <div class="duration-control">
@@ -1247,6 +1256,7 @@
         const y2 = parseFloat( controlPoints[ 1 ].y );
 
         previewBox.style.animation = 'none';
+        previewBox.style.left = '0%';
         setTimeout( () =>
         {
           previewBox.style.animation = `slide ${ duration }s  cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 }) infinite`;
@@ -1395,8 +1405,8 @@
       style.id = 'animation-styles';
       style.textContent = `
         @keyframes slide {
-          from { margin-left: 10px; }
-          to { margin-left: calc(100% - 40px); }
+          from { left: 0%; }
+          to { left: calc(100% - 24px); }
         }
         @keyframes springSlide {
           from { left: 0%; }
