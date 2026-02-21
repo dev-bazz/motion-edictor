@@ -906,13 +906,37 @@
       function generateSpringCurve ( bounce, duration )
       {
         const points = [];
+        const values = [];
         const timeStep = 0.01; // 100 samples per unit time
 
+        // First pass: collect all values to find min/max for centering
         for ( let t = 0; t <= 1; t += timeStep )
         {
           const value = generateSpringValue( t, bounce, duration );
+          values.push( value );
+        }
+
+        // Find min and max values
+        const minValue = Math.min( ...values );
+        const maxValue = Math.max( ...values );
+
+        // Calculate range and center point
+        const range = maxValue - minValue;
+        const centerValue = ( minValue + maxValue ) / 2;
+
+        // Scale to fit vertically with padding (use 80 pixels for upper/lower bounds)
+        const maxVerticalRange = 80;
+        const scale = range > 0 ? maxVerticalRange / range : 1;
+
+        // Second pass: create path with centered values
+        for ( let i = 0; i < values.length; i++ )
+        {
+          const t = i * timeStep;
+          const value = values[ i ];
           const x = t * 500;
-          const svgY = 150 - ( value * 100 ); // Center around 150
+          // Center the value around y=150
+          const centeredValue = ( value - centerValue ) * scale;
+          const svgY = 150 - centeredValue;
           points.push( `${ x } ${ svgY }` );
         }
 
