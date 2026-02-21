@@ -266,8 +266,7 @@ export interface SpringAnalysis {
 	maxOvershoot: number;
 	description: string;
 }
-{
-}
+
 /**{}
  * Anal{yzes the given spring confi}guration
  */
@@ -314,6 +313,7 @@ export function analyzeSpring(
 	// Find maximum overshoot
 	let maxOvershoot = 0;
 	const frames = generateSpringFrames(config, duration, 1000);
+	// biome-ignore lint/complexity/noForEach: <explanation>
 	frames.forEach((frame) => {
 		if (frame.value > 1) {
 			maxOvershoot = Math.max(maxOvershoot, (frame.value - 1) * 100);

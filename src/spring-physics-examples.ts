@@ -78,7 +78,7 @@ const svgPath = generateSpringCurvePathData(
 	300, // SVG height
 );
 
-console.log("SVG Path (first 100 chars):", svgPath.substring(0, 100) + "...");
+console.log("SVG Path (first 100 chars):", `${svgPath.substring(0, 100)}...`);
 
 // ============================================
 // Example 6: Creating Animation Keyframes
@@ -86,11 +86,13 @@ console.log("SVG Path (first 100 chars):", svgPath.substring(0, 100) + "...");
 
 console.log("\n=== Example 6: Animation Keyframes ===");
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function generateCSSKeyframes(name: string, config: any, duration: number) {
 	const frames = generateSpringFrames(config, duration, 25);
 
 	let keyframes = `@keyframes ${name} {\n`;
 
+	// biome-ignore lint/complexity/noForEach: <explanation>
 	frames.forEach((frame) => {
 		const percent = (frame.time * 100).toFixed(0);
 		const translateX = (frame.value * 100).toFixed(1);
@@ -106,7 +108,7 @@ const keyframesCss = generateCSSKeyframes(
 	SPRING_PRESETS.gentle,
 	0.8,
 );
-console.log("Generated Keyframes:\n" + keyframesCss);
+console.log(`Generated Keyframes:\n${keyframesCss}`);
 
 // ============================================
 // Example 7: Real-world Use Case - Button Click Animation
@@ -165,8 +167,8 @@ console.table(
 			stiffness: config.stiffness,
 			damping: config.damping,
 			dampingType: analysis.dampingType,
-			overshoot: analysis.maxOvershoot.toFixed(1) + "%",
-			settlingTime: analysis.settlingTime.toFixed(2) + "s",
+			overshoot: `${analysis.maxOvershoot.toFixed(1)}%`,
+			settlingTime: `${analysis.settlingTime.toFixed(2)}s`,
 		};
 	}),
 );
