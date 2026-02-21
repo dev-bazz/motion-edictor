@@ -845,24 +845,74 @@
         bounce: 0.5
       };
 
+      let springPreviewUpdateTimeout;
+
+      // Debounced spring preview update (300ms)
+      const debouncedSpringPreviewUpdate = debounce( () =>
+      {
+        updateSpringPreview();
+        showSpringUpdateIndicator();
+      }, 300 );
+
+      function showSpringUpdateIndicator ()
+      {
+        const preview = document.getElementById( 'springPreview' );
+        preview.classList.remove( 'preview-updating' );
+        // Trigger reflow to restart animation
+        void preview.offsetWidth;
+        preview.classList.add( 'preview-updating' );
+      }
+
+      // Realistic spring physics model
+      function generateSpringValue ( t, bounce, duration )
+      {
+        if ( t <= 0 ) return 0;
+        if ( t >= 1 ) return 1;
+
+        // Spring physics parameters
+        // bounce controls the damping ratio (lower = more damped, higher = less damped/bouncier)
+        // duration affects the natural frequency
+
+        // Damping ratio based on bounce:
+        // - bounce 0 = heavily damped (zeta ~1.0)
+        // - bounce 1 = lightly damped (zeta ~0.1)
+        const zeta = Math.max( 0.08, 1.0 - bounce * 0.9 );
+
+        // Natural frequency based on duration:
+        // - shorter duration = higher frequency (faster oscillations)
+        // - longer duration = lower frequency (slower oscillations)
+        const omega = ( 10 / duration ) * ( 1 + bounce * 0.5 );
+
+        // Calculate damped frequency
+        const wd = omega * Math.sqrt( Math.max( 0, 1 - zeta * zeta ) );
+
+        if ( wd === 0 )
+        {
+          // Over-damped case
+          return 1 - ( 1 + omega * t ) * Math.exp( -omega * t );
+        }
+
+        // Under-damped spring response with zero initial velocity, unit step input
+        // x(t) = 1 - e^(-zeta*omega*t) * (cos(wd*t) + (zeta*omega/wd)*sin(wd*t))
+        const exponentialDecay = Math.exp( -zeta * omega * t );
+        const cosTerm = Math.cos( wd * t );
+        const sinTerm = ( zeta * omega / wd ) * Math.sin( wd * t );
+
+        const displacement = 1 - exponentialDecay * ( cosTerm + sinTerm );
+
+        return displacement;
+      }
+
       function generateSpringCurve ( bounce, duration )
       {
         const points = [];
-        const timeStep = 1 / 100; // 100 samples per unit time
-        const totalTime = duration;
+        const timeStep = 0.01; // 100 samples per unit time
 
-        for ( let t = 0; t <= totalTime; t += timeStep )
+        for ( let t = 0; t <= 1; t += timeStep )
         {
-          // Simple bounce oscillation based on bounce parameter
-          const normalizedT = t / totalTime;
-
-          // Damped sine wave - bounce controls the number of oscillations and amplitude
-          const frequency = bounce * 10; // More bounce = more oscillations
-          const damping = Math.exp( -normalizedT * 3 ); // Exponential decay
-          const y = damping * Math.sin( normalizedT * frequency * Math.PI * 2 );
-
-          const x = ( t / totalTime ) * 500;
-          const svgY = 150 - ( y * 100 ); // Center around 150
+          const value = generateSpringValue( t, bounce, duration );
+          const x = t * 500;
+          const svgY = 150 - ( value * 100 ); // Center around 150
           points.push( `${ x } ${ svgY }` );
         }
 
@@ -877,40 +927,31 @@
 
       function updateSpringOutput ()
       {
-        const linearEasing = generateSpringLinearEasing( springParams.bounce );
+        const linearEasing = generateSpringLinearEasing( springParams.bounce, springParams.duration );
         const durationS = springParams.duration.toFixed( 1 );
         const css = `${ durationS }s linear(${ linearEasing })`;
         springCssOutput.textContent = css;
       }
 
-      function generateSpringLinearEasing ( bounce )
+      function generateSpringLinearEasing ( bounce, duration )
       {
         const keyframes = [];
-        const timeStep = 0.01; // Sample 100 points
+        const timeStep = 0.01; // Sample ~100 points
         const points = [];
 
-        // Calculate spring motion based on bounce
+        // Generate spring keyframes with proper physics
         for ( let t = 0; t <= 1; t += timeStep )
         {
-          // Damped sine wave - bounce controls the number of oscillations and amplitude
-          const frequency = bounce * 10; // More bounce = more oscillations
-          const damping = Math.exp( -t * 3 ); // Exponential decay
-          const displacement = damping * Math.sin( t * frequency * Math.PI * 2 );
-
-          // Map displacement from [-1, 1] to [0, 1] range
-          const value = 0.5 + displacement * 0.5;
-          const clampedValue = Math.max( 0, Math.min( 1, value ) );
-
-          points.push( { time: t, value: clampedValue } );
+          const value = generateSpringValue( t, bounce, duration );
+          points.push( { time: t, value } );
         }
 
         // Generate linear() easing string with time percentages
-        // Format: value or value percentage
         for ( let i = 0; i < points.length; i++ )
         {
           const point = points[ i ];
           const percent = ( point.time * 100 ).toFixed( 1 );
-          const value = point.value.toFixed( 3 );
+          const value = point.value.toFixed( 4 );
 
           // Skip percentage for first point (0%) and last point (100%)
           if ( i === 0 )
@@ -921,7 +962,7 @@
             keyframes.push( '1' );
           } else
           {
-            // Add percentage only if it's not a whole number or for significant stops
+            // Add percentage for all other points
             keyframes.push( `${ value } ${ percent }%` );
           }
         }
@@ -931,7 +972,7 @@
 
       function updateSpringPreview ()
       {
-        const linearEasing = generateSpringLinearEasing( springParams.bounce );
+        const linearEasing = generateSpringLinearEasing( springParams.bounce, springParams.duration );
 
         springPreviewBox.style.animation = 'none';
         springPreviewBox.style.marginLeft = '10px';
@@ -949,7 +990,7 @@
         springDurationValue.textContent = `${ springParams.duration.toFixed( 1 ) }s`;
         updateSpringVisualization();
         updateSpringOutput();
-        updateSpringPreview();
+        debouncedSpringPreviewUpdate();
       } );
 
       bounceSlider.addEventListener( 'input', ( e ) =>
@@ -958,7 +999,7 @@
         bounceValue.textContent = springParams.bounce.toFixed( 2 );
         updateSpringVisualization();
         updateSpringOutput();
-        updateSpringPreview();
+        debouncedSpringPreviewUpdate();
       } );
 
       springCopyBtn.addEventListener( 'click', () =>
