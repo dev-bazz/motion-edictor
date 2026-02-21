@@ -99,10 +99,11 @@
       }
 
       svg {
+        --bg-color: var(--vscode-input-background, var(--fallback-input-background));
         flex: 1;
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 2px;
-        background: white;
+        background: oklab(from var(--bg-color) .2 a b / 0.1);
         min-height: 0;
         width: 100%;
         overflow: visible;
@@ -256,7 +257,8 @@
             <!-- Grid -->
             <g id="grid" opacity="0.1"></g>
             <!-- Axes -->
-            <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 0,0 330,0"></polyline>
+            <polyline fill="none" stroke="#333" stroke-width="2" points="0,0 0,330"></polyline>
+            <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 330,330"></polyline>
             <!-- Control lines (tethers) -->
             <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
                       stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
