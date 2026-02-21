@@ -612,13 +612,12 @@
         lastMouseX = clientX;
         lastMouseY = clientY;
 
-        // Convert delta to SVG coordinates
-        const deltaSvgX = ( deltaX / rect.width ) * SVG_SIZE;
-        const deltaSvgY = ( deltaY / rect.height ) * SVG_SIZE;
+        // Use consistent scaling for both axes (SVG viewBox is square)
+        const scale = Math.min( rect.width, rect.height );
 
-        // Convert SVG delta to normalized delta
-        const deltaNormalizedX = deltaSvgX / SVG_SIZE;
-        const deltaNormalizedY = -deltaSvgY / SVG_SIZE; // Flip Y axis
+        // Convert delta to normalized delta with consistent scaling
+        const deltaNormalizedX = ( deltaX / scale ) * ( SVG_SIZE / SVG_SIZE );
+        const deltaNormalizedY = -( deltaY / scale ) * ( SVG_SIZE / SVG_SIZE ); // Flip Y axis
 
         // Apply delta to current position
         let newX = controlPoints[ selectedPoint ].x + deltaNormalizedX;
