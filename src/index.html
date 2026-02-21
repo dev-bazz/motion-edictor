@@ -319,12 +319,12 @@
           <h3>Duration</h3>
           <div class="duration-control">
             <label for="durationSlider">Duration:</label>
-            <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="3.4">
-            <div class="duration-value" id="durationValue">3.4s</div>
+            <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
+            <div class="duration-value" id="durationValue">1s</div>
           </div>
 
           <h3 style="margin-top: 15px;">CSS Output</h3>
-          <div class="code-block" id="cssOutput">3.4s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
+          <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
           <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
 
           <h3 style="margin-top: 15px;">Preview</h3>
@@ -387,7 +387,7 @@
         { x: 1, y: 0.5 }  // Point 2
       ];
 
-      let duration = 3.4; // Duration in seconds
+      let duration = 1; // Duration in seconds
 
       let isDrawing = false;
       let selectedPoint = -1;
@@ -592,9 +592,9 @@
 
       resetBtn.addEventListener( 'click', () =>
       {
-        duration = 3.4;
-        durationSlider.value = 3.4;
-        durationValue.textContent = '3.4s';
+        duration = 1;
+        durationSlider.value = 1;
+        durationValue.textContent = '1s';
         controlPoints = [
           { x: 0, y: 0.5 }, // Point 1
           { x: 1, y: 0.5 }  // Point 2
