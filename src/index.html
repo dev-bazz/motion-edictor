@@ -1054,7 +1054,6 @@
             <h3 style="margin-top: 15px;">CSS Output</h3>
             <div class="code-block" id="springCssOutput">animation: slide 1000ms linear(0, ...)</div>
             <button class="copy-btn" id="springCopyBtn">📋 Copy CSS to Clipboard</button>
-            <button class="export-btn" id="springExportBtn">📥 Export Config (JSON)</button>
 
           </div>
         </div>
@@ -1839,29 +1838,6 @@
           badgeEl.title = dampingDescription;
         }
       }
-
-      // Export configuration as JSON
-      function exportConfig ()
-      {
-        const config = {
-          duration: springParams.duration,
-          stiffness: springParams.stiffness,
-          damping: springParams.damping,
-          mass: springParams.mass,
-          exportedAt: new Date().toISOString()
-        };
-
-        const jsonStr = JSON.stringify( config, null, 2 );
-        vscode.postMessage( {
-          command: 'copyToClipboard',
-          value: jsonStr
-        } );
-      }
-
-      // Export button
-      const springExportBtn = document.getElementById( 'springExportBtn' );
-      springExportBtn?.addEventListener( 'click', exportConfig );
-
 
       springDuration.addEventListener( 'input', ( e ) =>
       {
