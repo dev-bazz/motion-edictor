@@ -98,13 +98,40 @@
         min-height: 0;
       }
 
-      canvas {
+      svg {
         flex: 1;
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 2px;
-        cursor: crosshair;
         background: white;
         min-height: 0;
+        width: 100%;
+        overflow: visible;
+        padding: 1.5rem;
+      }
+
+      .control-point {
+        cursor: grab;
+        transition: r 0.2s ease, filter 0.2s ease;
+      }
+
+      .control-point:hover {
+        filter: brightness(1.3) drop-shadow(0 0 4px rgba(0, 168, 255, 0.5));
+      }
+
+      .control-point:active {
+        cursor: grabbing;
+      }
+
+      .control-point-circle {
+        pointer-events: none;
+      }
+
+      .control-point-hit {
+        cursor: grab;
+      }
+
+      .control-point-hit:hover {
+        cursor: grab;
       }
 
       .output-section {
@@ -222,9 +249,37 @@
         <div class="canvas-wrapper">
           <small
                     style="margin-bottom: 8px; color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));">Draw
-            your easing curve on the
-            canvas</small>
-          <canvas id="easeCanvas"></canvas>
+            Ease Graph Generator</small>
+          <svg id="easeCanvas"
+                    style="width:100%;aspect-ratio:1;display:block;overflow:visible;position:relative;z-index:1"
+                    viewBox="0 0 330 330">
+            <!-- Grid -->
+            <g id="grid" opacity="0.1"></g>
+            <!-- Axes -->
+            <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 0,0 330,0"></polyline>
+            <!-- Control lines (tethers) -->
+            <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                      stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
+            <polyline id="control-2-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                      stroke-dasharray="4, 2" points="330,0 297,16.35"></polyline>
+            <!-- Cubic bezier curve -->
+            <path id="bezierCurve" d="M 0,330 C 33,198 297,16.35 330,0" fill="none"
+                      stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                      stroke-width="5" stroke-linecap="round"></path>
+            <!-- Control points -->
+            <!-- Hit areas for easier interaction (placed first for proper event handling) -->
+            <circle id="control-1-hit" class="control-point-hit" r="30" cx="33" cy="198" fill="transparent"
+                      style="touch-action:none;"></circle>
+            <circle id="control-2-hit" class="control-point-hit" r="30" cx="297" cy="16.35" fill="transparent"
+                      style="touch-action:none;"></circle>
+            <!-- Visible control point circles -->
+            <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
+                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                      style="touch-action:none;"></circle>
+            <circle id="control-2" class="control-point control-point-circle" r="12" cx="297" cy="16.35"
+                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                      style="touch-action:none;"></circle>
+          </svg>
         </div>
 
         <div class="output-section">
@@ -265,134 +320,95 @@
       {
         try
         {
-          vscode = acquireVsCodeApi()
+          vscode = acquireVsCodeApi();
         } catch ( error )
         {
-          vscode = {}
-
+          vscode = {};
         }
+      };
+      handleVscodeAssignment();
 
-      }
-      handleVscodeAssignment()
-
-      const canvas = document.getElementById( 'easeCanvas' );
-      const ctx = canvas.getContext( '2d' );
+      const svg = document.getElementById( 'easeCanvas' );
       const cssOutput = document.getElementById( 'cssOutput' );
       const copyBtn = document.getElementById( 'copyBtn' );
       const resetBtn = document.getElementById( 'resetBtn' );
       const pointList = document.getElementById( 'pointList' );
       const previewBox = document.getElementById( 'previewBox' );
-      // Default control points for cubic-bezier
-      let controlPoints = [ {
-        x: 0.25,
-        y: 0.9
-      }, // Point 1
-      {
-        x: 0.75,
-        y: 0.1
-      } // Point 2
+
+      // SVG viewBox dimensions (used for scaling)
+      const SVG_SIZE = 330;
+      const SVG_PADDING = 0;
+
+      // Default control points (normalized 0-1)
+      let controlPoints = [
+        { x: 0, y: 0.5 }, // Point 1
+        { x: 1, y: 0.5 }  // Point 2
       ];
+
       let isDrawing = false;
       let selectedPoint = -1;
-      const pointRadius = 8;
+      let dragOffset = { x: 0, y: 0 }; // Offset between click point and control point center
 
-      function resizeCanvas ()
+      // Convert normalized coordinates (0-1) to SVG coordinates
+      function normalizedToSvg ( x, y )
       {
-        const rect = canvas.parentElement.getBoundingClientRect();
-        const padding = 16; // Total padding from container
-        const newWidth = Math.max( rect.width - padding, 50 );
-        const newHeight = Math.max( rect.height - padding, 50 );
-
-        if ( canvas.width !== newWidth || canvas.height !== newHeight )
-        {
-          canvas.width = newWidth;
-          canvas.height = newHeight;
-        }
+        return {
+          x: x * SVG_SIZE,
+          y: SVG_SIZE - ( y * SVG_SIZE ) // Flip Y axis
+        };
       }
 
-      function drawCurve ()
+      // Convert SVG coordinates to normalized coordinates
+      function svgToNormalized ( svgX, svgY )
       {
-        ctx.clearRect( 0, 0, canvas.width, canvas.height );
-        ctx.strokeStyle = '#888';
-        ctx.fillStyle = 'rgba(100, 150, 200, 0.1)';
-        ctx.lineWidth = 0.5;
-        // Draw grid
-        for ( let i = 0; i <= 10; i++ )
-        {
-          const x = ( canvas.width / 10 ) * i;
-          const y = ( canvas.height / 10 ) * i;
-          ctx.fillRect( x - 0.5, y - 0.5, 1, 1 );
-        }
-        // Draw axes
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo( 0, canvas.height );
-        ctx.lineTo( canvas.width, canvas.height );
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo( 0, 0 );
-        ctx.lineTo( 0, canvas.height );
-        ctx.stroke();
-        // Draw cubic bezier curve
-        ctx.strokeStyle = '#00a8ff';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        const p0 = {
-          x: 0,
-          y: 0
+        return {
+          x: svgX / SVG_SIZE,
+          y: 1 - ( svgY / SVG_SIZE ) // Flip Y axis back
         };
-        const p3 = {
-          x: 1,
-          y: 1
-        };
+      }
+
+      // Generate cubic bezier path
+      function generateBezierPath ()
+      {
+        const p0 = { x: 0, y: 0 };  // Start at bottom-left
+        const p3 = { x: 1, y: 1 };  // End at top-right
         const p1 = controlPoints[ 0 ];
         const p2 = controlPoints[ 1 ];
-        ctx.moveTo( p0.x * canvas.width, canvas.height - p0.y * canvas.height );
-        for ( let t = 0; t <= 1; t += 0.01 )
-        {
-          const x = Math.pow( 1 - t, 3 ) * p0.x +
-            3 * Math.pow( 1 - t, 2 ) * t * p1.x +
-            3 * ( 1 - t ) * Math.pow( t, 2 ) * p2.x +
-            Math.pow( t, 3 ) * p3.x;
-          const y = Math.pow( 1 - t, 3 ) * p0.y +
-            3 * Math.pow( 1 - t, 2 ) * t * p1.y +
-            3 * ( 1 - t ) * Math.pow( t, 2 ) * p2.y +
-            Math.pow( t, 3 ) * p3.y;
-          ctx.lineTo( x * canvas.width, canvas.height - y * canvas.height );
-        }
-        ctx.stroke();
-        // Draw control lines
-        ctx.strokeStyle = '#888';
-        ctx.lineWidth = 1;
-        ctx.setLineDash( [ 5, 5 ] );
-        ctx.beginPath();
-        ctx.moveTo( 0, canvas.height );
-        ctx.lineTo( p1.x * canvas.width, canvas.height - p1.y * canvas.height );
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo( canvas.width, 0 );
-        ctx.lineTo( p2.x * canvas.width, canvas.height - p2.y * canvas.height );
-        ctx.stroke();
-        ctx.setLineDash( [] );
-        // Draw control points
-        controlPoints.forEach( ( point, index ) =>
-        {
-          ctx.fillStyle = selectedPoint === index ? '#ff6b6b' : '#00a8ff';
-          ctx.beginPath();
-          ctx.arc(
-            point.x * canvas.width,
-            canvas.height - point.y * canvas.height,
-            pointRadius,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-          // Draw outline
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        } );
+
+        const p0Svg = normalizedToSvg( p0.x, p0.y );
+        const p1Svg = normalizedToSvg( p1.x, p1.y );
+        const p2Svg = normalizedToSvg( p2.x, p2.y );
+        const p3Svg = normalizedToSvg( p3.x, p3.y );
+
+        return `M ${ p0Svg.x },${ p0Svg.y } C ${ p1Svg.x },${ p1Svg.y } ${ p2Svg.x },${ p2Svg.y } ${ p3Svg.x },${ p3Svg.y }`;
+      }
+
+      // Update SVG elements
+      function updateSvg ()
+      {
+        const p0Svg = normalizedToSvg( 0, 0 );  // Bottom-left
+        const p1Svg = normalizedToSvg( controlPoints[ 0 ].x, controlPoints[ 0 ].y );
+        const p2Svg = normalizedToSvg( controlPoints[ 1 ].x, controlPoints[ 1 ].y );
+        const p3Svg = normalizedToSvg( 1, 1 );  // Top-right
+
+        // Update bezier curve
+        document.getElementById( 'bezierCurve' ).setAttribute( 'd', generateBezierPath() );
+
+        // Update tether lines
+        document.getElementById( 'control-1-tether' ).setAttribute( 'points', `${ p0Svg.x },${ p0Svg.y } ${ p1Svg.x },${ p1Svg.y }` );
+        document.getElementById( 'control-2-tether' ).setAttribute( 'points', `${ p3Svg.x },${ p3Svg.y } ${ p2Svg.x },${ p2Svg.y }` );
+
+        // Update control points
+        document.getElementById( 'control-1' ).setAttribute( 'cx', p1Svg.x );
+        document.getElementById( 'control-1' ).setAttribute( 'cy', p1Svg.y );
+        document.getElementById( 'control-1-hit' ).setAttribute( 'cx', p1Svg.x );
+        document.getElementById( 'control-1-hit' ).setAttribute( 'cy', p1Svg.y );
+
+        document.getElementById( 'control-2' ).setAttribute( 'cx', p2Svg.x );
+        document.getElementById( 'control-2' ).setAttribute( 'cy', p2Svg.y );
+        document.getElementById( 'control-2-hit' ).setAttribute( 'cx', p2Svg.x );
+        document.getElementById( 'control-2-hit' ).setAttribute( 'cy', p2Svg.y );
+
         updateCSSOutput();
         updatePreview();
       }
@@ -427,58 +443,91 @@
         }, 10 );
       }
 
-      canvas.addEventListener( 'mousedown', ( e ) =>
+      // SVG event handling - Setup hit areas with improved interaction
+      function handleDragStart ( pointIndex )
       {
-        const rect = canvas.getBoundingClientRect();
-        const x = ( e.clientX - rect.left ) / rect.width;
-        const y = 1 - ( e.clientY - rect.top ) / rect.height;
-
-        // Check if clicking on a control point
-        for ( let i = 0; i < controlPoints.length; i++ )
+        return ( e ) =>
         {
-          const dx = ( controlPoints[ i ].x * rect.width ) / rect.width - x;
-          const dy = ( controlPoints[ i ].y * rect.height ) / rect.height - y;
-          const distance = Math.sqrt( dx * dx + dy * dy );
+          e.preventDefault();
 
-          if ( distance < pointRadius / Math.min( rect.width, rect.height ) )
+          // Calculate the offset between mouse position and point's current SVG position
+          const rect = svg.getBoundingClientRect();
+          let clientX = e.clientX;
+          let clientY = e.clientY;
+
+          if ( e.touches )
           {
-            selectedPoint = i;
-            isDrawing = true;
-            drawCurve();
-            return;
+            clientX = e.touches[ 0 ].clientX;
+            clientY = e.touches[ 0 ].clientY;
           }
-        }
-      } );
 
-      canvas.addEventListener( 'mousemove', ( e ) =>
+          const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
+          const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
+
+          const pointSvg = normalizedToSvg( controlPoints[ pointIndex ].x, controlPoints[ pointIndex ].y );
+
+          dragOffset.x = pointSvg.x - mouseX;
+          dragOffset.y = pointSvg.y - mouseY;
+
+          isDrawing = true;
+          selectedPoint = pointIndex;
+          svg.style.cursor = 'grabbing';
+        };
+      }
+
+      const control1Hit = document.getElementById( 'control-1-hit' );
+      const control2Hit = document.getElementById( 'control-2-hit' );
+
+      control1Hit.addEventListener( 'mousedown', handleDragStart( 0 ) );
+      control2Hit.addEventListener( 'mousedown', handleDragStart( 1 ) );
+
+      // Touch support
+      control1Hit.addEventListener( 'touchstart', handleDragStart( 0 ) );
+      control2Hit.addEventListener( 'touchstart', handleDragStart( 1 ) );
+
+      function handleDragMove ( e )
       {
         if ( !isDrawing || selectedPoint === -1 ) return;
 
-        const rect = canvas.getBoundingClientRect();
-        let x = ( e.clientX - rect.left ) / rect.width;
-        let y = 1 - ( e.clientY - rect.top ) / rect.height;
+        const rect = svg.getBoundingClientRect();
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+
+        // Handle touch events
+        if ( e.touches )
+        {
+          clientX = e.touches[ 0 ].clientX;
+          clientY = e.touches[ 0 ].clientY;
+        }
+
+        const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
+        const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
+
+        // Apply the offset so point stays under cursor relative to click position
+        const svgX = mouseX + dragOffset.x;
+        const svgY = mouseY + dragOffset.y;
+
+        let normalized = svgToNormalized( svgX, svgY );
 
         // Clamp values between 0 and 1
-        x = Math.max( 0, Math.min( 1, x ) );
-        y = Math.max( 0, Math.min( 1, y ) );
+        normalized.x = Math.max( 0, Math.min( 1, normalized.x ) );
+        normalized.y = Math.max( 0, Math.min( 1, normalized.y ) );
 
-        controlPoints[ selectedPoint ] = { x, y };
-        drawCurve();
-      } );
+        controlPoints[ selectedPoint ] = normalized;
+        updateSvg();
+      }
 
-      canvas.addEventListener( 'mouseup', () =>
+      function handleDragEnd ()
       {
         isDrawing = false;
         selectedPoint = -1;
-        drawCurve();
-      } );
+        svg.style.cursor = 'default';
+      }
 
-      canvas.addEventListener( 'mouseleave', () =>
-      {
-        isDrawing = false;
-        selectedPoint = -1;
-        drawCurve();
-      } );
+      document.addEventListener( 'mousemove', handleDragMove );
+      document.addEventListener( 'touchmove', handleDragMove );
+      document.addEventListener( 'mouseup', handleDragEnd );
+      document.addEventListener( 'touchend', handleDragEnd );
 
       copyBtn.addEventListener( 'click', () =>
       {
@@ -491,11 +540,11 @@
       resetBtn.addEventListener( 'click', () =>
       {
         controlPoints = [
-          { x: 0.25, y: 0.9 },
-          { x: 0.75, y: 0.1 }
+          { x: 0.1, y: 0.4 },
+          { x: 0.9, y: 0.95 }
         ];
         selectedPoint = -1;
-        drawCurve();
+        updateSvg();
       } );
 
       // Add animation for preview
@@ -508,23 +557,8 @@
       `;
       document.head.appendChild( style );
 
-      // Initial setup
-      window.addEventListener( 'resize', () =>
-      {
-        resizeCanvas();
-        drawCurve();
-      } );
-
-      // Use ResizeObserver to handle sidebar resize
-      const resizeObserver = new ResizeObserver( () =>
-      {
-        resizeCanvas();
-        drawCurve();
-      } );
-      resizeObserver.observe( canvas.parentElement );
-
-      resizeCanvas();
-      drawCurve();
+      // Initial SVG update
+      updateSvg();
     </script>
   </body>
 

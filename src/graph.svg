@@ -1,0 +1,29 @@
+<svg style="width:100%;aspect-ratio:1;display:block;overflow:visible;position:relative;z-index:1" viewBox="0 0 330 330">
+  <polyline fill="none" stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))"
+            stroke-width="1" points="0,0 0,330 330,330"></polyline>
+  <path d="M 0,330 C 0,81.18 330,138.60000000000002 330,0" fill="none"
+            stroke="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))" stroke-width="5"
+            stroke-linecap="round"></path>
+  <polyline id="control-1-tether" fill="none"
+            stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))" stroke-width="2"
+            stroke-dasharray="4, 2" points="0,330 0,81.18"></polyline>
+  <polyline id="control-2-tether" fill="none"
+            stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))" stroke-width="2"
+            stroke-dasharray="4, 2" points="330,0 330,138.60000000000002"></polyline>
+  <circle id="reset-control-1" class="reset-control-point" r="7" cx="0" cy="330"
+            fill="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))"
+            style="opacity:0.3;touch-action:none"></circle>
+  <circle id="reset-control-2" class="reset-control-point" cx="330" cy="0" r="7"
+            fill="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))"
+            style="opacity:0.3;touch-action:none"></circle>
+  <circle id="control-1" class="control-point" r="7"
+            fill="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))" cx="0" cy="81.18"
+            style="touch-action:none"></circle>
+  <circle id="control-2" class="control-point" r="7"
+            fill="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))" cx="330" cy="138.60000000000002"
+            style="touch-action:none"></circle>
+  <circle id="control-1" class="control-point" r="40" fill="transparent" cx="0" cy="81.18"
+            style="touch-action: none; cursor: grab;"></circle>
+  <circle id="control-2" class="control-point" r="40" fill="transparent" cx="330" cy="138.60000000000002"
+            style="touch-action: none; cursor: grab;"></circle>
+</svg>
