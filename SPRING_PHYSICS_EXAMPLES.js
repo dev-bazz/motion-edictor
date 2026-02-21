@@ -1,0 +1,148 @@
+"use strict";
+/**
+ * Spring Physics Examples
+ *
+ * This file demonstrates how to use the spring physics engine
+ * in your own projects.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnimatedButton = void 0;
+const spring_physics_1 = require("./spring-physics");
+// ============================================
+// Example 1: Using Spring Presets
+// ============================================
+console.log("=== Example 1: Spring Presets ===");
+const preset = spring_physics_1.SPRING_PRESETS.snappy;
+const duration = 1;
+const easing = (0, spring_physics_1.generateLinearEasing)(preset, duration);
+const cssCode = (0, spring_physics_1.generateCSSCode)(preset, duration);
+console.log("Snappy Spring CSS:", cssCode);
+// ============================================
+// Example 2: Custom Spring Configuration
+// ============================================
+console.log("\n=== Example 2: Custom Configuration ===");
+const customConfig = {
+    stiffness: 250, // Very tight spring
+    damping: 18, // Less damping = more bounce
+    mass: 0.8, // Light mass = snappier feel
+};
+const customCss = (0, spring_physics_1.generateCSSCode)(customConfig, 0.8);
+console.log("Custom Spring CSS:", customCss);
+// ============================================
+// Example 3: Analyzing Spring Behavior
+// ============================================
+console.log("\n=== Example 3: Spring Analysis ===");
+const analysis = (0, spring_physics_1.analyzeSpring)(customConfig, 0.8);
+console.log("Damping Type:", analysis.dampingType);
+console.log("Oscillations:", analysis.oscillations);
+console.log("Settling Time:", analysis.settlingTime.toFixed(2), "seconds");
+console.log("Max Overshoot:", analysis.maxOvershoot.toFixed(2), "%");
+console.log("Description:", analysis.description);
+// ============================================
+// Example 4: Getting Frame-by-Frame Data
+// ============================================
+console.log("\n=== Example 4: Frame Data ===");
+const frames = (0, spring_physics_1.generateSpringFrames)(spring_physics_1.SPRING_PRESETS.standard, 1, 20);
+console.table(frames);
+// ============================================
+// Example 5: Generating SVG Visualization
+// ============================================
+console.log("\n=== Example 5: SVG Path Data ===");
+const svgPath = (0, spring_physics_1.generateSpringCurvePathData)(spring_physics_1.SPRING_PRESETS.bouncy, 1, 500, // SVG width
+300);
+console.log("SVG Path (first 100 chars):", svgPath.substring(0, 100) + "...");
+// ============================================
+// Example 6: Creating Animation Keyframes
+// ============================================
+console.log("\n=== Example 6: Animation Keyframes ===");
+function generateCSSKeyframes(name, config, duration) {
+    const frames = (0, spring_physics_1.generateSpringFrames)(config, duration, 25);
+    let keyframes = `@keyframes ${name} {\n`;
+    frames.forEach((frame) => {
+        const percent = (frame.time * 100).toFixed(0);
+        const translateX = (frame.value * 100).toFixed(1);
+        keyframes += `  ${percent}% { transform: translateX(${translateX}%); }\n`;
+    });
+    keyframes += "}\n";
+    return keyframes;
+}
+const keyframesCss = generateCSSKeyframes("slideIn", spring_physics_1.SPRING_PRESETS.gentle, 0.8);
+console.log("Generated Keyframes:\n" + keyframesCss);
+// ============================================
+// Example 7: Real-world Use Case - Button Click Animation
+// ============================================
+console.log("\n=== Example 7: Button Click Animation ===");
+class AnimatedButton {
+    config = {
+        stiffness: 200,
+        damping: 20,
+        mass: 0.9,
+    };
+    getScaleAnimation() {
+        // Quick scale animation on click
+        return (0, spring_physics_1.generateCSSCode)(this.config, 0.4);
+    }
+    generateCSSRule() {
+        const easing = (0, spring_physics_1.generateLinearEasing)(this.config, 0.4);
+        return `
+      .button:active {
+        animation: buttonClick 400ms linear(${easing}) forwards;
+      }
+
+      @keyframes buttonClick {
+        from { transform: scale(1); }
+        to { transform: scale(0.95); }
+      }
+    `;
+    }
+}
+exports.AnimatedButton = AnimatedButton;
+const button = new AnimatedButton();
+console.log("Button CSS:", button.generateCSSRule());
+// ============================================
+// Example 8: Comparing Different Configs
+// ============================================
+console.log("\n=== Example 8: Configuration Comparison ===");
+const configs = [
+    { name: "Gentle", config: spring_physics_1.SPRING_PRESETS.gentle },
+    { name: "Standard", config: spring_physics_1.SPRING_PRESETS.standard },
+    { name: "Snappy", config: spring_physics_1.SPRING_PRESETS.snappy },
+    { name: "Bouncy", config: spring_physics_1.SPRING_PRESETS.bouncy },
+];
+console.table(configs.map(({ name, config }) => {
+    const analysis = (0, spring_physics_1.analyzeSpring)(config, 1);
+    return {
+        name,
+        stiffness: config.stiffness,
+        damping: config.damping,
+        dampingType: analysis.dampingType,
+        overshoot: analysis.maxOvershoot.toFixed(1) + "%",
+        settlingTime: analysis.settlingTime.toFixed(2) + "s",
+    };
+}));
+// ============================================
+// Example 9: Single Point Calculation
+// ============================================
+console.log("\n=== Example 9: Calculate Value at Specific Time ===");
+const value = (0, spring_physics_1.calculateSpringValue)(0.5, // At 50% of animation
+spring_physics_1.SPRING_PRESETS.standard.stiffness, spring_physics_1.SPRING_PRESETS.standard.damping, spring_physics_1.SPRING_PRESETS.standard.mass, 1);
+console.log("Spring value at t=0.5s:", value.toFixed(4));
+// ============================================
+// Example 10: Creating Multiple Spring Animations
+// ============================================
+console.log("\n=== Example 10: Staggered Animations ===");
+const items = ["item-1", "item-2", "item-3"];
+const staggerDelay = 0.1; // 100ms between each
+let staggeredCSS = "";
+items.forEach((item, index) => {
+    const delay = index * staggerDelay;
+    const animation = (0, spring_physics_1.generateCSSCode)(spring_physics_1.SPRING_PRESETS.gentle, 0.6);
+    staggeredCSS += `
+    .${item} {
+      ${animation.replace("animation:", "animation:")}
+      animation-delay: ${delay}s;
+    }
+  `;
+});
+console.log("Staggered Animation CSS:", staggeredCSS);
+//# sourceMappingURL=SPRING_PHYSICS_EXAMPLES.js.map

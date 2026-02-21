@@ -1,9 +1,10 @@
 # CSS Ease Generator
 
-A VS Code extension that helps you generate CSS easing (cubic-bezier) values from an interactive motion editor graph. Visually design your easing curves and instantly get the CSS code.
+A VS Code extension that helps you generate CSS easing values from interactive motion editor graphs. Choose between traditional **cubic-bezier curves** or professional **spring physics animations**.
 
-## Features
+## ✨ Features
 
+### Cubic-Bezier Editor
 - **Interactive Canvas Editor**: Draw and edit easing curves on a canvas
 - **Control Points**: Drag control points to adjust your easing curve
 - **Live Preview**: See a preview animation using your easing function
@@ -11,7 +12,20 @@ A VS Code extension that helps you generate CSS easing (cubic-bezier) values fro
 - **Copy to Clipboard**: One-click copy functionality for generated values
 - **Reset Curve**: Quickly reset to default easing values
 
-## Usage
+### 🎯 Spring Physics Engine (NEW!)
+- **Professional Spring Physics**: Industry-standard damped harmonic oscillator model
+- **Three Core Parameters**:
+  - **Stiffness** (50-500): Control spring tightness
+  - **Damping** (5-100): Control bounce and oscillation
+  - **Mass** (0.1-5): Control momentum and inertia
+- **Spring Presets**: Ready-made configurations (Gentle, Standard, Snappy, Bouncy, Molasses, Springy)
+- **Real-time Visualization**: See your spring curve update instantly
+- **CSS linear() Easing**: Generate modern CSS animations with precise keyframes
+- **Spring Analysis**: Understand damping type, oscillations, settling time, and overshoot
+
+## 📖 Usage
+
+### Cubic-Bezier Mode
 
 1. Open the Command Palette (`Cmd+Shift+P` on Mac, `Ctrl+Shift+P` on Windows/Linux)
 2. Search for "Open CSS Ease Generator"
@@ -20,18 +34,91 @@ A VS Code extension that helps you generate CSS easing (cubic-bezier) values fro
 5. See the CSS output and preview animation on the right side
 6. Click "Copy to Clipboard" to copy the cubic-bezier value
 
-## How It Works
+### Spring Physics Mode
 
+1. Open the CSS Ease Generator
+2. Click the **Spring Editor** tab (or use the editor switcher)
+3. Adjust the three sliders:
+   - **Duration**: Total animation time
+   - **Stiffness**: Higher = tighter, more responsive spring
+   - **Damping**: Higher = less bounce, smoother settling
+   - **Mass**: Control momentum and acceleration
+4. Watch the real-time preview of your spring animation
+5. Copy the generated `linear()` easing function to your CSS
+6. Use the preset buttons for quick configuration changes
+
+## 🎨 Spring Physics Presets
+
+| Preset | Feel | Best For |
+|--------|------|----------|
+| **Gentle** | Soft, slow | UI entrance animations |
+| **Standard** | Balanced, natural | General purpose animations |
+| **Snappy** | Quick, responsive | Interactive elements |
+| **Bouncy** | Playful, lively | Attention-grabbing effects |
+| **Molasses** | Smooth, elegant | Smooth transitions |
+| **Springy** | Modern, dynamic | Drag-and-drop animations |
+
+## 🔧 How It Works
+
+### Cubic-Bezier Mode
 The extension uses cubic-bezier curves with two control points (P1 and P2). The curve starts at (0, 0) and ends at (1, 1).
 
 - **Control Points**: Drag these points to shape your easing curve
 - **Grid**: The grid helps you position points precisely
-- **Preview**: The animated box on the right shows how your easing affects motion
+- **Preview**: The animated box shows how your easing affects motion
 - **CSS Output**: The cubic-bezier function is updated in real-time
+
+### Spring Physics Mode
+Uses the **damped harmonic oscillator** physics model:
+
+```
+x(t) = 1 - e^(-ζω₀t)[cos(ωdt) + (ζω₀/ωd)sin(ωdt)]
+```
+
+Where:
+- **ω₀** = √(k/m) — Natural frequency
+- **ζ** = c/(2√(km)) — Damping ratio
+- **ωd** = ω₀√(1-ζ²) — Damped frequency
+
+This is the same physics engine used by React Spring, Framer Motion, and Anime.js!
+
+## 📚 Documentation
+
+For detailed information about spring physics:
+- **[SPRING_PHYSICS_GUIDE.md](./SPRING_PHYSICS_GUIDE.md)** - Complete spring physics reference
+- **[SPRING_PHYSICS_EXAMPLES.ts](./SPRING_PHYSICS_EXAMPLES.ts)** - Code examples and use cases
+
+## 🚀 Programmatic Usage
+
+You can import the spring physics engine directly in your TypeScript/JavaScript projects:
+
+```typescript
+import {
+  calculateSpringValue,
+  generateLinearEasing,
+  generateCSSCode,
+  SPRING_PRESETS,
+  analyzeSpring
+} from './spring-physics';
+
+// Use a preset
+const config = SPRING_PRESETS.snappy;
+const duration = 1.5; // seconds
+
+// Generate CSS code
+const css = generateCSSCode(config, duration);
+
+// Analyze spring behavior
+const analysis = analyzeSpring(config, duration);
+console.log(analysis.description);
+```
+
+See **SPRING_PHYSICS_EXAMPLES.ts** for more examples!
 
 ## Requirements
 
 - VS Code 1.109.0 or higher
+- Modern browser with support for CSS `linear()` easing functions
 
 ## Development
 
@@ -39,15 +126,25 @@ To run and test this extension:
 
 1. `npm install` - Install dependencies
 2. `npm run compile` - Compile TypeScript
-3. Press `F5` in VS Code to launch the extension in debug mode
-4. Open the Command Palette and search for "Open CSS Ease Generator"
+3. `npm run watch` - Watch for file changes and recompile
+4. Press `F5` in VS Code to launch the extension in debug mode
+5. Open the Command Palette and search for "Open CSS Ease Generator"
 
 ## Release Notes
 
-### 0.0.1
+### 0.0.2
+- 🎉 Added professional spring physics engine
+- 🎯 Three independent parameter controls (Stiffness, Damping, Mass)
+- 📊 Real-time spring curve visualization
+- 🔧 Spring preset configurations
+- 📚 Comprehensive spring physics documentation
+- ✨ TypeScript spring physics module for programmatic use
 
+### 0.0.1
 - Initial release
 - Interactive easing curve editor with canvas
+- Cubic-bezier value generation
+
 - CSS cubic-bezier value generation
 - Copy to clipboard functionality
 - Live preview animation
