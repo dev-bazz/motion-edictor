@@ -834,7 +834,6 @@
       <div class="header">
         <h1>CSS Ease Generator</h1>
         <div class="controls">
-          <button id="resetBtn">Reset Curve</button>
         </div>
       </div>
 
@@ -1113,7 +1112,6 @@
       const svg = document.getElementById( 'easeCanvas' );
       const cssOutput = document.getElementById( 'cssOutput' );
       const copyBtn = document.getElementById( 'copyBtn' );
-      const resetBtn = document.getElementById( 'resetBtn' );
       const pointList = document.getElementById( 'pointList' );
       const previewBox = document.getElementById( 'previewBox' );
       const durationSlider = document.getElementById( 'durationSlider' );
@@ -1385,19 +1383,6 @@
         {
           copyBtn.textContent = originalText;
         }, 1500 );
-      } );
-
-      resetBtn.addEventListener( 'click', () =>
-      {
-        duration = 1;
-        durationSlider.value = 1;
-        durationValue.textContent = '1s';
-        controlPoints = [
-          { x: 0, y: 0.5 }, // Point 1
-          { x: 1, y: 0.5 }  // Point 2
-        ];
-        selectedPoint = -1;
-        updateSvg();
       } );
 
       // Add animation for preview
