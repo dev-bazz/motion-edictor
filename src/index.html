@@ -328,6 +328,30 @@
         letter-spacing: 0.5px;
       }
 
+      .spring-tips {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px;
+        font-size: 9px;
+        line-height: 1.4;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        margin-top: 8px;
+      }
+
+      .spring-tips strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .spring-tips ul {
+        margin: 4px 0 0 16px;
+        padding: 0;
+      }
+
+      .spring-tips li {
+        margin: 2px 0;
+      }
+
       .damping-badge.underdamped {
         background: rgba(255, 100, 100, 0.3);
         color: #ff6464;
@@ -695,6 +719,18 @@
         /* user-select: none; */
       }
 
+      .spring-guide-text {
+        font-size: 11px;
+        opacity: 0.4;
+        fill: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        pointer-events: none;
+        font-weight: 500;
+      }
+
+      .spring-canvas-wrapper {
+        position: relative;
+      }
+
       .control-point-tooltip {
         position: absolute;
         background: rgba(0, 0, 0, 0.9);
@@ -916,15 +952,53 @@
         </div>
 
         <div id="springEditor" class="editor-content">
-          <div class="canvas-wrapper">
+          <div class="canvas-wrapper spring-canvas-wrapper">
 
             <svg id="springCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
-              <path d="M184 0 L184 300" fill="transparent"
-                        stroke="var(--token-f4968045-2b87-4693-9aa2-cfd330b580b3, rgba(255, 255, 255, 0.1))"
-                        stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              <!-- Grid background -->
+              <defs>
+                <pattern id="springGridPattern" x="50" y="30" width="50" height="30" patternUnits="userSpaceOnUse">
+                  <line x1="0" y1="0" x2="0" y2="300" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                            stroke-width="0.5" opacity="0.1" />
+                  <line x1="0" y1="0" x2="500" y2="0" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                            stroke-width="0.5" opacity="0.1" />
+                </pattern>
+              </defs>
+
+              <!-- Grid fill -->
+              <rect width="500" height="300" fill="url(#springGridPattern)" />
+
+              <!-- Reference lines (0 and 1 output values) -->
+              <line x1="0" y1="270" x2="500" y2="270" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="2" opacity="0.15" />
+              <line x1="0" y1="30" x2="500" y2="30" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="2" opacity="0.15" />
+
+              <!-- Center line (0.5 reference) -->
+              <line x1="0" y1="150" x2="500" y2="150" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="1" opacity="0.08" stroke-dasharray="4,4" />
+
+              <!-- Axis labels -->
+              <g class="spring-guide-text">
+                <text x="5" y="25" text-anchor="start" font-size="11">1.0</text>
+                <text x="5" y="285" text-anchor="start" font-size="11">0.0</text>
+                <text x="490" y="285" text-anchor="end" font-size="11">t=1</text>
+              </g>
+
+              <!-- Time marker line (settlement indicator) -->
+              <path id="settlementLine" d="M250 0 L250 300" fill="transparent"
+                        stroke="var(--vscode-input-border, var(--fallback-input-border))" stroke-width="2" opacity="0.2"
+                        stroke-dasharray="6,4"></path>
+
+              <!-- Spring curve path -->
               <path id="springPath" d="M0 150L1 150L2 150" fill="transparent"
-                        stroke="var(--token-65b54c24-8db9-454b-9fc2-5de614e025ca, rgb(255, 43, 110))" stroke-width="7"
-                        stroke-linecap="round" stroke-linejoin="round"></path>
+                        stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+
+              <!-- Overshoot highlight area -->
+              <path id="overshootArea" d=""
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        opacity="0.05" />
             </svg>
           </div>
           <div class="output-section">
@@ -1004,6 +1078,15 @@
                 <span class="analysis-label">Max Overshoot:</span>
                 <span class="analysis-value" id="overshotValue">8.0%</span>
               </div>
+            </div>
+
+            <div class="spring-tips">
+              <strong>💡 Spring Tips:</strong>
+              <ul>
+                <li><strong>Stiffness ↑</strong> = faster response</li>
+                <li><strong>Damping ↑</strong> = less bounce</li>
+                <li><strong>Mass ↑</strong> = slower settling</li>
+              </ul>
             </div>
 
             <h3 style="margin-top: 15px;">CSS Output</h3>
@@ -1465,41 +1548,64 @@
         const values = [];
         const timeStep = 0.005; // 200 samples per unit time for smoother curves
 
-        // First pass: collect all values
+        // First pass: collect all values to find max overshoot
         for ( let t = 0; t <= 1; t += timeStep )
         {
           const value = generateSpringValue( t, stiffness, damping, mass, duration );
           values.push( value );
         }
 
-        // Find min and max values for scaling
-        const minValue = Math.min( ...values );
-        const maxValue = Math.max( ...values );
+        // Fixed grid system for better visual consistency
+        // Y-axis: 270px = 0, 30px = 1 (240px range)
+        const yMin = 270; // 0 value
+        const yMax = 30;  // 1 value
+        const yRange = yMin - yMax; // 240px
 
-        // Determine scale based on actual oscillation range
-        const range = maxValue - minValue;
-        const topPadding = 20; // pixels
-        const bottomPadding = 50; // pixels
-        const canvasHeight = 300 - topPadding - bottomPadding;
+        // X-axis: 0 to 500px represents time 0 to 1
+        const xRange = 500;
 
-        // Scale factor to fit all oscillations in canvas
-        const scale = range > 0 ? canvasHeight / range : canvasHeight;
-
-        // Reference points for scaling
-        const minY = topPadding;
-        const maxY = 300 - bottomPadding;
-
-        // Second pass: create path with proper scaling
+        // Create path points using fixed coordinate system
         for ( let i = 0; i < values.length; i++ )
         {
           const t = i * timeStep;
-          const value = values[ i ];
-          const x = t * 500;
-
-          // Map value to canvas coordinates
-          const svgY = maxY - ( ( value - minValue ) * scale );
-          points.push( `${ x } ${ svgY }` );
+          const value = Math.max( -0.5, Math.min( 2, values[ i ] ) ); // Clamp to prevent extreme overshoot from misscaling
+          const x = t * xRange;
+          const y = yMin - ( value * yRange );
+          points.push( `${ x.toFixed( 2 ) } ${ y.toFixed( 2 ) }` );
         }
+
+        // Calculate overshoot visualization
+        const maxValue = Math.max( ...values );
+        const overshootPercentage = Math.max( 0, ( maxValue - 1 ) * 100 );
+
+        if ( overshootPercentage > 0.5 )
+        {
+          // Draw overshoot area overlay
+          const overshootY = yMin - ( 1 * yRange );
+          const overshootPeakY = yMin - ( maxValue * yRange );
+          const overshootPath = `M0 ${ overshootY } L${ xRange } ${ overshootY } L${ xRange } ${ overshootPeakY } L0 ${ overshootPeakY } Z`;
+          document.getElementById( 'overshootArea' ).setAttribute( 'd', overshootPath );
+        } else
+        {
+          document.getElementById( 'overshootArea' ).setAttribute( 'd', '' );
+        }
+
+        // Update settlement indicator line
+        // Calculate approximate settling time (2% threshold)
+        const settlingThreshold = 0.02;
+        const settlingDuration = duration;
+        let settlingTimeNorm = 1;
+        for ( let t = 0; t <= 1; t += 0.01 )
+        {
+          const value = generateSpringValue( t, stiffness, damping, mass, duration );
+          if ( Math.abs( value - 1 ) < settlingThreshold )
+          {
+            settlingTimeNorm = t;
+            break;
+          }
+        }
+        const settlementX = settlingTimeNorm * xRange;
+        document.getElementById( 'settlementLine' ).setAttribute( 'd', `M${ settlementX } 0 L${ settlementX } 300` );
 
         return `M${ points.join( 'L' ) }`;
       }
@@ -1623,20 +1729,30 @@
         const omega0 = Math.sqrt( stiffness / mass );
         const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
 
-        let dampingType = 'underdamped';
+        let dampingType = 'Underdamped';
         let dampingClass = 'underdamped';
+        let dampingDescription = 'Bouncy motion with oscillations';
+
         if ( dampingRatio >= 1 )
+        {
+          dampingType = 'Overdamped';
+          dampingClass = 'critical';
+          dampingDescription = 'Smooth, slow, no bounce';
+        } else if ( dampingRatio >= 0.95 )
         {
           dampingType = 'Critically Damped';
           dampingClass = 'critical';
-        } else if ( dampingRatio > 0.8 )
+          dampingDescription = 'Fastest smooth motion';
+        } else if ( dampingRatio >= 0.65 )
         {
           dampingType = 'Underdamped';
           dampingClass = 'underdamped';
+          dampingDescription = 'Smooth with subtle bounce';
         } else
         {
-          dampingType = dampingRatio > 0.5 ? 'Underdamped' : 'Oscillating';
+          dampingType = 'Oscillating';
           dampingClass = 'underdamped';
+          dampingDescription = 'Lively, noticeable bounce';
         }
 
         // Count oscillations
@@ -1666,11 +1782,35 @@
         }
 
         // Update UI
-        document.querySelector( '.damping-badge' ).className = `damping-badge ${ dampingClass }`;
-        document.querySelector( '.damping-badge' ).textContent = dampingType.toUpperCase();
-        document.getElementById( 'oscillationsValue' ).textContent = oscillations;
-        document.getElementById( 'settlingTimeValue' ).textContent = `${ settlingTime.toFixed( 2 ) }s`;
-        document.getElementById( 'overshotValue' ).textContent = `${ maxOvershoot.toFixed( 1 ) }%`;
+        const badgeEl = document.querySelector( '.damping-badge' );
+        if ( badgeEl )
+        {
+          badgeEl.className = `damping-badge ${ dampingClass }`;
+          badgeEl.textContent = dampingType.toUpperCase();
+          badgeEl.title = dampingDescription;
+        }
+
+        const oscEl = document.getElementById( 'oscillationsValue' );
+        if ( oscEl )
+        {
+          oscEl.textContent = oscillations;
+          oscEl.title = `Would complete ${ oscillations } full cycles`;
+        }
+
+        const settleEl = document.getElementById( 'settlingTimeValue' );
+        if ( settleEl )
+        {
+          settleEl.textContent = `${ settlingTime.toFixed( 2 ) }s`;
+          settleEl.title = 'Time to reach 99% of target value';
+        }
+
+        const overshootEl = document.getElementById( 'overshotValue' );
+        if ( overshootEl )
+        {
+          overshootEl.textContent = `${ maxOvershoot.toFixed( 1 ) }%`;
+          overshootEl.title = `Maximum value overshoots target by this amount`;
+          overshootEl.style.color = maxOvershoot > 20 ? '#ff6b6b' : maxOvershoot > 10 ? '#ffa500' : 'inherit';
+        }
       }
 
       // Apply spring preset
