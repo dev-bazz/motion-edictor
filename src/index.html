@@ -571,7 +571,8 @@
       const control1 = document.getElementById( 'control-1' );
       const control2 = document.getElementById( 'control-2' );
 
-      let pendingDragUpdate = null;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
 
       function handleDragStart ( pointIndex, hitElement, pointElement )
       {
@@ -579,18 +580,11 @@
         {
           e.preventDefault();
 
-          // Calculate the offset between mouse position and point's current SVG position
-          const rect = svg.getBoundingClientRect();
-          let clientX = e.clientX || e.touches?.[ 0 ].clientX;
-          let clientY = e.clientY || e.touches?.[ 0 ].clientY;
+          const clientX = e.clientX !== undefined ? e.clientX : e.touches[ 0 ].clientX;
+          const clientY = e.clientY !== undefined ? e.clientY : e.touches[ 0 ].clientY;
 
-          const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
-          const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
-
-          const pointSvg = normalizedToSvg( controlPoints[ pointIndex ].x, controlPoints[ pointIndex ].y );
-
-          dragOffset.x = pointSvg.x - mouseX;
-          dragOffset.y = pointSvg.y - mouseY;
+          lastMouseX = clientX;
+          lastMouseY = clientY;
 
           isDrawing = true;
           selectedPoint = pointIndex;
@@ -600,63 +594,49 @@
         };
       }
 
-      function performDragUpdate ( mouseX, mouseY )
-      {
-        if ( !isDrawing || selectedPoint === -1 ) return;
-
-        const svgX = mouseX + dragOffset.x;
-        const svgY = mouseY + dragOffset.y;
-
-        let normalized = svgToNormalized( svgX, svgY );
-
-        // Clamp values between 0 and 1
-        normalized.x = Math.max( 0, Math.min( 1, normalized.x ) );
-        normalized.y = Math.max( 0, Math.min( 1, normalized.y ) );
-
-        // Only update if values actually changed
-        if ( controlPoints[ selectedPoint ].x !== normalized.x || controlPoints[ selectedPoint ].y !== normalized.y )
-        {
-          controlPoints[ selectedPoint ] = normalized;
-          updateSvg();
-        }
-      }
-
       function handleDragMove ( e )
       {
         if ( !isDrawing || selectedPoint === -1 ) return;
 
-        e.preventDefault();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[ 0 ]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[ 0 ]?.clientY;
+
+        if ( clientX === undefined || clientY === undefined ) return;
 
         const rect = svg.getBoundingClientRect();
-        let clientX = e.clientX || e.touches?.[ 0 ].clientX;
-        let clientY = e.clientY || e.touches?.[ 0 ].clientY;
 
-        const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
-        const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
+        // Calculate delta in screen pixels
+        const deltaX = clientX - lastMouseX;
+        const deltaY = clientY - lastMouseY;
 
-        // Cancel previous pending update and schedule new one
-        if ( pendingDragUpdate )
-        {
-          cancelAnimationFrame( pendingDragUpdate );
-        }
+        lastMouseX = clientX;
+        lastMouseY = clientY;
 
-        // Use requestAnimationFrame for smooth, performant updates
-        pendingDragUpdate = requestAnimationFrame( () =>
-        {
-          performDragUpdate( mouseX, mouseY );
-          pendingDragUpdate = null;
-        } );
+        // Convert delta to SVG coordinates
+        const deltaSvgX = ( deltaX / rect.width ) * SVG_SIZE;
+        const deltaSvgY = ( deltaY / rect.height ) * SVG_SIZE;
+
+        // Convert SVG delta to normalized delta
+        const deltaNormalizedX = deltaSvgX / SVG_SIZE;
+        const deltaNormalizedY = -deltaSvgY / SVG_SIZE; // Flip Y axis
+
+        // Apply delta to current position
+        let newX = controlPoints[ selectedPoint ].x + deltaNormalizedX;
+        let newY = controlPoints[ selectedPoint ].y + deltaNormalizedY;
+
+        // Clamp values between 0 and 1
+        newX = Math.max( 0, Math.min( 1, newX ) );
+        newY = Math.max( 0, Math.min( 1, newY ) );
+
+        controlPoints[ selectedPoint ].x = newX;
+        controlPoints[ selectedPoint ].y = newY;
+
+        updateSvg();
       }
 
       function handleDragEnd ( e )
       {
         if ( !isDrawing ) return;
-
-        if ( pendingDragUpdate )
-        {
-          cancelAnimationFrame( pendingDragUpdate );
-          pendingDragUpdate = null;
-        }
 
         const hitElement = selectedPoint === 0 ? control1Hit : control2Hit;
         const pointElement = selectedPoint === 0 ? control1 : control2;
@@ -668,21 +648,23 @@
         pointElement.style.filter = '';
       }
 
-      control1Hit.addEventListener( 'mousedown', handleDragStart( 0, control1Hit, control1 ), { passive: false } );
-      control2Hit.addEventListener( 'mousedown', handleDragStart( 1, control2Hit, control2 ), { passive: false } );
+      // Use pointer events for best performance
+      control1Hit.addEventListener( 'pointerdown', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'pointerdown', handleDragStart( 1, control2Hit, control2 ) );
 
-      // Touch support
-      control1Hit.addEventListener( 'touchstart', handleDragStart( 0, control1Hit, control1 ), { passive: false } );
-      control2Hit.addEventListener( 'touchstart', handleDragStart( 1, control2Hit, control2 ), { passive: false } );
+      // Fallback events
+      control1Hit.addEventListener( 'mousedown', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'mousedown', handleDragStart( 1, control2Hit, control2 ) );
+      control1Hit.addEventListener( 'touchstart', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'touchstart', handleDragStart( 1, control2Hit, control2 ) );
 
-      // Use pointer events for better performance on modern browsers
-      document.addEventListener( 'pointermove', handleDragMove, { passive: false } );
-      document.addEventListener( 'pointerup', handleDragEnd );
-      // Fallback for older browsers
-      document.addEventListener( 'mousemove', handleDragMove, { passive: false } );
-      document.addEventListener( 'touchmove', handleDragMove, { passive: false } );
-      document.addEventListener( 'mouseup', handleDragEnd );
-      document.addEventListener( 'touchend', handleDragEnd );
+      // Global move/end events with passive false for preventDefault
+      document.addEventListener( 'pointermove', handleDragMove, false );
+      document.addEventListener( 'pointerup', handleDragEnd, false );
+      document.addEventListener( 'mousemove', handleDragMove, false );
+      document.addEventListener( 'mouseup', handleDragEnd, false );
+      document.addEventListener( 'touchmove', handleDragMove, false );
+      document.addEventListener( 'touchend', handleDragEnd, false );
 
       // Duration slider event listener
       durationSlider.addEventListener( 'input', ( e ) =>
