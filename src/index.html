@@ -234,6 +234,37 @@
         font-size: 10px;
       }
 
+      #preview {
+        position: relative;
+      }
+
+      .preview-updating::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 8px;
+        height: 8px;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        border-radius: 50%;
+        animation: updatePulse 0.6s ease-in-out forwards;
+        opacity: 0;
+        transition: all .4s ease;
+
+      }
+
+      @keyframes updatePulse {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        100% {
+          opacity: 0;
+          transform: scale(1.5);
+        }
+      }
+
       /* Mobile/Sidebar responsive styles */
       @media (max-width: 500px) {
         .container {
@@ -392,6 +423,38 @@
       let isDrawing = false;
       let selectedPoint = -1;
       let dragOffset = { x: 0, y: 0 }; // Offset between click point and control point center
+      let previewUpdateTimeout; // Track debounce timeout
+
+      // Debounce utility function
+      function debounce ( func, delay )
+      {
+        let timeoutId;
+        return function ( ...args )
+        {
+          clearTimeout( timeoutId );
+          timeoutId = setTimeout( () =>
+          {
+            func.apply( this, args );
+          }, delay );
+        };
+      }
+
+      // Show UI indicator pulse
+      function showUpdateIndicator ()
+      {
+        const preview = document.getElementById( 'preview' );
+        preview.classList.remove( 'preview-updating' );
+        // Trigger reflow to restart animation
+        void preview.offsetWidth;
+        preview.classList.add( 'preview-updating' );
+      }
+
+      // Debounced preview update (400ms)
+      const debouncedPreviewUpdate = debounce( () =>
+      {
+        updatePreview();
+        showUpdateIndicator();
+      }, 400 );
 
       // Convert normalized coordinates (0-1) to SVG coordinates
       function normalizedToSvg ( x, y )
@@ -454,7 +517,7 @@
         document.getElementById( 'control-2-hit' ).setAttribute( 'cy', p2Svg.y );
 
         updateCSSOutput();
-        updatePreview();
+        debouncedPreviewUpdate();
       }
 
       function updateCSSOutput ()
@@ -579,7 +642,7 @@
         duration = parseFloat( e.target.value );
         durationValue.textContent = `${ duration.toFixed( 1 ) }s`;
         updateCSSOutput();
-        updatePreview();
+        debouncedPreviewUpdate();
       } );
 
       copyBtn.addEventListener( 'click', () =>
