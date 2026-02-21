@@ -35,8 +35,8 @@
       }
 
       .container {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto 1fr;
         height: 100%;
         width: 100%;
         padding: 12px;
@@ -44,10 +44,10 @@
       }
 
       .header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        flex-shrink: 0;
+        gap: 12px;
       }
 
       .header h1 {
@@ -56,9 +56,9 @@
       }
 
       .controls {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto;
         gap: 8px;
-        flex-shrink: 0;
       }
 
       button {
@@ -80,23 +80,20 @@
 
       .editor-section {
         display: grid;
-        grid-template-rows: auto 1fr 2fr;
+        grid-template-rows: auto 1fr;
         gap: 12px;
-        flex: 1;
+        height: 100%;
         min-height: 0;
         overflow: hidden;
       }
 
       .canvas-wrapper {
         padding: 0.75rem;
-
-        flex: 1;
         display: flex;
         flex-direction: column;
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
-
         min-height: 0;
       }
 
@@ -116,15 +113,18 @@
 
       .control-point {
         cursor: grab;
-        transition: r 0.2s ease, filter 0.2s ease;
+        transition: r 0.15s ease, filter 0.15s ease;
+        will-change: cx, cy;
       }
 
       .control-point:hover {
-        filter: brightness(1.3) drop-shadow(0 0 4px rgba(0, 168, 255, 0.5));
+        filter: brightness(1.4) drop-shadow(0 0 6px rgba(0, 168, 255, 0.6));
+        r: 14;
       }
 
       .control-point:active {
         cursor: grabbing;
+        filter: brightness(1.5) drop-shadow(0 0 8px rgba(0, 168, 255, 0.8));
       }
 
       .control-point-circle {
@@ -133,16 +133,28 @@
 
       .control-point-hit {
         cursor: grab;
+        touch-action: none;
       }
 
       .control-point-hit:hover {
         cursor: grab;
       }
 
+      #control-1-hit,
+      #control-2-hit {
+        transition: r 0.15s ease;
+      }
+
+      #control-1-hit:hover,
+      #control-2-hit:hover {
+        r: 40;
+        filter: drop-shadow(0 0 4px rgba(0, 168, 255, 0.3));
+      }
+
       .output-section {
-
-
-
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
@@ -155,6 +167,9 @@
         font-size: 12px;
         font-weight: 600;
         flex-shrink: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
       }
 
       .code-block {
@@ -167,12 +182,23 @@
         word-break: break-all;
         color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
         flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+
+      .code-block:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.1);
       }
 
       .copy-btn {
         width: 100%;
         padding: 6px 8px;
         flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+
+      .copy-btn:active {
+        transform: scale(0.98);
       }
 
       .info-text {
@@ -182,24 +208,257 @@
       }
 
       .point-list {
+        display: none;
         font-size: 11px;
         overflow-y: auto;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 2px;
         padding: 6px;
-        flex-shrink: 0;
+        max-height: 100px;
+      }
+
+      /* Spring Editor Specific Styles */
+      .duration-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .duration-control label {
+        font-size: 11px;
+        min-width: 55px;
+      }
+
+      .duration-control input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .duration-value {
+        font-size: 11px;
+        font-weight: 500;
+        min-width: 45px;
+        text-align: right;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      /* Preset Buttons */
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .preset-btn {
+        padding: 6px 8px;
+        font-size: 10px;
+        text-align: center;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .preset-btn:hover {
+        border-color: var(--vscode-button-background, var(--fallback-button-background));
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+      }
+
+      .preset-btn.active {
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+        border-color: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.3);
+      }
+
+      /* Spring Analysis Card */
+      .analysis-card {
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        padding: 8px;
+        margin-top: 8px;
+        font-size: 10px;
+      }
+
+      .analysis-card h4 {
+        margin: 0 0 6px 0;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .analysis-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 0;
+        border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+      }
+
+      .analysis-row:last-child {
+        border-bottom: none;
+      }
+
+      .analysis-label {
+        opacity: 0.7;
+      }
+
+      .analysis-value {
+        font-weight: 600;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .damping-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .spring-tips {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px;
+        font-size: 9px;
+        line-height: 1.4;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        margin-top: 8px;
+      }
+
+      .spring-tips strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .spring-tips ul {
+        margin: 4px 0 0 16px;
+        padding: 0;
+      }
+
+      .spring-tips li {
+        margin: 2px 0;
+      }
+
+      .damping-badge.underdamped {
+        background: rgba(255, 100, 100, 0.3);
+        color: #ff6464;
+      }
+
+      .damping-badge.critical {
+        background: rgba(255, 200, 0, 0.3);
+        color: #ffc800;
+      }
+
+      .damping-badge.overdamped {
+        background: rgba(100, 200, 255, 0.3);
+        color: #64c8ff;
+      }
+
+      /* Parameter Info Tooltip */
+      .param-info {
+        position: relative;
+        display: inline-block;
+        margin-left: 4px;
+        width: 14px;
+        height: 14px;
+        line-height: 14px;
+        text-align: center;
+        border-radius: 50%;
+        background: rgba(0, 168, 255, 0.2);
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        font-size: 9px;
+        font-weight: bold;
+        cursor: help;
+        transition: all 0.2s ease;
+      }
+
+      .param-info:hover {
+        background: rgba(0, 168, 255, 0.4);
+      }
+
+      .param-info::after {
+        content: attr(data-tooltip);
+        visibility: hidden;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 10px;
+        font-weight: normal;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+
+      .param-info:hover::after {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Export Button */
+      .export-btn {
+        width: 100%;
+        padding: 6px 8px;
+        margin-top: 8px;
+        font-size: 11px;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .export-btn:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: white;
+      }
+
+      /* Info banner */
+      .info-banner {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px 8px;
+        font-size: 10px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      .info-banner strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
       }
 
       .duration-control {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: 12px;
         padding: 8px;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
-        flex-shrink: 0;
       }
 
       .duration-control label {
@@ -234,8 +493,279 @@
         font-size: 10px;
       }
 
+      nav {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+      }
+
+      nav button {
+        padding: 8px 16px;
+        background: transparent;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      nav button:hover {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+      }
+
+      nav button.active {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-bottom-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .editor-content {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .editor-content.active {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
       #preview {
         position: relative;
+        width: 100%;
+        height: 80px;
+        background: linear-gradient(to bottom,
+            var(--vscode-input-background, var(--fallback-input-background)) 0%,
+            var(--vscode-editor-background, var(--fallback-editor-background)) 100%);
+        border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+      }
+
+      #preview:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 168, 255, 0.15);
+      }
+
+      .easing-preview-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+      }
+
+      #previewBox {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.6));
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        transition: none;
+        flex-shrink: 0;
+      }
+
+      #springPreview {
+        position: relative;
+        width: 100%;
+        height: 80px;
+        background: linear-gradient(to right,
+            var(--vscode-editor-background, var(--fallback-editor-background)) 0%,
+            var(--vscode-input-background, var(--fallback-input-background)) 15%,
+            var(--vscode-input-background, var(--fallback-input-background)) 85%,
+            var(--vscode-editor-background, var(--fallback-editor-background)) 100%);
+        border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        display: grid;
+        grid-template-columns: 28px 1fr 28px;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+      }
+
+      #springPreview:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 168, 255, 0.15);
+      }
+
+      #springPreview::before {
+        content: '';
+        position: absolute;
+        left: 24px;
+        right: 24px;
+        top: 50%;
+        height: 1px;
+        background: var(--vscode-input-border, var(--fallback-input-border));
+        transform: translateY(-50%);
+        opacity: 0.3;
+      }
+
+      .spring-preview-start,
+      .spring-preview-end {
+        font-size: 9px;
+        opacity: 0.5;
+        text-align: center;
+        z-index: 1;
+      }
+
+      .spring-preview-container {
+        position: relative;
+        height: 100%;
+        flex: 1;
+        z-index: 1;
+      }
+
+      #springPreviewBox {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.6));
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        transition: none;
+        flex-shrink: 0;
+      }
+
+      #preview.preview-updating {
+        animation: previewPulse 0.4s ease-out;
+      }
+
+      @keyframes previewPulse {
+        0% {
+          filter: brightness(1.2);
+        }
+
+        100% {
+          filter: brightness(1);
+        }
+      }
+
+      /* Spring Preview Animation Feedback */
+      #springPreview.preview-updating {
+        animation: springPreviewPulse 0.4s ease-out;
+      }
+
+      @keyframes springPreviewPulse {
+        0% {
+          filter: brightness(1.2);
+        }
+
+        100% {
+          filter: brightness(1);
+        }
+      }
+
+      .preview-info {
+        font-size: 9px;
+        opacity: 0.6;
+        text-align: center;
+        margin-top: 2px;
+        font-family: monospace;
+      }
+
+      /* Enhanced Easing Canvas */
+      .easing-info-overlay {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.6);
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-family: monospace;
+        pointer-events: none;
+        max-width: 120px;
+        z-index: 10;
+      }
+
+      .easing-grid-helper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .easing-grid-lines {
+        stroke: var(--vscode-input-border, var(--fallback-input-border));
+        stroke-width: 0.5;
+        opacity: 0.15;
+      }
+
+      .easing-grid-thick {
+        stroke: var(--vscode-input-border, var(--fallback-input-border));
+        stroke-width: 1;
+        opacity: 0.1;
+      }
+
+      .easing-guide-text {
+        font-size: 9px;
+        opacity: 0.3;
+        fill: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        pointer-events: none;
+        /* user-select: none; */
+      }
+
+      .spring-guide-text {
+        font-size: 11px;
+        opacity: 0.4;
+        fill: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        pointer-events: none;
+        font-weight: 500;
+      }
+
+      .spring-canvas-wrapper {
+        position: relative;
+      }
+
+      .control-point-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: #0a8;
+        padding: 4px 8px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-family: monospace;
+        pointer-events: none;
+        z-index: 20;
+        white-space: nowrap;
+        left: 0;
+        top: 0;
+      }
+
+      .easing-tips {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px;
+        font-size: 9px;
+        line-height: 1.3;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        margin-top: 8px;
+      }
+
+      .easing-tips strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
       }
 
       .preview-updating::after {
@@ -304,82 +834,236 @@
       <div class="header">
         <h1>CSS Ease Generator</h1>
         <div class="controls">
-          <button id="resetBtn">Reset Curve</button>
         </div>
       </div>
 
       <div class="editor-section">
         <nav>
-          <button>Easing</button>
-          <button>Spring</button>
+          <button id="easingTab" class="active">Easing</button>
+          <button id="springTab">Spring</button>
         </nav>
-        <div class="canvas-wrapper">
 
-          <svg id="easeCanvas" viewBox="0 0 330 330">
-            <!-- Grid -->
-            <g id="grid" opacity="0.1"></g>
-            <!-- Axes -->
-            <polyline fill="none" stroke="#333" stroke-width="2" points="0,0 0,330"></polyline>
-            <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 330,330"></polyline>
-            <!-- Control lines (tethers) -->
-            <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
-                      stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
-            <polyline id="control-2-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
-                      stroke-dasharray="4, 2" points="330,0 297,16.35"></polyline>
-            <!-- Cubic bezier curve -->
-            <path id="bezierCurve" d="M 0,330 C 33,198 297,16.35 330,0" fill="none"
-                      stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      stroke-width="5" stroke-linecap="round"></path>
-            <!-- Control points -->
-            <!-- Hit areas for easier interaction (placed first for proper event handling) -->
-            <circle id="control-1-hit" class="control-point-hit" r="30" cx="33" cy="198" fill="transparent"
-                      style="touch-action:none;"></circle>
-            <circle id="control-2-hit" class="control-point-hit" r="30" cx="297" cy="16.35" fill="transparent"
-                      style="touch-action:none;"></circle>
-            <!-- Visible control point circles -->
-            <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
-                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      style="touch-action:none;"></circle>
-            <circle id="control-2" class="control-point control-point-circle" r="12" cx="297" cy="16.35"
-                      fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
-                      style="touch-action:none;"></circle>
-          </svg>
+        <div id="easingEditor" class="editor-content active">
+          <div class="canvas-wrapper">
+            <svg id="easeCanvas" viewBox="0 0 330 330">
+              <!-- Grid lines (light) -->
+              <g class="easing-grid-lines">
+                <line x1="16.5" y1="0" x2="16.5" y2="330" />
+                <line x1="33" y1="0" x2="33" y2="330" />
+                <line x1="49.5" y1="0" x2="49.5" y2="330" />
+                <line x1="66" y1="0" x2="66" y2="330" />
+                <line x1="82.5" y1="0" x2="82.5" y2="330" />
+                <line x1="99" y1="0" x2="99" y2="330" />
+                <line x1="115.5" y1="0" x2="115.5" y2="330" />
+                <line x1="132" y1="0" x2="132" y2="330" />
+                <line x1="148.5" y1="0" x2="148.5" y2="330" />
+                <line x1="165" y1="0" x2="165" y2="330" />
+                <line x1="181.5" y1="0" x2="181.5" y2="330" />
+                <line x1="198" y1="0" x2="198" y2="330" />
+                <line x1="214.5" y1="0" x2="214.5" y2="330" />
+                <line x1="231" y1="0" x2="231" y2="330" />
+                <line x1="247.5" y1="0" x2="247.5" y2="330" />
+                <line x1="264" y1="0" x2="264" y2="330" />
+                <line x1="280.5" y1="0" x2="280.5" y2="330" />
+                <line x1="297" y1="0" x2="297" y2="330" />
+                <line x1="313.5" y1="0" x2="313.5" y2="330" />
+                <!-- Horizontal grid -->
+                <line x1="0" y1="16.5" x2="330" y2="16.5" />
+                <line x1="0" y1="33" x2="330" y2="33" />
+                <line x1="0" y1="49.5" x2="330" y2="49.5" />
+                <line x1="0" y1="66" x2="330" y2="66" />
+                <line x1="0" y1="82.5" x2="330" y2="82.5" />
+                <line x1="0" y1="99" x2="330" y2="99" />
+                <line x1="0" y1="115.5" x2="330" y2="115.5" />
+                <line x1="0" y1="132" x2="330" y2="132" />
+                <line x1="0" y1="148.5" x2="330" y2="148.5" />
+                <line x1="0" y1="165" x2="330" y2="165" />
+                <line x1="0" y1="181.5" x2="330" y2="181.5" />
+                <line x1="0" y1="198" x2="330" y2="198" />
+                <line x1="0" y1="214.5" x2="330" y2="214.5" />
+                <line x1="0" y1="231" x2="330" y2="231" />
+                <line x1="0" y1="247.5" x2="330" y2="247.5" />
+                <line x1="0" y1="264" x2="330" y2="264" />
+                <line x1="0" y1="280.5" x2="330" y2="280.5" />
+                <line x1="0" y1="297" x2="330" y2="297" />
+                <line x1="0" y1="313.5" x2="330" y2="313.5" />
+              </g>
+              <!-- Thicker grid marks -->
+              <g class="easing-grid-thick">
+                <line x1="0" y1="165" x2="330" y2="165" />
+                <line x1="165" y1="0" x2="165" y2="330" />
+              </g>
+              <!-- Guide labels -->
+              <g class="easing-guide-text">
+                <text x="5" y="12" text-anchor="start">1.0</text>
+                <text x="5" y="325" text-anchor="start">0.0</text>
+                <text x="325" y="325" text-anchor="end">1.0</text>
+              </g>
+              <!-- Grid -->
+              <g id="grid" opacity="0.1"></g>
+              <!-- Axes -->
+              <polyline fill="none" stroke="#333" stroke-width="2" points="0,0 0,330"></polyline>
+              <polyline fill="none" stroke="#333" stroke-width="2" points="0,330 330,330"></polyline>
+              <!-- Control lines (tethers) -->
+              <polyline id="control-1-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                        stroke-dasharray="4, 2" points="0,330 33,198"></polyline>
+              <polyline id="control-2-tether" fill="none" stroke="rgba(100, 150, 200, 0.3)" stroke-width="2"
+                        stroke-dasharray="4, 2" points="330,0 297,16.35"></polyline>
+              <!-- Cubic bezier curve -->
+              <path id="bezierCurve" d="M 0,330 C 33,198 297,16.35 330,0" fill="none"
+                        stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        stroke-width="5" stroke-linecap="round"></path>
+              <!-- Control points -->
+              <!-- Hit areas for easier interaction (placed first for proper event handling) -->
+              <circle id="control-1-hit" class="control-point-hit" r="40" cx="33" cy="198" fill="transparent"
+                        style="touch-action:none; pointer-events: auto;"></circle>
+              <circle id="control-2-hit" class="control-point-hit" r="40" cx="297" cy="16.35" fill="transparent"
+                        style="touch-action:none; pointer-events: auto;"></circle>
+              <!-- Visible control point circles -->
+              <circle id="control-1" class="control-point control-point-circle" r="12" cx="33" cy="198"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        style="touch-action:none;"></circle>
+              <circle id="control-2" class="control-point control-point-circle" r="12" cx="297" cy="16.35"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        style="touch-action:none;"></circle>
+            </svg>
+          </div>
+
+          <div class="output-section">
+            <h3 style="margin-top: 15px;">Preview</h3>
+            <div id="preview">
+              <div class="easing-preview-container">
+                <div id="previewBox"></div>
+              </div>
+            </div>
+            <h3>Duration</h3>
+            <div class="duration-control">
+              <label for="durationSlider">Duration:</label>
+              <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
+              <div class="duration-value" id="durationValue">1s</div>
+            </div>
+
+            <div class="easing-tips">
+              <strong>💡 Drag Tips:</strong>
+              Top-right = ease-out (quick start, slow end) •
+              Bottom-left = ease-in (slow start, quick end)
+            </div>
+
+            <h3 style="margin-top: 15px;">CSS Output</h3>
+            <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
+            <button class="copy-btn" id="copyBtn">📋 Copy to Clipboard</button>
+
+
+
+            <div class="point-list" id="pointList"></div>
+          </div>
         </div>
 
-        <div class="output-section">
-          <h3>Duration</h3>
-          <div class="duration-control">
-            <label for="durationSlider">Duration:</label>
-            <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
-            <div class="duration-value" id="durationValue">1s</div>
+        <div id="springEditor" class="editor-content">
+          <div class="canvas-wrapper spring-canvas-wrapper">
+
+            <svg id="springCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
+              <!-- Grid background -->
+              <defs>
+                <pattern id="springGridPattern" x="50" y="30" width="50" height="30" patternUnits="userSpaceOnUse">
+                  <line x1="0" y1="0" x2="0" y2="300" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                            stroke-width="0.5" opacity="0.1" />
+                  <line x1="0" y1="0" x2="500" y2="0" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                            stroke-width="0.5" opacity="0.1" />
+                </pattern>
+              </defs>
+
+              <!-- Grid fill -->
+              <rect width="500" height="300" fill="url(#springGridPattern)" />
+
+              <!-- Reference lines (0 and 1 output values) -->
+              <line x1="0" y1="270" x2="500" y2="270" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="2" opacity="0.15" />
+              <line x1="0" y1="30" x2="500" y2="30" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="2" opacity="0.15" />
+
+              <!-- Center line (0.5 reference) -->
+              <line x1="0" y1="150" x2="500" y2="150" stroke="var(--vscode-input-border, var(--fallback-input-border))"
+                        stroke-width="1" opacity="0.08" stroke-dasharray="4,4" />
+
+              <!-- Axis labels -->
+              <g class="spring-guide-text">
+                <text x="5" y="25" text-anchor="start" font-size="11">1.0</text>
+                <text x="5" y="285" text-anchor="start" font-size="11">0.0</text>
+                <text x="490" y="285" text-anchor="end" font-size="11">t=1</text>
+              </g>
+
+              <!-- Time marker line (settlement indicator) -->
+              <path id="settlementLine" d="M250 0 L250 300" fill="transparent"
+                        stroke="var(--vscode-input-border, var(--fallback-input-border))" stroke-width="2" opacity="0.2"
+                        stroke-dasharray="6,4"></path>
+
+              <!-- Spring curve path -->
+              <path id="springPath" d="M0 150L1 150L2 150" fill="transparent"
+                        stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+
+              <!-- Overshoot highlight area -->
+              <path id="overshootArea" d=""
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        opacity="0.05" />
+            </svg>
           </div>
+          <div class="output-section">
+            <div class="info-banner">
+              <strong>Pro Tip:</strong> Adjust bounciness and duration to fine-tune your spring animation
+            </div>
 
-          <h3 style="margin-top: 15px;">CSS Output</h3>
-          <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
-          <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+            <h3 style="margin-top: 15px;">Preview</h3>
 
-          <h3 style="margin-top: 15px;">Preview</h3>
-          <div id="preview" style="
-					width: 100%;
-					height: 60px;
-					background: var(--vscode-editor-background, var(--fallback-editor-background));
-					border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
-					border-radius: 2px;
-					display: flex;
-					align-items: center;
-					overflow: hidden;
-				">
-            <div id="previewBox" style="
-						width: 30px;
-						height: 30px;
-						background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-						margin-left: 10px;
-						border-radius: 2px;
-					"></div>
+            <div id="springPreview">
+              <div class="spring-preview-start">●</div>
+              <div class="spring-preview-container">
+                <div id="springPreviewBox"></div>
+              </div>
+              <div class="spring-preview-end">✓</div>
+            </div>
+            <div class="preview-info" id="springPreviewInfo">Motion: Smooth | Settling: 0.95s</div>
+
+            <h3>Parameters</h3>
+            <div class="duration-control">
+              <label for="springDuration">Duration:
+                <span class="param-info" data-tooltip="Total animation time in seconds">?</span>
+              </label>
+              <input type="range" id="springDuration" min="0.1" max="2" step="0.1" value="1">
+              <div class="duration-value" id="springDurationValue">1s</div>
+            </div>
+
+            <div class="duration-control">
+              <label for="bounciness">Bounciness:
+                <span class="param-info" data-tooltip="0 = smooth, 100 = bouncy">?</span>
+              </label>
+              <input type="range" id="bounciness" min="0" max="100" step="5" value="50">
+              <div class="duration-value" id="bouncinessValue">50</div>
+            </div>
+
+            <div class="duration-control" style="display: none;">
+              <label for="mass">Mass:
+                <span class="param-info" data-tooltip="Higher = more momentum, slower settling">?</span>
+              </label>
+              <input type="range" id="mass" min="0.1" max="5" step="0.1" value="1">
+              <div class="duration-value" id="massValue">1.0</div>
+            </div>
+
+            <div class="spring-tips">
+              <strong>💡 How it works:</strong>
+              <ul>
+                <li><strong>Bounciness = 0</strong> = smooth, no overshoot</li>
+                <li><strong>Bounciness = 50</strong> = natural, balanced feel</li>
+                <li><strong>Bounciness = 100</strong> = lively, lots of bounce</li>
+              </ul>
+            </div>
+
+            <h3 style="margin-top: 15px;">CSS Output</h3>
+            <div class="code-block" id="springCssOutput">animation: slide 1000ms linear(0, ...)</div>
+            <button class="copy-btn" id="springCopyBtn">📋 Copy CSS to Clipboard</button>
+
           </div>
-
-          <h3 style="margin-top: 15px;">Control Points</h3>
-          <div class="point-list" id="pointList"></div>
         </div>
       </div>
     </div>
@@ -399,10 +1083,35 @@
       };
       handleVscodeAssignment();
 
+      // Tab switching functionality
+      const easingTab = document.getElementById( 'easingTab' );
+      const springTab = document.getElementById( 'springTab' );
+      const easingEditor = document.getElementById( 'easingEditor' );
+      const springEditor = document.getElementById( 'springEditor' );
+
+      function switchTab ( tabName )
+      {
+        if ( tabName === 'easing' )
+        {
+          easingEditor.classList.add( 'active' );
+          springEditor.classList.remove( 'active' );
+          easingTab.classList.add( 'active' );
+          springTab.classList.remove( 'active' );
+        } else
+        {
+          springEditor.classList.add( 'active' );
+          easingEditor.classList.remove( 'active' );
+          springTab.classList.add( 'active' );
+          easingTab.classList.remove( 'active' );
+        }
+      }
+
+      easingTab.addEventListener( 'click', () => switchTab( 'easing' ) );
+      springTab.addEventListener( 'click', () => switchTab( 'spring' ) );
+
       const svg = document.getElementById( 'easeCanvas' );
       const cssOutput = document.getElementById( 'cssOutput' );
       const copyBtn = document.getElementById( 'copyBtn' );
-      const resetBtn = document.getElementById( 'resetBtn' );
       const pointList = document.getElementById( 'pointList' );
       const previewBox = document.getElementById( 'previewBox' );
       const durationSlider = document.getElementById( 'durationSlider' );
@@ -439,6 +1148,7 @@
         };
       }
 
+      // Quick duration helper
       // Show UI indicator pulse
       function showUpdateIndicator ()
       {
@@ -544,97 +1254,112 @@
         const y2 = parseFloat( controlPoints[ 1 ].y );
 
         previewBox.style.animation = 'none';
+        previewBox.style.left = '0%';
         setTimeout( () =>
         {
-          previewBox.style.animation = `slide ${ duration }s cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 }) infinite`;
+          previewBox.style.animation = `slide ${ duration }s  cubic-bezier(${ x1 }, ${ y1 }, ${ x2 }, ${ y2 }) infinite`;
         }, 10 );
       }
 
       // SVG event handling - Setup hit areas with improved interaction
-      function handleDragStart ( pointIndex )
+      const control1Hit = document.getElementById( 'control-1-hit' );
+      const control2Hit = document.getElementById( 'control-2-hit' );
+      const control1 = document.getElementById( 'control-1' );
+      const control2 = document.getElementById( 'control-2' );
+
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+
+      function handleDragStart ( pointIndex, hitElement, pointElement )
       {
         return ( e ) =>
         {
           e.preventDefault();
 
-          // Calculate the offset between mouse position and point's current SVG position
-          const rect = svg.getBoundingClientRect();
-          let clientX = e.clientX;
-          let clientY = e.clientY;
+          const clientX = e.clientX !== undefined ? e.clientX : e.touches[ 0 ].clientX;
+          const clientY = e.clientY !== undefined ? e.clientY : e.touches[ 0 ].clientY;
 
-          if ( e.touches )
-          {
-            clientX = e.touches[ 0 ].clientX;
-            clientY = e.touches[ 0 ].clientY;
-          }
-
-          const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
-          const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
-
-          const pointSvg = normalizedToSvg( controlPoints[ pointIndex ].x, controlPoints[ pointIndex ].y );
-
-          dragOffset.x = pointSvg.x - mouseX;
-          dragOffset.y = pointSvg.y - mouseY;
+          lastMouseX = clientX;
+          lastMouseY = clientY;
 
           isDrawing = true;
           selectedPoint = pointIndex;
           svg.style.cursor = 'grabbing';
+          hitElement.style.r = '45';
+          pointElement.style.filter = 'brightness(1.5) drop-shadow(0 0 8px rgba(0, 168, 255, 0.8))';
         };
       }
-
-      const control1Hit = document.getElementById( 'control-1-hit' );
-      const control2Hit = document.getElementById( 'control-2-hit' );
-
-      control1Hit.addEventListener( 'mousedown', handleDragStart( 0 ) );
-      control2Hit.addEventListener( 'mousedown', handleDragStart( 1 ) );
-
-      // Touch support
-      control1Hit.addEventListener( 'touchstart', handleDragStart( 0 ) );
-      control2Hit.addEventListener( 'touchstart', handleDragStart( 1 ) );
 
       function handleDragMove ( e )
       {
         if ( !isDrawing || selectedPoint === -1 ) return;
 
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[ 0 ]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[ 0 ]?.clientY;
+
+        if ( clientX === undefined || clientY === undefined ) return;
+
         const rect = svg.getBoundingClientRect();
-        let clientX = e.clientX;
-        let clientY = e.clientY;
 
-        // Handle touch events
-        if ( e.touches )
-        {
-          clientX = e.touches[ 0 ].clientX;
-          clientY = e.touches[ 0 ].clientY;
-        }
+        // Calculate delta in screen pixels
+        const deltaX = clientX - lastMouseX;
+        const deltaY = clientY - lastMouseY;
 
-        const mouseX = ( ( clientX - rect.left ) / rect.width ) * SVG_SIZE;
-        const mouseY = ( ( clientY - rect.top ) / rect.height ) * SVG_SIZE;
+        lastMouseX = clientX;
+        lastMouseY = clientY;
 
-        // Apply the offset so point stays under cursor relative to click position
-        const svgX = mouseX + dragOffset.x;
-        const svgY = mouseY + dragOffset.y;
+        // Use consistent scaling for both axes (SVG viewBox is square)
+        const scale = Math.min( rect.width, rect.height );
 
-        let normalized = svgToNormalized( svgX, svgY );
+        // Convert delta to normalized delta with consistent scaling
+        const deltaNormalizedX = ( deltaX / scale ) * ( SVG_SIZE / SVG_SIZE );
+        const deltaNormalizedY = -( deltaY / scale ) * ( SVG_SIZE / SVG_SIZE ); // Flip Y axis
+
+        // Apply delta to current position
+        let newX = controlPoints[ selectedPoint ].x + deltaNormalizedX;
+        let newY = controlPoints[ selectedPoint ].y + deltaNormalizedY;
 
         // Clamp values between 0 and 1
-        normalized.x = Math.max( 0, Math.min( 1, normalized.x ) );
-        normalized.y = Math.max( 0, Math.min( 1, normalized.y ) );
+        newX = Math.max( 0, Math.min( 1, newX ) );
+        newY = Math.max( 0, Math.min( 1, newY ) );
 
-        controlPoints[ selectedPoint ] = normalized;
+        controlPoints[ selectedPoint ].x = newX;
+        controlPoints[ selectedPoint ].y = newY;
+
         updateSvg();
       }
 
-      function handleDragEnd ()
+      function handleDragEnd ( e )
       {
+        if ( !isDrawing ) return;
+
+        const hitElement = selectedPoint === 0 ? control1Hit : control2Hit;
+        const pointElement = selectedPoint === 0 ? control1 : control2;
+
         isDrawing = false;
         selectedPoint = -1;
         svg.style.cursor = 'default';
+        hitElement.style.r = '40';
+        pointElement.style.filter = '';
       }
 
-      document.addEventListener( 'mousemove', handleDragMove );
-      document.addEventListener( 'touchmove', handleDragMove );
-      document.addEventListener( 'mouseup', handleDragEnd );
-      document.addEventListener( 'touchend', handleDragEnd );
+      // Use pointer events for best performance
+      control1Hit.addEventListener( 'pointerdown', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'pointerdown', handleDragStart( 1, control2Hit, control2 ) );
+
+      // Fallback events
+      control1Hit.addEventListener( 'mousedown', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'mousedown', handleDragStart( 1, control2Hit, control2 ) );
+      control1Hit.addEventListener( 'touchstart', handleDragStart( 0, control1Hit, control1 ) );
+      control2Hit.addEventListener( 'touchstart', handleDragStart( 1, control2Hit, control2 ) );
+
+      // Global move/end events with passive false for preventDefault
+      document.addEventListener( 'pointermove', handleDragMove, false );
+      document.addEventListener( 'pointerup', handleDragEnd, false );
+      document.addEventListener( 'mousemove', handleDragMove, false );
+      document.addEventListener( 'mouseup', handleDragEnd, false );
+      document.addEventListener( 'touchmove', handleDragMove, false );
+      document.addEventListener( 'touchend', handleDragEnd, false );
 
       // Duration slider event listener
       durationSlider.addEventListener( 'input', ( e ) =>
@@ -651,30 +1376,513 @@
           command: 'copyToClipboard',
           value: cssOutput.textContent
         } );
-      } );
-
-      resetBtn.addEventListener( 'click', () =>
-      {
-        duration = 1;
-        durationSlider.value = 1;
-        durationValue.textContent = '1s';
-        controlPoints = [
-          { x: 0, y: 0.5 }, // Point 1
-          { x: 1, y: 0.5 }  // Point 2
-        ];
-        selectedPoint = -1;
-        updateSvg();
+        // Visual feedback
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout( () =>
+        {
+          copyBtn.textContent = originalText;
+        }, 1500 );
       } );
 
       // Add animation for preview
       const style = document.createElement( 'style' );
+      style.id = 'animation-styles';
       style.textContent = `
         @keyframes slide {
-          from { margin-left: 10px; }
-          to { margin-left: calc(100% - 40px); }
+          from { left: 0%; }
+          to { left: calc(100% - 24px); }
+        }
+        @keyframes springSlide {
+          from { left: 0%; }
+          to { left: calc(100% - 24px); }
         }
       `;
       document.head.appendChild( style );
+
+      // Dynamic keyframes style for spring
+      let springKeyframesStyle = document.createElement( 'style' );
+      springKeyframesStyle.id = 'spring-keyframes';
+      document.head.appendChild( springKeyframesStyle );
+
+      // Spring editor functionality
+      const springCanvas = document.getElementById( 'springCanvas' );
+      const springDuration = document.getElementById( 'springDuration' );
+      const springDurationValue = document.getElementById( 'springDurationValue' );
+      const bouncinessSlider = document.getElementById( 'bounciness' );
+      const bouncinessValue = document.getElementById( 'bouncinessValue' );
+      const springCssOutput = document.getElementById( 'springCssOutput' );
+      const springCopyBtn = document.getElementById( 'springCopyBtn' );
+      const springPreviewBox = document.getElementById( 'springPreviewBox' );
+
+      let springParams = {
+        duration: 1,
+        bounciness: 50,
+        stiffness: 170,
+        damping: 26,
+        mass: 1
+      };
+
+      // Convert bounciness (0-100) to stiffness and damping values
+      function bouncinessToSpringParams ( bounciness )
+      {
+        // Normalize bounciness to 0-1 range
+        const normalized = bounciness / 100;
+
+        // Smooth mapping using easing function
+        // Low bounciness (0) = high damping (smooth, no bounce)
+        // High bounciness (100) = low damping (oscillatory, bouncy)
+
+        // Stiffness: increase with bounciness for faster response
+        const stiffness = 80 + normalized * 420; // 80-500 range
+
+        // Damping: decrease with bounciness for more bounce
+        // Map bounciness to damping ratio (0-1 where 1 = critically damped)
+        let dampingRatio;
+        if ( normalized < 0.5 )
+        {
+          // Smooth (0-50): damping ratio 1.0 to 0.7
+          dampingRatio = 1.0 - ( normalized * 2 ) * 0.3;
+        } else
+        {
+          // Bouncy (50-100): damping ratio 0.7 to 0.3
+          dampingRatio = 0.7 - ( ( normalized - 0.5 ) * 2 ) * 0.4;
+        }
+
+        // Calculate damping from damping ratio: c = ζ * 2√(km)
+        const damping = dampingRatio * 2 * Math.sqrt( stiffness * 1 ); // mass = 1
+
+        return { stiffness, damping };
+      }
+
+      let springPreviewUpdateTimeout;
+
+      // Debounced spring preview update (300ms)
+      const debouncedSpringPreviewUpdate = debounce( () =>
+      {
+        updateSpringPreview();
+        showSpringUpdateIndicator();
+      }, 300 );
+
+      function showSpringUpdateIndicator ()
+      {
+        const preview = document.getElementById( 'springPreview' );
+        preview.classList.remove( 'preview-updating' );
+        // Trigger reflow to restart animation
+        void preview.offsetWidth;
+        preview.classList.add( 'preview-updating' );
+      }
+
+      // Professional spring physics engine using damped harmonic oscillator
+      // This is the standard physics model used by React Spring, Framer Motion, etc.
+      function generateSpringValue ( t, stiffness, damping, mass, duration )
+      {
+        if ( t <= 0 ) return 0;
+        if ( t >= 1 ) return 1;
+
+        // Normalize time to animation duration
+        const normalizedTime = ( t * duration );
+
+        // Angular frequency (natural frequency)
+        // ω₀ = √(k/m)
+        const omega0 = Math.sqrt( stiffness / mass );
+
+        // Damping ratio
+        // ζ (zeta) = c / (2√(km))
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        // If overdamped (ζ >= 1), no oscillation occurs
+        if ( dampingRatio >= 1 )
+        {
+          const r1 = -omega0 * ( dampingRatio + Math.sqrt( dampingRatio * dampingRatio - 1 ) );
+          return 1 - Math.exp( r1 * normalizedTime ) * ( 1 + r1 * normalizedTime );
+        }
+
+        // Damped frequency
+        // ωd = ω₀√(1 - ζ²)
+        const omegad = omega0 * Math.sqrt( Math.max( 0, 1 - dampingRatio * dampingRatio ) );
+
+        // Displacement equation for underdamped system:
+        // x(t) = 1 - e^(-ζω₀t)[cos(ωdt) + (ζω₀/ωd)sin(ωdt)]
+        const exponentialDecay = Math.exp( -dampingRatio * omega0 * normalizedTime );
+
+        if ( omegad === 0 )
+        {
+          return 1 - exponentialDecay * ( 1 + dampingRatio * omega0 * normalizedTime );
+        }
+
+        const cosTerm = Math.cos( omegad * normalizedTime );
+        const sinTerm = ( dampingRatio * omega0 / omegad ) * Math.sin( omegad * normalizedTime );
+
+        return 1 - exponentialDecay * ( cosTerm + sinTerm );
+      }
+
+      function generateSpringCurve ( stiffness, damping, mass, duration )
+      {
+        const points = [];
+        const values = [];
+
+        // Use high-density sampling for very smooth visualization
+        // Fixed sampling rate of 0.002 (500 samples per second) for butter-smooth curves
+        const visualizationTimeStep = 0.002;
+
+        // Collect all values with high-density sampling for smooth visualization
+        for ( let t = 0; t <= 1; t += visualizationTimeStep )
+        {
+          const value = generateSpringValue( t, stiffness, damping, mass, duration );
+          values.push( value );
+        }
+
+        // Always include final point at t=1
+        const finalValue = generateSpringValue( 1, stiffness, damping, mass, duration );
+        values.push( finalValue );
+
+        // Calculate min and max values for adaptive scaling
+        const minValue = Math.min( ...values, 0 );
+        const maxValue = Math.max( ...values, 1 );
+        const range = maxValue - minValue;
+
+        // Ensure minimum range for the graph
+        const padding = 0.1;
+        const scaledMin = minValue - ( range * padding );
+        const scaledMax = maxValue + ( range * padding );
+        const scaledRange = scaledMax - scaledMin;
+
+        // Adaptive Y-axis scaled to content
+        // SVG viewBox is 0 0 500 300, so Y goes 0 to 300
+        const graphHeight = 280; // Leave space for axis labels
+        const graphTopPad = 10;
+
+        // X-axis: 0 to 500px represents time 0 to 1
+        const xRange = 500;
+
+        // Create path points using high-density sampling
+        for ( let i = 0; i < values.length - 1; i++ )
+        {
+          const t = i * visualizationTimeStep;
+          const value = values[ i ];
+          const x = t * xRange;
+          const normalizedValue = ( value - scaledMin ) / scaledRange;
+          const y = graphTopPad + ( 1 - normalizedValue ) * graphHeight;
+          points.push( `${ x.toFixed( 2 ) } ${ y.toFixed( 2 ) }` );
+        }
+
+        // Add the final point at t=1
+        const finalNormalizedValue = ( finalValue - scaledMin ) / scaledRange;
+        const finalY = graphTopPad + ( 1 - finalNormalizedValue ) * graphHeight;
+        points.push( `${ xRange.toFixed( 2 ) } ${ finalY.toFixed( 2 ) }` );
+
+        // Calculate overshoot visualization
+        const overshootPercentage = Math.max( 0, ( maxValue - 1 ) * 100 );
+
+        if ( overshootPercentage > 0.5 )
+        {
+          // Draw overshoot area overlay using adaptive scaling
+          const normalizedOne = ( 1 - scaledMin ) / scaledRange;
+          const normalizedMax = ( maxValue - scaledMin ) / scaledRange;
+          const overshootY = graphTopPad + ( 1 - normalizedOne ) * graphHeight; // y at value=1
+          const overshootPeakY = graphTopPad + ( 1 - normalizedMax ) * graphHeight; // y at max value
+          const overshootPath = `M0 ${ overshootY } L${ xRange } ${ overshootY } L${ xRange } ${ overshootPeakY } L0 ${ overshootPeakY } Z`;
+          document.getElementById( 'overshootArea' ).setAttribute( 'd', overshootPath );
+        } else
+        {
+          document.getElementById( 'overshootArea' ).setAttribute( 'd', '' );
+        }
+
+        // Update settlement indicator line using adaptive scaling
+        // Calculate approximate settling time (2% threshold)
+        const settlingThreshold = 0.02;
+        let settlingTimeNorm = 1;
+        for ( let t = 0; t <= 1; t += 0.01 )
+        {
+          const value = generateSpringValue( t, stiffness, damping, mass, duration );
+          if ( Math.abs( value - 1 ) < settlingThreshold )
+          {
+            settlingTimeNorm = t;
+            break;
+          }
+        }
+        const settlementX = settlingTimeNorm * xRange;
+        document.getElementById( 'settlementLine' ).setAttribute( 'd', `M${ settlementX } 0 L${ settlementX } 300` );
+
+        return `M${ points.join( 'L' ) }`;
+      }
+
+      function updateSpringVisualization ()
+      {
+        const path = generateSpringCurve( springParams.stiffness, springParams.damping, springParams.mass, springParams.duration );
+        document.getElementById( 'springPath' ).setAttribute( 'd', path );
+      }
+
+      function updateSpringOutput ()
+      {
+        const linearEasing = generateSpringLinearEasing( springParams.stiffness, springParams.damping, springParams.mass, springParams.duration );
+        const durationMs = ( springParams.duration * 1000 ).toFixed( 0 );
+        const css = `${ durationMs }ms linear(${ linearEasing })`;
+        springCssOutput.textContent = css;
+      }
+
+      function generateSpringLinearEasing ( stiffness, damping, mass, duration )
+      {
+        const keyframes = [];
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let timeStep;
+
+        // Determine sampling strategy based on damping type
+        if ( dampingRatio >= 1 )
+        {
+          // Overdamped (smooth, no oscillation): use proportional sampling
+          const numSamples = Math.max( 3, Math.ceil( duration * 30 ) );
+          timeStep = 1 / numSamples;
+        } else
+        {
+          // Underdamped (oscillatory): sample based on actual oscillations
+          const omegad = omega0 * Math.sqrt( Math.max( 0, 1 - dampingRatio * dampingRatio ) );
+          const oscillationPeriod = ( 2 * Math.PI ) / omegad;
+
+          // Calculate actual number of oscillations (not clamped to 1)
+          const oscillationCount = duration / oscillationPeriod;
+
+          // Use adaptive sampling: 8-12 samples per oscillation
+          let samplesPerOscillation;
+          if ( oscillationCount < 0.5 )
+          {
+            // Less than half an oscillation: minimal sampling
+            samplesPerOscillation = 4;
+          } else if ( oscillationCount < 2 )
+          {
+            // Partial to a couple oscillations: moderate sampling
+            samplesPerOscillation = 8;
+          } else
+          {
+            // Multiple oscillations: good sampling
+            samplesPerOscillation = 12;
+          }
+
+          const totalSamples = Math.max( 3, Math.ceil( oscillationCount * samplesPerOscillation ) );
+          timeStep = 1 / totalSamples;
+        }
+
+        const points = [];
+
+        // Generate spring keyframes with proper physics
+        for ( let t = 0; t <= 1; t += timeStep )
+        {
+          const value = generateSpringValue( t, stiffness, damping, mass, duration );
+          points.push( { time: t, value } );
+        }
+
+        // Always ensure the final point is included
+        const lastPoint = points[ points.length - 1 ];
+        if ( lastPoint.time < 1 )
+        {
+          const finalValue = generateSpringValue( 1, stiffness, damping, mass, duration );
+          points.push( { time: 1, value: finalValue } );
+        }
+
+        // Generate linear() easing string without time percentages
+        for ( let i = 0; i < points.length; i++ )
+        {
+          const point = points[ i ];
+          const value = point.value.toFixed( 4 );
+
+          if ( i === 0 )
+          {
+            keyframes.push( value );
+          } else if ( i === points.length - 1 )
+          {
+            keyframes.push( '1' );
+          } else
+          {
+            // Add value without percentage
+            keyframes.push( value );
+          }
+        }
+
+        return keyframes.join( ', ' );
+      }
+
+      function updateSpringPreview ()
+      {
+        const linearEasing = generateSpringLinearEasing( springParams.stiffness, springParams.damping, springParams.mass, springParams.duration );
+
+        springPreviewBox.style.animation = 'none';
+        springPreviewBox.style.left = '0%';
+
+        setTimeout( () =>
+        {
+          const easing = `linear(${ linearEasing })`;
+          springPreviewBox.style.animation = `none`;
+          springPreviewBox.style.left = '0%';
+
+          // Trigger reflow to restart animation
+          void springPreviewBox.offsetWidth;
+
+          springPreviewBox.style.animation = `springSlide ${ springParams.duration }s ${ easing } forwards`;
+        }, 10 );
+
+        // Update preview info
+        updateSpringPreviewInfo();
+      }
+
+      function updateSpringPreviewInfo ()
+      {
+        const { stiffness, damping, mass, duration } = springParams;
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let motionType = 'Smooth';
+        if ( dampingRatio < 0.65 )
+        {
+          motionType = 'Bouncy';
+        } else if ( dampingRatio < 0.95 )
+        {
+          motionType = 'Natural';
+        } else if ( dampingRatio >= 1 )
+        {
+          motionType = 'Smooth';
+        }
+
+        // Calculate settling time
+        let settlingTime = duration;
+        for ( let t = 0; t <= duration; t += 0.01 )
+        {
+          const normalizedT = t / duration;
+          const value = generateSpringValue( normalizedT, stiffness, damping, mass, duration );
+          if ( value >= 0.99 )
+          {
+            settlingTime = t;
+            break;
+          }
+        }
+
+        const infoEl = document.getElementById( 'springPreviewInfo' );
+        if ( infoEl )
+        {
+          infoEl.textContent = `Motion: ${ motionType } | Settling: ${ settlingTime.toFixed( 2 ) }s`;
+        }
+      }
+
+      // Analyze spring behavior
+      function analyzeSpring ()
+      {
+        const { stiffness, damping, mass, duration } = springParams;
+        const omega0 = Math.sqrt( stiffness / mass );
+        const dampingRatio = damping / ( 2 * Math.sqrt( stiffness * mass ) );
+
+        let dampingType = 'Underdamped';
+        let dampingClass = 'underdamped';
+        let dampingDescription = 'Bouncy motion with oscillations';
+
+        if ( dampingRatio >= 1 )
+        {
+          dampingType = 'Overdamped';
+          dampingClass = 'critical';
+          dampingDescription = 'Smooth, slow, no bounce';
+        } else if ( dampingRatio >= 0.95 )
+        {
+          dampingType = 'Critically Damped';
+          dampingClass = 'critical';
+          dampingDescription = 'Fastest smooth motion';
+        } else if ( dampingRatio >= 0.65 )
+        {
+          dampingType = 'Underdamped';
+          dampingClass = 'underdamped';
+          dampingDescription = 'Smooth with subtle bounce';
+        } else
+        {
+          dampingType = 'Oscillating';
+          dampingClass = 'underdamped';
+          dampingDescription = 'Lively, noticeable bounce';
+        }
+
+        // Count oscillations
+        let oscillations = 0;
+        if ( dampingRatio < 1 )
+        {
+          const omegad = omega0 * Math.sqrt( Math.max( 0, 1 - dampingRatio * dampingRatio ) );
+          oscillations = Math.floor( ( duration * omegad ) / ( 2 * Math.PI ) );
+        }
+
+        // Calculate settling time and max overshoot
+        let settlingTime = duration;
+        let maxOvershoot = 0;
+
+        for ( let t = 0; t <= duration; t += 0.01 )
+        {
+          const normalizedT = t / duration;
+          const value = generateSpringValue( normalizedT, stiffness, damping, mass, duration );
+          if ( value >= 0.99 && settlingTime === duration )
+          {
+            settlingTime = t;
+          }
+          if ( value > 1 )
+          {
+            maxOvershoot = Math.max( maxOvershoot, ( value - 1 ) * 100 );
+          }
+        }
+
+        // Update UI
+        const badgeEl = document.querySelector( '.damping-badge' );
+        if ( badgeEl )
+        {
+          badgeEl.className = `damping-badge ${ dampingClass }`;
+          badgeEl.textContent = dampingType.toUpperCase();
+          badgeEl.title = dampingDescription;
+        }
+      }
+
+      springDuration.addEventListener( 'input', ( e ) =>
+      {
+        springParams.duration = parseFloat( e.target.value );
+        springDurationValue.textContent = `${ springParams.duration.toFixed( 1 ) }s`;
+        updateSpringVisualization();
+        updateSpringOutput();
+        debouncedSpringPreviewUpdate();
+      } );
+
+      bouncinessSlider.addEventListener( 'input', ( e ) =>
+      {
+        springParams.bounciness = parseFloat( e.target.value );
+        bouncinessValue.textContent = springParams.bounciness.toFixed( 0 );
+
+        // Calculate spring params from bounciness
+        const params = bouncinessToSpringParams( springParams.bounciness );
+        springParams.stiffness = params.stiffness;
+        springParams.damping = params.damping;
+
+        updateSpringVisualization();
+        updateSpringOutput();
+        analyzeSpring();
+        debouncedSpringPreviewUpdate();
+      } );
+
+      springCopyBtn.addEventListener( 'click', () =>
+      {
+        vscode.postMessage( {
+          command: 'copyToClipboard',
+          value: springCssOutput.textContent
+        } );
+        // Visual feedback
+        const originalText = springCopyBtn.textContent;
+        springCopyBtn.textContent = '✓ Copied!';
+        setTimeout( () =>
+        {
+          springCopyBtn.textContent = originalText;
+        }, 1500 );
+      } );
+
+      // Initial spring visualization and analysis
+      // Initialize stiffness and damping from default bounciness
+      const initialParams = bouncinessToSpringParams( springParams.bounciness );
+      springParams.stiffness = initialParams.stiffness;
+      springParams.damping = initialParams.damping;
+
+      updateSpringVisualization();
+      updateSpringOutput();
+      analyzeSpring();
 
       // Initial SVG update
       updateSvg();
