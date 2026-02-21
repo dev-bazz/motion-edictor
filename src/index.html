@@ -1042,26 +1042,6 @@
               <div class="duration-value" id="massValue">1.0</div>
             </div>
 
-            <div class="analysis-card" id="springAnalysis">
-              <h4>Spring Analysis</h4>
-              <div class="analysis-row">
-                <span class="analysis-label">Type:</span>
-                <span class="analysis-value"><span class="damping-badge standard">Standard</span></span>
-              </div>
-              <div class="analysis-row">
-                <span class="analysis-label">Oscillations:</span>
-                <span class="analysis-value" id="oscillationsValue">2</span>
-              </div>
-              <div class="analysis-row">
-                <span class="analysis-label">Settling Time:</span>
-                <span class="analysis-value" id="settlingTimeValue">0.95s</span>
-              </div>
-              <div class="analysis-row">
-                <span class="analysis-label">Max Overshoot:</span>
-                <span class="analysis-value" id="overshotValue">8.0%</span>
-              </div>
-            </div>
-
             <div class="spring-tips">
               <strong>💡 How it works:</strong>
               <ul>
@@ -1547,16 +1527,21 @@
       {
         const points = [];
         const values = [];
-        // Adaptive sampling: higher stiffness needs finer sampling for smooth curves
-        const samplesPerSecond = Math.min( 1000, Math.max( 200, stiffness / 2 ) );
-        const timeStep = 1 / samplesPerSecond; // Adaptive sampling based on stiffness
 
-        // First pass: collect all values to find max overshoot
-        for ( let t = 0; t <= 1; t += timeStep )
+        // Use high-density sampling for very smooth visualization
+        // Fixed sampling rate of 0.002 (500 samples per second) for butter-smooth curves
+        const visualizationTimeStep = 0.002;
+
+        // Collect all values with high-density sampling for smooth visualization
+        for ( let t = 0; t <= 1; t += visualizationTimeStep )
         {
           const value = generateSpringValue( t, stiffness, damping, mass, duration );
           values.push( value );
         }
+
+        // Always include final point at t=1
+        const finalValue = generateSpringValue( 1, stiffness, damping, mass, duration );
+        values.push( finalValue );
 
         // Calculate min and max values for adaptive scaling
         const minValue = Math.min( ...values, 0 );
@@ -1577,16 +1562,21 @@
         // X-axis: 0 to 500px represents time 0 to 1
         const xRange = 500;
 
-        // Create path points using adaptive scaling
-        for ( let i = 0; i < values.length; i++ )
+        // Create path points using high-density sampling
+        for ( let i = 0; i < values.length - 1; i++ )
         {
-          const t = i * timeStep;
+          const t = i * visualizationTimeStep;
           const value = values[ i ];
           const x = t * xRange;
           const normalizedValue = ( value - scaledMin ) / scaledRange;
           const y = graphTopPad + ( 1 - normalizedValue ) * graphHeight;
           points.push( `${ x.toFixed( 2 ) } ${ y.toFixed( 2 ) }` );
         }
+
+        // Add the final point at t=1
+        const finalNormalizedValue = ( finalValue - scaledMin ) / scaledRange;
+        const finalY = graphTopPad + ( 1 - finalNormalizedValue ) * graphHeight;
+        points.push( `${ xRange.toFixed( 2 ) } ${ finalY.toFixed( 2 ) }` );
 
         // Calculate overshoot visualization
         const overshootPercentage = Math.max( 0, ( maxValue - 1 ) * 100 );
@@ -1847,28 +1837,6 @@
           badgeEl.className = `damping-badge ${ dampingClass }`;
           badgeEl.textContent = dampingType.toUpperCase();
           badgeEl.title = dampingDescription;
-        }
-
-        const oscEl = document.getElementById( 'oscillationsValue' );
-        if ( oscEl )
-        {
-          oscEl.textContent = oscillations;
-          oscEl.title = `Would complete ${ oscillations } full cycles`;
-        }
-
-        const settleEl = document.getElementById( 'settlingTimeValue' );
-        if ( settleEl )
-        {
-          settleEl.textContent = `${ settlingTime.toFixed( 2 ) }s`;
-          settleEl.title = 'Time to reach 99% of target value';
-        }
-
-        const overshootEl = document.getElementById( 'overshotValue' );
-        if ( overshootEl )
-        {
-          overshootEl.textContent = `${ maxOvershoot.toFixed( 1 ) }%`;
-          overshootEl.title = `Maximum value overshoots target by this amount`;
-          overshootEl.style.color = maxOvershoot > 20 ? '#ff6b6b' : maxOvershoot > 10 ? '#ffa500' : 'inherit';
         }
       }
 
