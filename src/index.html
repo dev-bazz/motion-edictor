@@ -79,8 +79,8 @@
       }
 
       .editor-section {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: auto 1fr 2fr;
         gap: 12px;
         flex: 1;
         min-height: 0;
@@ -88,26 +88,30 @@
       }
 
       .canvas-wrapper {
+        padding: 0.75rem;
+
         flex: 1;
         display: flex;
         flex-direction: column;
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
-        padding: 8px;
+
         min-height: 0;
       }
 
       svg {
         --bg-color: var(--vscode-input-background, var(--fallback-input-background));
         flex: 1;
-        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 2px;
-        background: oklab(from var(--bg-color) .2 a b / 0.1);
         min-height: 0;
         width: 100%;
         overflow: visible;
-        padding: 1.5rem;
+
+
+        display: block;
+        position: relative;
+        z-index: 1
       }
 
       .control-point {
@@ -136,15 +140,13 @@
       }
 
       .output-section {
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+
+
+
         background: var(--vscode-input-background, var(--fallback-input-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
         padding: 12px;
-        max-height: 45%;
         overflow-y: auto;
       }
 
@@ -181,7 +183,6 @@
 
       .point-list {
         font-size: 11px;
-        max-height: 80px;
         overflow-y: auto;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
@@ -210,13 +211,10 @@
           font-size: 14px;
         }
 
-        .canvas-wrapper {
-          padding: 6px;
-        }
+
 
         .output-section {
           padding: 10px;
-          max-height: 40%;
         }
 
         .output-section h3 {
@@ -230,7 +228,6 @@
         }
 
         .point-list {
-          max-height: 60px;
           padding: 4px;
         }
       }
@@ -247,13 +244,13 @@
       </div>
 
       <div class="editor-section">
+        <nav>
+          <button>Easing</button>
+          <button>Spring</button>
+        </nav>
         <div class="canvas-wrapper">
-          <small
-                    style="margin-bottom: 8px; color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));">Draw
-            Ease Graph Generator</small>
-          <svg id="easeCanvas"
-                    style="width:100%;aspect-ratio:1;display:block;overflow:visible;position:relative;z-index:1"
-                    viewBox="0 0 330 330">
+
+          <svg id="easeCanvas" viewBox="0 0 330 330">
             <!-- Grid -->
             <g id="grid" opacity="0.1"></g>
             <!-- Axes -->
@@ -541,9 +538,10 @@
 
       resetBtn.addEventListener( 'click', () =>
       {
+
         controlPoints = [
-          { x: 0.1, y: 0.4 },
-          { x: 0.9, y: 0.95 }
+          { x: 0, y: 0.5 }, // Point 1
+          { x: 1, y: 0.5 }  // Point 2
         ];
         selectedPoint = -1;
         updateSvg();
