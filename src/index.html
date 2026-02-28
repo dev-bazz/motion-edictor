@@ -939,7 +939,7 @@
             <h3>Duration</h3>
             <div class="duration-control">
               <label for="durationSlider">Duration:</label>
-              <input type="range" id="durationSlider" min="0.1" max="10" step="0.1" value="1">
+              <input type="range" id="durationSlider" min="0.1" max="3" step="0.1" value="1">
               <div class="duration-value" id="durationValue">1s</div>
             </div>
 
@@ -951,7 +951,7 @@
 
             <h3 style="margin-top: 15px;">CSS Output</h3>
             <div class="code-block" id="cssOutput">1s cubic-bezier(0.25, 0.1, 0.25, 1.0)</div>
-            <button class="copy-btn" id="copyBtn">📋 Copy to Clipboard</button>
+            <button class="copy-btn" id="copyBtn"> Copy </button>
 
 
 
@@ -1030,7 +1030,7 @@
               <label for="springDuration">Duration:
                 <span class="param-info" data-tooltip="Total animation time in seconds">?</span>
               </label>
-              <input type="range" id="springDuration" min="0.1" max="2" step="0.1" value="1">
+              <input type="range" id="springDuration" min="0.1" max="2" step="0.001" value="1">
               <div class="duration-value" id="springDurationValue">1s</div>
             </div>
 
@@ -1046,7 +1046,7 @@
               <label for="mass">Mass:
                 <span class="param-info" data-tooltip="Higher = more momentum, slower settling">?</span>
               </label>
-              <input type="range" id="mass" min="0.1" max="5" step="0.1" value="1">
+              <input type="range" id="mass" min="0.1" max="3" step="0.001" value="1">
               <div class="duration-value" id="massValue">1.0</div>
             </div>
 
@@ -1061,7 +1061,7 @@
 
             <h3 style="margin-top: 15px;">CSS Output</h3>
             <div class="code-block" id="springCssOutput">animation: slide 1000ms linear(0, ...)</div>
-            <button class="copy-btn" id="springCopyBtn">📋 Copy CSS to Clipboard</button>
+            <button class="copy-btn" id="springCopyBtn">Copy </button>
 
           </div>
         </div>
@@ -1123,8 +1123,8 @@
 
       // Default control points (normalized 0-1)
       let controlPoints = [
-        { x: 0, y: 0.5 }, // Point 1
-        { x: 1, y: 0.5 }  // Point 2
+        { x: 0.5, y: 0 }, // Point 1
+        { x: 0.5, y: 1 }  // Point 2
       ];
 
       let duration = 1; // Duration in seconds
