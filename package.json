@@ -1,7 +1,7 @@
 {
   "name": "motion-graph-edictor",
-  "displayName": "CSS Easing Generator (👌 Sweet)",
-  "description": "Visually design CSS animations with cubic-bezier curves or spring physics - generate production-ready code with instant previews",
+  "displayName": "Motion — CSS Animation Editor: Easing, Spring Physics & Scroll-Driven",
+  "description": "Visual CSS animation editor for cubic-bezier easing curves, spring physics (linear() easing), and scroll-driven animation ranges (animation-timeline, animation-range). Generate production-ready CSS with live previews directly in VS Code.",
   "icon": "media/brand-icon.png",
   "version": "0.0.5",
   "repository": "https://github.com/dev-bazz/motion-edictor",
@@ -11,7 +11,25 @@
   "publisher": "BaZz",
   "categories": [
     "Visualization",
-    "Snippets"
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "css",
+    "animation",
+    "easing",
+    "cubic-bezier",
+    "spring physics",
+    "scroll-driven animation",
+    "animation-timeline",
+    "animation-range",
+    "linear() easing",
+    "motion design",
+    "css transition",
+    "timing function",
+    "ease editor",
+    "motion editor",
+    "css generator"
   ],
   "activationEvents": [
     "onView:easeGeneratorView"
