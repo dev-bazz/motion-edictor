@@ -966,16 +966,256 @@
         min-width: 50px;
       }
 
+      /* Scroll section accent */
+      .ranges-scroll-section .range-control-row {
+        border-left: 3px solid var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      /* Color-coded range rows */
+      .range-control-row.range-start-row {
+        border-left: 3px solid #4CAF50;
+      }
+
+      .range-control-row.range-end-row {
+        border-left: 3px solid #f44336;
+      }
+
+      .range-control-row:hover {
+        border-color: rgba(0, 168, 255, 0.3);
+      }
+
+      .range-control-row.range-start-row:hover {
+        border-left-color: #4CAF50;
+      }
+
+      .range-control-row.range-end-row:hover {
+        border-left-color: #f44336;
+      }
+
+      /* Section labels with divider line */
+      .ranges-section-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        opacity: 0.5;
+        margin-top: 12px;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .ranges-section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--vscode-input-border, var(--fallback-input-border));
+        opacity: 0.4;
+      }
+
+      /* Progress header */
+      .ranges-progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .ranges-progress-title {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+      }
+
+      .ranges-progress-pct {
+        font-size: 14px;
+        font-family: monospace;
+        font-weight: 700;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        transition: color 0.2s ease, text-shadow 0.2s ease;
+      }
+
+      .ranges-progress-pct.active {
+        text-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+      }
+
+      /* Phase badge */
+      .ranges-phase-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+      }
+
+      .ranges-phase-badge.before {
+        background: rgba(255, 152, 0, 0.15);
+        color: #ff9800;
+      }
+
+      .ranges-phase-badge.in-range {
+        background: rgba(76, 175, 80, 0.15);
+        color: #4caf50;
+      }
+
+      .ranges-phase-badge.after {
+        background: rgba(0, 168, 255, 0.15);
+        color: #00a8ff;
+      }
+
+      .ranges-phase-badge .phase-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+      }
+
+      /* Preset grid */
+      .ranges-preset-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+      }
+
+      .ranges-preset-btn {
+        padding: 5px 4px;
+        font-size: 9px;
+        text-align: center;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        white-space: nowrap;
+      }
+
+      .ranges-preset-btn:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        background: rgba(0, 168, 255, 0.1);
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .ranges-preset-btn.active {
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: var(--vscode-button-foreground, var(--fallback-button-foreground));
+        border-color: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.25);
+      }
+
+      /* Options grid */
+      .ranges-options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .range-option-row {
+        display: grid;
+        grid-template-columns: 55px 1fr;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        transition: border-color 0.15s ease;
+      }
+
+      .range-option-row:hover {
+        border-color: rgba(0, 168, 255, 0.25);
+      }
+
+      .range-option-row label {
+        font-size: 10px;
+        font-weight: 600;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .range-option-row select {
+        width: 100%;
+        padding: 4px 6px;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .range-option-row select:hover {
+        border-color: rgba(0, 168, 255, 0.3);
+      }
+
+      .range-option-slider-row {
+        display: grid;
+        grid-template-columns: 55px 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        transition: border-color 0.15s ease;
+      }
+
+      .range-option-slider-row:hover {
+        border-color: rgba(0, 168, 255, 0.25);
+      }
+
+      .range-option-slider-row label {
+        font-size: 10px;
+        font-weight: 600;
+        opacity: 0.7;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .range-option-slider-row input[type="range"] {
+        min-width: 0;
+        cursor: pointer;
+      }
+
+      .range-option-value {
+        font-family: monospace;
+        font-size: 10px;
+        min-width: 35px;
+        text-align: right;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        font-weight: 600;
+      }
+
+      /* CSS output */
+      .ranges-css-output {
+        position: relative;
+      }
+
+      .ranges-css-output .code-block {
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
       .ranges-progress-section {
         margin-top: 4px;
       }
 
       .ranges-progress-bar {
         width: 100%;
-        height: 6px;
+        height: 8px;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
-        border-radius: 3px;
+        border-radius: 4px;
         overflow: hidden;
         margin-top: 4px;
       }
@@ -983,9 +1223,23 @@
       .ranges-progress-fill {
         height: 100%;
         width: 0%;
-        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-        border-radius: 3px;
-        transition: width 0.1s ease;
+        background: linear-gradient(90deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.6));
+        border-radius: 4px;
+        transition: width 0.12s ease;
+        position: relative;
+      }
+
+      .ranges-progress-fill::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 12px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15));
+        border-radius: 0 4px 4px 0;
       }
 
       .ranges-progress-label {
@@ -1000,12 +1254,17 @@
       .ranges-preview-area {
         position: relative;
         width: 100%;
-        height: 200px;
+        height: 240px;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
-        border-radius: 4px;
+        border-radius: 6px;
         overflow: hidden;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: border-color 0.2s ease;
+      }
+
+      .ranges-preview-area:hover {
+        border-color: rgba(0, 168, 255, 0.3);
       }
 
       .ranges-preview-scrollport {
@@ -1022,54 +1281,68 @@
         position: absolute;
         left: 0;
         right: 0;
-        height: 600px;
-        /* tall content area */
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        padding: 16px 20px;
-        transition: top 0.1s ease;
+        gap: 10px;
+        padding: 14px 16px;
+        transition: top 0.12s ease;
       }
 
       .ranges-preview-block {
-        width: 80%;
-        height: 32px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        width: 82%;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 4px;
         flex-shrink: 0;
-        opacity: 0.5;
+        opacity: 0.4;
+        position: relative;
+        overflow: hidden;
       }
 
-      .ranges-preview-block.placeholder-text::after {
+      .ranges-preview-block::after {
         content: '';
         display: block;
-        width: 60%;
-        height: 6px;
-        margin: 13px auto;
-        background: rgba(255, 255, 255, 0.06);
-        border-radius: 3px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.04);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 12px;
+      }
+
+      .ranges-preview-block:nth-child(odd)::after {
+        width: 65%;
+      }
+
+      .ranges-preview-block:nth-child(even)::after {
+        width: 45%;
       }
 
       .ranges-preview-subject {
-        width: 80%;
-        height: 50px;
+        width: 82%;
+        height: 52px;
         background: linear-gradient(135deg,
             var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
-            rgba(0, 168, 255, 0.6));
+            rgba(0, 168, 255, 0.5));
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        box-shadow: 0 4px 16px rgba(0, 168, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 10px;
-        font-weight: 600;
+        font-weight: 700;
         color: white;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
         text-transform: uppercase;
-        transition: transform 0.15s ease, opacity 0.15s ease, border-radius 0.15s ease;
+        transition: transform 0.15s ease, opacity 0.15s ease, border-radius 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .ranges-preview-subject.animating {
+        box-shadow: 0 6px 24px rgba(0, 168, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
       }
 
       /* Viewport overlay frame */
@@ -1090,7 +1363,7 @@
         left: 0;
         right: 0;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
-        opacity: 0.75;
+        opacity: 0.8;
         z-index: 5;
       }
 
@@ -1108,25 +1381,25 @@
         position: absolute;
         left: 0;
         right: 0;
-        border: 1.5px dashed rgba(0, 168, 255, 0.5);
         pointer-events: none;
         z-index: 6;
       }
 
       .ranges-preview-viewport-border.top {
         top: var(--viewport-top-mask, 0px);
+        border-top: 1.5px solid rgba(0, 168, 255, 0.35);
       }
 
       .ranges-preview-viewport-border.bottom {
         bottom: var(--viewport-bottom-mask, 0px);
+        border-bottom: 1.5px solid rgba(0, 168, 255, 0.35);
       }
 
       .ranges-preview-viewport-label {
         position: absolute;
-        right: 6px;
-        font-size: 8px;
-        font-weight: 600;
-        color: rgba(0, 168, 255, 0.6);
+        font-size: 7px;
+        font-weight: 700;
+        color: rgba(0, 168, 255, 0.5);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         pointer-events: none;
@@ -1134,11 +1407,13 @@
       }
 
       .ranges-preview-viewport-label.top-label {
-        top: calc(var(--viewport-top-mask, 0px) + 2px);
+        top: calc(var(--viewport-top-mask, 0px) + 3px);
+        left: 8px;
       }
 
       .ranges-preview-viewport-label.bottom-label {
-        bottom: calc(var(--viewport-bottom-mask, 0px) + 2px);
+        bottom: calc(var(--viewport-bottom-mask, 0px) + 3px);
+        left: 8px;
       }
 
       /* Range marker lines in preview */
@@ -1173,11 +1448,19 @@
       }
 
       .ranges-preview-from-marker .ranges-preview-marker-label {
-        color: #4CAF50;
+        color: #fff;
+        background: rgba(76, 175, 80, 0.8);
+        right: 8px;
+        padding: 1px 4px;
+        border-radius: 2px;
       }
 
       .ranges-preview-to-marker .ranges-preview-marker-label {
-        color: #f44336;
+        color: #fff;
+        background: rgba(244, 67, 54, 0.8);
+        right: 8px;
+        padding: 1px 4px;
+        border-radius: 2px;
       }
 
       /* Scroll track on the right */
@@ -2812,48 +3095,58 @@
 
         if ( !previewArea || !content ) return;
 
-        const areaH = previewArea.offsetHeight || 220;
-        const contentH = content.scrollHeight || 700;
+        const areaH = previewArea.offsetHeight || 240;
 
-        // Viewport is the visible area — let's define it as the middle 40% of the preview
-        const vpFraction = 0.4;
+        // Viewport region: middle 45% of the preview area
+        const vpFraction = 0.45;
         const vpTop = areaH * ( ( 1 - vpFraction ) / 2 );
-        const vpBottom = areaH - vpTop;
-        const vpHeight = vpBottom - vpTop;
+        const vpHeight = areaH * vpFraction;
 
-        // Set CSS variables for viewport mask overlay
+        // Set viewport mask CSS variables
         previewArea.style.setProperty( '--viewport-top-mask', vpTop + 'px' );
         previewArea.style.setProperty( '--viewport-bottom-mask', vpTop + 'px' );
 
-        // Scroll the content strip: at scrollPos=0, content top is at viewport bottom;
-        // at scrollPos=1, content bottom is at viewport top
+        // Content height represents the full scrollable page.
+        // We want realistic scrolling: the content is taller than the viewport,
+        // and scrolling moves it upward through the viewport window.
+        const numBlocks = content.children.length;
+        const blockH = 38; // approximate block + gap height
+        const subjectH = 62; // approximate subject height
+        const contentH = numBlocks * blockH + subjectH;
+
+        // Total scrollable distance: content overflows beyond the viewport
+        // At scrollPos=0: the top of content is at the top of viewport (beginning of page)
+        // At scrollPos=1: the bottom of content is at the bottom of viewport (end of page)
         const maxScroll = contentH - vpHeight;
         const scrollOffset = scrollPos * maxScroll;
+
+        // Position content so it scrolls through the viewport window
         content.style.top = ( vpTop - scrollOffset ) + 'px';
 
         // Scrollbar thumb
         if ( thumb )
         {
-          const trackH = areaH - 8;
-          const thumbH = Math.max( 16, ( vpHeight / contentH ) * trackH );
+          const trackH = areaH - 12;
+          const thumbH = Math.max( 20, ( vpHeight / contentH ) * trackH );
           const thumbTop = scrollPos * ( trackH - thumbH );
           thumb.style.height = thumbH + 'px';
-          thumb.style.top = thumbTop + 'px';
+          thumb.style.top = ( 4 + thumbTop ) + 'px';
         }
 
-        // Position FROM/TO marker lines relative to the preview area
-        // These represent where in the scroll the range starts/ends
+        // Position FROM/TO markers.
+        // These show the scroll position at which the range boundary is hit.
+        // startFrac/endFrac are scroll fractions (0-1). We map them to Y positions
+        // within the viewport area to show where the trigger points are.
         if ( fromMarker )
         {
-          // Map startFrac to a Y position: at startFrac scroll, the subject hits the range start
-          // Show the marker at the viewport boundary that corresponds to the range edge
-          const fromY = vpTop + ( 1 - startFrac ) * vpHeight;
+          // At startFrac, the animation begins — show where in the viewport that happens
+          const fromY = vpTop + startFrac * vpHeight;
           fromMarker.style.top = Math.max( 0, Math.min( areaH, fromY ) ) + 'px';
         }
 
         if ( toMarker )
         {
-          const toY = vpTop + ( 1 - endFrac ) * vpHeight;
+          const toY = vpTop + endFrac * vpHeight;
           toMarker.style.top = Math.max( 0, Math.min( areaH, toY ) ) + 'px';
         }
       }
