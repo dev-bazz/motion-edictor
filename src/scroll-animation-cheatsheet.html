@@ -12,20 +12,26 @@
         --fallback-button-background: #0e639c;
         --fallback-button-foreground: #ffffff;
         --fallback-button-hoverBackground: #1177bb;
-        --fallback-input-background: #2d2d2d;
+        --fallback-input-background: #3c3c3c;
         --fallback-input-border: #555555;
         --fallback-descriptionForeground: #b4b4b4;
         --fallback-symbolIcon-colorForeground: #00a8ff;
 
-        --bg: var(--vscode-editor-background, var(--fallback-editor-background));
-        --fg: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
-        --accent: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
-        --card-bg: var(--vscode-input-background, var(--fallback-input-background));
-        --border: var(--vscode-input-border, var(--fallback-input-border));
-        --btn-bg: var(--vscode-button-background, var(--fallback-button-background));
-        --btn-fg: var(--vscode-button-foreground, var(--fallback-button-foreground));
-        --btn-hover: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
-        --muted: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        /* Syntax highlighting — VS Code Dark+ theme */
+        --syn-keyword: #569cd6;
+        --syn-property: #9cdcfe;
+        --syn-value: #ce9178;
+        --syn-string: #ce9178;
+        --syn-number: #b5cea8;
+        --syn-function: #dcdcaa;
+        --syn-comment: #6a9955;
+        --syn-selector: #d7ba7d;
+        --syn-tag: #569cd6;
+        --syn-attr: #9cdcfe;
+        --syn-punctuation: #d4d4d4;
+        --syn-at-rule: #c586c0;
+        --syn-unit: #b5cea8;
+        --syn-important: #569cd6;
       }
 
       * {
@@ -36,172 +42,207 @@
 
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: var(--bg);
-        color: var(--fg);
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
         line-height: 1.6;
         overflow-y: auto;
-        padding: 0;
+        height: 100vh;
       }
 
-      /* ── Layout ── */
-      .page {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 24px 20px 64px;
-      }
-
-      .page-title {
-        font-size: 26px;
-        font-weight: 700;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .page-title .icon {
-        font-size: 28px;
-      }
-
-      .page-subtitle {
-        color: var(--muted);
-        font-size: 13px;
-        margin-bottom: 28px;
-      }
-
-      /* ── Table of Contents ── */
-      .toc {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 16px 20px;
-        margin-bottom: 32px;
-      }
-
-      .toc h2 {
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        opacity: 0.7;
-        margin-bottom: 10px;
-      }
-
-      .toc-grid {
+      /* ═══════════════════════════════════════════════ */
+      /* LAYOUT — matches main extension container      */
+      /* ═══════════════════════════════════════════════ */
+      .container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px 24px;
+        grid-template-rows: auto auto 1fr;
+        height: 100%;
+        width: 100%;
+        padding: 12px;
+        gap: 12px;
+        max-width: 960px;
+        margin: 0 auto;
       }
 
-      .toc a {
-        color: var(--accent);
-        text-decoration: none;
-        font-size: 13px;
-        padding: 3px 0;
-        display: block;
-        transition: opacity 0.15s;
-      }
-
-      .toc a:hover {
-        opacity: 0.75;
-        text-decoration: underline;
-      }
-
-      /* ── Section ── */
-      .section {
-        margin-bottom: 36px;
-      }
-
-      .section-title {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        padding-bottom: 6px;
-        border-bottom: 2px solid var(--accent);
-        display: flex;
+      /* ── Header — matches main extension ── */
+      .header {
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
       }
 
-      .section-title .badge {
-        font-size: 10px;
-        background: var(--accent);
-        color: var(--bg);
-        padding: 2px 8px;
-        border-radius: 10px;
+      .header h1 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .header .subtitle {
+        grid-column: 1 / -1;
+        font-size: 11px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        line-height: 1.4;
+      }
+
+      /* ── Nav tabs — matches main extension tab bar ── */
+      nav.toc-nav {
+        display: flex;
+        gap: 0;
+        padding-bottom: 0;
+        border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        overflow-x: auto;
+        flex-shrink: 0;
+      }
+
+      nav.toc-nav button {
+        padding: 8px 14px;
+        background: transparent;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        font-size: 11px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      nav.toc-nav button:hover {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+      }
+
+      nav.toc-nav button.active {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-bottom-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      /* ── Tab Content ── */
+      .tab-content {
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .tab-content.active {
+        display: flex;
+      }
+
+      /* ── Buttons — matches main extension ── */
+      button.btn {
+        padding: 6px 12px;
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: var(--vscode-button-foreground, var(--fallback-button-foreground));
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+
+      button.btn:hover {
+        background: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+      }
+
+      /* ── Section cards — matches .output-section ── */
+      .section-card {
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        padding: 12px;
+        transition: border-color 0.2s;
+      }
+
+      .section-card:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .section-card h3 {
+        font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-      }
-
-      .subsection {
-        margin-bottom: 20px;
-      }
-
-      .subsection-title {
-        font-size: 15px;
-        font-weight: 600;
+        opacity: 0.8;
         margin-bottom: 8px;
-        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
 
-      p {
-        margin-bottom: 10px;
-        font-size: 13px;
-        color: var(--muted);
+      .section-card h3 .badge {
+        font-size: 9px;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        color: var(--vscode-editor-background, var(--fallback-editor-background));
+        padding: 1px 6px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
       }
 
-      p strong {
-        color: var(--fg);
+      .section-card p {
+        font-size: 11px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        line-height: 1.5;
+        margin-bottom: 8px;
       }
 
-      /* ── Code Blocks ── */
+      .section-card p strong {
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+      }
+
+      /* ── Code block — matches main extension .code-block ── */
       .code-block {
         position: relative;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        padding: 14px 16px;
-        margin-bottom: 12px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 2px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
         font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        font-size: 12px;
+        font-size: 11px;
         line-height: 1.7;
         overflow-x: auto;
         white-space: pre;
-        color: var(--fg);
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
         tab-size: 2;
+        transition: all 0.2s ease;
       }
 
       .code-block:hover {
-        border-color: var(--accent);
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.1);
       }
 
       .code-label {
         position: absolute;
-        top: 6px;
-        right: 8px;
-        font-size: 10px;
-        color: var(--muted);
-        background: var(--card-bg);
-        padding: 1px 8px;
-        border-radius: 3px;
+        top: 4px;
+        right: 6px;
+        font-size: 9px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        padding: 1px 6px;
+        border-radius: 2px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        pointer-events: none;
       }
 
       .copy-btn {
         position: absolute;
-        bottom: 6px;
-        right: 8px;
-        background: var(--btn-bg);
-        color: var(--btn-fg);
+        bottom: 4px;
+        right: 6px;
+        padding: 2px 8px;
+        font-size: 10px;
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: var(--vscode-button-foreground, var(--fallback-button-foreground));
         border: none;
-        border-radius: 3px;
-        padding: 3px 10px;
-        font-size: 11px;
+        border-radius: 2px;
         cursor: pointer;
         opacity: 0;
-        transition: opacity 0.2s, background 0.2s;
+        transition: opacity 0.15s, background 0.15s;
       }
 
       .code-block:hover .copy-btn {
@@ -209,190 +250,233 @@
       }
 
       .copy-btn:hover {
-        background: var(--btn-hover);
+        background: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
       }
 
-      /* ── Tables ── */
+      /* ── Syntax Highlighting tokens ── */
+      .syn-k {
+        color: var(--syn-keyword);
+      }
+
+      .syn-p {
+        color: var(--syn-property);
+      }
+
+      .syn-v {
+        color: var(--syn-value);
+      }
+
+      .syn-s {
+        color: var(--syn-string);
+      }
+
+      .syn-n {
+        color: var(--syn-number);
+      }
+
+      .syn-f {
+        color: var(--syn-function);
+      }
+
+      .syn-c {
+        color: var(--syn-comment);
+        font-style: italic;
+      }
+
+      .syn-se {
+        color: var(--syn-selector);
+      }
+
+      .syn-t {
+        color: var(--syn-tag);
+      }
+
+      .syn-a {
+        color: var(--syn-attr);
+      }
+
+      .syn-pn {
+        color: var(--syn-punctuation);
+      }
+
+      .syn-ar {
+        color: var(--syn-at-rule);
+      }
+
+      .syn-u {
+        color: var(--syn-unit);
+      }
+
+      .syn-im {
+        color: var(--syn-important);
+      }
+
+      /* ── Tables — compact style ── */
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 14px;
-        font-size: 12px;
+        margin-bottom: 8px;
+        font-size: 11px;
       }
 
       th,
       td {
         text-align: left;
-        padding: 8px 12px;
-        border: 1px solid var(--border);
+        padding: 6px 10px;
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
       }
 
       th {
-        background: var(--card-bg);
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
         font-weight: 600;
-        font-size: 11px;
+        font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.4px;
       }
 
       td {
-        color: var(--muted);
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
       }
 
       td code {
-        color: var(--accent);
-        background: var(--bg);
-        padding: 1px 5px;
-        border-radius: 3px;
-        font-size: 11.5px;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        padding: 1px 4px;
+        border-radius: 2px;
+        font-size: 10.5px;
       }
 
-      /* ── Info / Tip / Warning Boxes ── */
+      /* ── Info / Tip / Warning — matches .info-banner + .spring-tips ── */
       .info-box {
-        background: var(--card-bg);
-        border-left: 3px solid var(--accent);
-        border-radius: 0 4px 4px 0;
-        padding: 10px 14px;
-        margin-bottom: 14px;
-        font-size: 12px;
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        font-size: 10px;
+        line-height: 1.5;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      .info-box strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
       }
 
       .info-box.tip {
-        border-left-color: #4ec9b0;
+        border-color: rgba(78, 201, 176, 0.35);
+        background: rgba(78, 201, 176, 0.05);
       }
 
-      .info-box.warn {
-        border-left-color: #d7ba7d;
-      }
-
-      .info-box .label {
-        font-weight: 700;
-        margin-bottom: 2px;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-      }
-
-      .info-box.tip .label {
+      .info-box.tip strong {
         color: #4ec9b0;
       }
 
-      .info-box.warn .label {
+      .info-box.warn {
+        border-color: rgba(215, 186, 125, 0.35);
+        background: rgba(215, 186, 125, 0.05);
+      }
+
+      .info-box.warn strong {
         color: #d7ba7d;
       }
 
-      .info-box p {
-        margin: 0;
-        color: var(--fg);
+      .info-box .box-label {
+        font-weight: 700;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 3px;
+        display: block;
       }
 
-      /* ── Visual Demo Boxes ── */
-      .demo-container {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 20px;
-        margin-bottom: 14px;
+      /* ── Preview containers — matches #preview from main extension ── */
+      .preview-box {
         position: relative;
+        width: 100%;
+        background: linear-gradient(to bottom,
+            var(--vscode-input-background, var(--fallback-input-background)) 0%,
+            var(--vscode-editor-background, var(--fallback-editor-background)) 100%);
+        border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
         overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: border-color 0.2s ease;
+        margin-bottom: 8px;
       }
 
-      .demo-label {
-        font-size: 10px;
-        color: var(--muted);
+      .preview-box:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 8px rgba(0, 168, 255, 0.15);
+      }
+
+      .preview-label {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        font-size: 9px;
         text-transform: uppercase;
         letter-spacing: 0.8px;
-        margin-bottom: 12px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        z-index: 5;
+        pointer-events: none;
       }
 
-      /* Scroll-timeline demo */
-      .scroll-demo-track {
-        height: 150px;
-        overflow-y: scroll;
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        position: relative;
+      .preview-hint {
+        position: absolute;
+        bottom: 6px;
+        right: 8px;
+        font-size: 9px;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        opacity: 0.6;
+        z-index: 5;
+        pointer-events: none;
       }
 
-      .scroll-demo-track .scroll-content {
-        height: 600px;
-        padding: 12px;
-        background: repeating-linear-gradient(180deg,
-            transparent,
-            transparent 49px,
-            var(--border) 49px,
-            var(--border) 50px);
+      /* ── Animated ball — matches #previewBox ── */
+      .anim-ball {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.6));
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        flex-shrink: 0;
       }
 
-      .scroll-progress-bar {
-        position: sticky;
-        top: 0;
-        height: 4px;
-        background: var(--accent);
-        width: 0%;
-        transition: none;
-        border-radius: 0 2px 2px 0;
-        z-index: 2;
-      }
-
-      /* Animated box demos */
-      .anim-box {
-        width: 50px;
-        height: 50px;
-        background: var(--accent);
+      .anim-rect {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.5));
         border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
-        color: var(--bg);
+        font-size: 16px;
         font-weight: 700;
-      }
-
-      /* ── Keyword list ── */
-      .keyword-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-
-      .keyword-item {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        padding: 8px 12px;
-        font-size: 12px;
-      }
-
-      .keyword-item code {
-        color: var(--accent);
-        font-weight: 600;
-      }
-
-      .keyword-item .desc {
-        color: var(--muted);
-        font-size: 11px;
-        margin-top: 2px;
+        color: var(--vscode-editor-background, var(--fallback-editor-background));
       }
 
       /* ── Browser support badges ── */
       .browser-support {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         flex-wrap: wrap;
-        margin-bottom: 14px;
+        margin-bottom: 8px;
       }
 
       .browser-badge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 11px;
+        gap: 4px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 12px;
+        padding: 3px 10px;
+        font-size: 10px;
       }
 
       .browser-badge.yes {
@@ -405,775 +489,828 @@
         color: #d7ba7d;
       }
 
-      .browser-badge.no {
-        border-color: #f44747;
-        color: #f44747;
-      }
-
-      /* ── Utility ── */
-      .mt-sm {
-        margin-top: 8px;
-      }
-
-      .mb-sm {
+      /* ── Keyword grid ── */
+      .keyword-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 6px;
         margin-bottom: 8px;
       }
 
-      .flex-row {
+      .keyword-item {
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        padding: 6px 10px;
+        font-size: 11px;
+        transition: border-color 0.15s;
+      }
+
+      .keyword-item:hover {
+        border-color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .keyword-item code {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        font-weight: 600;
+        font-size: 11px;
+      }
+
+      .keyword-item .desc {
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        font-size: 10px;
+        margin-top: 2px;
+      }
+
+      /* ═══════════════════════════════════════════════ */
+      /* PREVIEW-SPECIFIC ANIMATIONS                    */
+      /* ═══════════════════════════════════════════════ */
+
+      /* Demo 1: Progress bar */
+      .demo-progress-track {
+        height: 120px;
+        overflow-y: auto;
+        position: relative;
+        border-radius: 2px;
+      }
+
+      .demo-progress-track .filler {
+        height: 500px;
+        background: repeating-linear-gradient(180deg,
+            transparent, transparent 29px,
+            var(--vscode-input-border, var(--fallback-input-border)) 29px,
+            var(--vscode-input-border, var(--fallback-input-border)) 30px);
+        opacity: 0.3;
+      }
+
+      .demo-progress-bar {
+        position: sticky;
+        top: 0;
+        height: 4px;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        width: 0%;
+        border-radius: 0 2px 2px 0;
+        z-index: 10;
+        box-shadow: 0 0 8px rgba(0, 168, 255, 0.5);
+      }
+
+      /* Demo 2: Reveal cards track */
+      .demo-reveal-track {
+        height: 200px;
+        overflow-y: auto;
+        padding: 12px;
+        border-radius: 2px;
+      }
+
+      .demo-reveal-track .spacer {
+        height: 80px;
+      }
+
+      .demo-reveal-card {
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        font-size: 11px;
+      }
+
+      .demo-reveal-card.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .demo-reveal-card .card-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+
+      /* Demo 3: Parallax layers */
+      .demo-parallax-track {
+        height: 180px;
+        overflow-y: auto;
+        position: relative;
+        border-radius: 2px;
+      }
+
+      .demo-parallax-track .filler {
+        height: 600px;
+      }
+
+      .parallax-layer {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        pointer-events: none;
+      }
+
+      .parallax-bg {
+        background: rgba(0, 168, 255, 0.1);
+        border: 1px dashed rgba(0, 168, 255, 0.3);
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        z-index: 1;
+      }
+
+      .parallax-fg {
+        background: rgba(0, 168, 255, 0.25);
+        border: 1px solid rgba(0, 168, 255, 0.5);
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        z-index: 2;
+        margin-top: -40px;
+      }
+
+      /* Demo 4: Horizontal scroll */
+      .demo-hz-track {
         display: flex;
         gap: 12px;
+        overflow-x: auto;
+        padding: 16px 12px;
+        scroll-snap-type: x mandatory;
+        border-radius: 2px;
+      }
+
+      .demo-hz-item {
+        flex: 0 0 100px;
+        height: 70px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        scroll-snap-align: start;
+        opacity: 0.3;
+        transform: translateX(-20px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+
+      .demo-hz-item.visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      /* Demo 5: Sticky header shrink */
+      .demo-sticky-track {
+        height: 160px;
+        overflow-y: auto;
+        position: relative;
+        border-radius: 2px;
+      }
+
+      .demo-sticky-track .filler {
+        height: 600px;
+      }
+
+      .demo-sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 14px 16px;
+        background: transparent;
+        font-size: 12px;
+        font-weight: 600;
+        transition: padding 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, font-size 0.3s ease;
+        border-radius: 4px 4px 0 0;
+      }
+
+      .demo-sticky-header.shrunk {
+        padding: 6px 16px;
+        background: rgba(0, 0, 0, 0.7);
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+        font-size: 11px;
+      }
+
+      .demo-sticky-header .header-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        margin-right: 8px;
+      }
+
+      /* Demo 6: Text reveal */
+      .demo-text-track {
+        height: 160px;
+        overflow-y: auto;
+        padding: 16px;
+        border-radius: 2px;
+      }
+
+      .demo-text-track .spacer {
+        height: 60px;
+      }
+
+      .demo-text-words {
+        font-size: 20px;
+        font-weight: 700;
+        perspective: 600px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 40px;
+      }
+
+      .demo-text-words span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(100%) rotateX(-60deg);
+        filter: blur(4px);
+        transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+      }
+
+      .demo-text-words span.visible {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+        filter: blur(0);
+      }
+
+      /* Demo 7: animation-range scope visualizer */
+      .range-visualizer {
+        position: relative;
+        height: 200px;
+        overflow-y: auto;
+        border-radius: 2px;
+      }
+
+      .range-visualizer .filler {
+        height: 600px;
+        position: relative;
+      }
+
+      .range-indicator {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        z-index: 10;
+        font-size: 10px;
+        font-weight: 600;
+        pointer-events: none;
+      }
+
+      .range-indicator .bar {
+        flex: 1;
+        height: 6px;
+        background: var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .range-indicator .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        border-radius: 3px;
+        box-shadow: 0 0 6px rgba(0, 168, 255, 0.5);
+      }
+
+      .range-indicator .pct {
+        min-width: 32px;
+        text-align: right;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        font-family: 'Consolas', monospace;
+      }
+
+      .range-scope-box {
+        position: sticky;
+        top: 30px;
+        margin: 8px 12px;
+        padding: 10px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        transition: opacity 0.3s, transform 0.3s;
+      }
+
+      .range-scope-box .anim-rect {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      /* Range selector buttons */
+      .range-btns {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+
+      .range-btns button {
+        padding: 4px 10px;
+        font-size: 10px;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .range-btns button:hover,
+      .range-btns button.active {
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: var(--vscode-button-foreground, var(--fallback-button-foreground));
+        border-color: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+      }
+
+      .range-btns button.active {
+        box-shadow: 0 0 6px rgba(0, 168, 255, 0.3);
+      }
+
+      /* ── Scrollbar styling ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      /* ── Utility ── */
+      .flex-row {
+        display: flex;
+        gap: 8px;
         align-items: center;
         flex-wrap: wrap;
       }
 
+      .mt {
+        margin-top: 8px;
+      }
+
+      .mb {
+        margin-bottom: 8px;
+      }
+
       hr {
         border: none;
-        border-top: 1px solid var(--border);
-        margin: 24px 0;
+        border-top: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        margin: 4px 0;
       }
     </style>
   </head>
 
   <body>
-    <div class="page">
+    <div class="container">
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- HEADER -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <h1 class="page-title"><span class="icon">📜</span> CSS Scroll Animation Cheat Sheet</h1>
-      <p class="page-subtitle">Everything you need to know about CSS Scroll-Driven Animations — properties, timelines,
-        ranges, and ready-to-use snippets.</p>
+      <!-- ═══════════ HEADER ═══════════ -->
+      <div class="header">
+        <h1>📜 CSS Scroll Animation</h1>
+        <span class="subtitle">Comprehensive cheat sheet — properties, timelines, ranges, recipes &amp; live
+          previews</span>
+      </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- TABLE OF CONTENTS -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <nav class="toc">
-        <h2>Contents</h2>
-        <div class="toc-grid">
-          <a href="#overview">1. Overview &amp; Concepts</a>
-          <a href="#browser-support">2. Browser Support</a>
-          <a href="#scroll-timeline">3. scroll-timeline</a>
-          <a href="#view-timeline">4. view-timeline</a>
-          <a href="#animation-timeline">5. animation-timeline</a>
-          <a href="#animation-range">6. animation-range</a>
-          <a href="#scroll-function">7. scroll() Function</a>
-          <a href="#view-function">8. view() Function</a>
-          <a href="#named-timelines">9. Named Timelines</a>
-          <a href="#timeline-scope">10. timeline-scope</a>
-          <a href="#progress-bar">11. Scroll Progress Bar</a>
-          <a href="#reveal-on-scroll">12. Reveal on Scroll</a>
-          <a href="#parallax">13. Parallax Effects</a>
-          <a href="#horizontal">14. Horizontal Scroll</a>
-          <a href="#sticky-header">15. Sticky Header Animation</a>
-          <a href="#image-sequence">16. Image Sequence on Scroll</a>
-          <a href="#text-reveal">17. Text Reveal on Scroll</a>
-          <a href="#combined">18. Combining with @keyframes</a>
-          <a href="#js-fallback">19. JavaScript Fallback</a>
-          <a href="#best-practices">20. Best Practices</a>
-        </div>
+      <!-- ═══════════ TAB NAV ═══════════ -->
+      <nav class="toc-nav" id="tabNav">
+        <button class="active" data-tab="basics">Basics</button>
+        <button data-tab="properties">Properties</button>
+        <button data-tab="functions">Functions</button>
+        <button data-tab="ranges">Ranges</button>
+        <button data-tab="recipes">Recipes</button>
+        <button data-tab="advanced">Advanced</button>
+        <button data-tab="reference">Reference</button>
       </nav>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 1. OVERVIEW -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="overview" class="section">
-        <h2 class="section-title">1. Overview &amp; Concepts</h2>
-        <p>CSS Scroll-Driven Animations let you tie <strong>@keyframes</strong> progress to scroll position instead of
-          time. There are two core timeline types:</p>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: BASICS                                    -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content active" id="tab-basics">
 
-        <table>
-          <tr>
-            <th>Timeline Type</th>
-            <th>What drives it</th>
-            <th>Use Case</th>
-          </tr>
-          <tr>
-            <td><code>ScrollTimeline</code></td>
-            <td>Position of scroll container</td>
-            <td>Progress bars, parallax, sticky animations</td>
-          </tr>
-          <tr>
-            <td><code>ViewTimeline</code></td>
-            <td>Element's visibility in scroll-port</td>
-            <td>Reveal-on-scroll, entrance/exit animations</td>
-          </tr>
-        </table>
-
-        <p>The animation's <strong>current time</strong> is determined by scroll progress (0% → 100%) rather than
-          elapsed seconds. All standard <code>@keyframes</code> rules apply — you just swap the time-based timeline for
-          a scroll-based one.</p>
-
-        <div class="info-box tip">
-          <div class="label">💡 Key Insight</div>
-          <p>Unlike JavaScript scroll listeners, CSS scroll-driven animations run on the <strong>compositor
-              thread</strong>, giving you buttery-smooth 60fps+ animations with zero main-thread jank.</p>
+        <!-- Overview -->
+        <div class="section-card">
+          <h3>Overview &amp; Concepts</h3>
+          <p>CSS Scroll-Driven Animations tie <strong>@keyframes</strong> progress to scroll position instead of time.
+            Two core timeline types:</p>
+          <table>
+            <tr>
+              <th>Timeline Type</th>
+              <th>What Drives It</th>
+              <th>Use Case</th>
+            </tr>
+            <tr>
+              <td><code>ScrollTimeline</code></td>
+              <td>Position of scroll container</td>
+              <td>Progress bars, parallax, sticky headers</td>
+            </tr>
+            <tr>
+              <td><code>ViewTimeline</code></td>
+              <td>Element visibility in scrollport</td>
+              <td>Reveal-on-scroll, entrance/exit animations</td>
+            </tr>
+          </table>
+          <div class="info-box tip">
+            <span class="box-label">💡 Key Insight</span>
+            CSS scroll-driven animations run on the <strong>compositor thread</strong> — buttery-smooth 60fps+ with zero
+            main-thread jank, unlike JS scroll listeners.
+          </div>
         </div>
-      </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 2. BROWSER SUPPORT -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="browser-support" class="section">
-        <h2 class="section-title">2. Browser Support</h2>
-        <div class="browser-support">
-          <span class="browser-badge yes">✅ Chrome 115+</span>
-          <span class="browser-badge yes">✅ Edge 115+</span>
-          <span class="browser-badge yes">✅ Opera 101+</span>
-          <span class="browser-badge yes">✅ Chrome Android 115+</span>
-          <span class="browser-badge partial">⚠️ Safari 18+ (partial)</span>
-          <span class="browser-badge partial">⚠️ Firefox 110+ (flag)</span>
+        <!-- Browser Support -->
+        <div class="section-card">
+          <h3>Browser Support</h3>
+          <div class="browser-support">
+            <span class="browser-badge yes">✅ Chrome 115+</span>
+            <span class="browser-badge yes">✅ Edge 115+</span>
+            <span class="browser-badge yes">✅ Opera 101+</span>
+            <span class="browser-badge yes">✅ Android 115+</span>
+            <span class="browser-badge partial">⚠️ Safari 18+</span>
+            <span class="browser-badge partial">⚠️ Firefox (flag)</span>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Feature detection */</span>
+            <span class="syn-ar">@supports</span> (<span class="syn-p">animation-timeline</span>: <span
+                      class="syn-f">scroll</span>()) {
+            <span class="syn-c">/* scroll-driven styles */</span>
+            }
+
+            <span class="syn-ar">@supports not</span> (<span class="syn-p">animation-timeline</span>: <span
+                      class="syn-f">scroll</span>()) {
+            <span class="syn-c">/* fallback styles */</span>
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
-        <div class="code-block"><span class="code-label">CSS</span>/* Feature detection */
-          @supports (animation-timeline: scroll()) {
-          /* scroll-driven styles */
-          }
 
-          @supports not (animation-timeline: scroll()) {
-          /* fallback styles */
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 3. scroll-timeline -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="scroll-timeline" class="section">
-        <h2 class="section-title">3. scroll-timeline <span class="badge">Property</span></h2>
-        <p>Declares a <strong>named scroll progress timeline</strong> on a scroll container. Child elements (or the
-          element itself) can reference it via <code>animation-timeline</code>.</p>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: PROPERTIES                                -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-properties">
 
-        <table>
-          <tr>
-            <th>Property</th>
-            <th>Values</th>
-            <th>Default</th>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline-name</code></td>
-            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
-            <td><code>none</code></td>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline-axis</code></td>
-            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
-            <td><code>block</code></td>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline</code></td>
-            <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
-          </tr>
-        </table>
+        <!-- scroll-timeline -->
+        <div class="section-card">
+          <h3>scroll-timeline <span class="badge">Property</span></h3>
+          <p>Declares a <strong>named scroll progress timeline</strong> on a scroll container.</p>
+          <table>
+            <tr>
+              <th>Property</th>
+              <th>Values</th>
+              <th>Default</th>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline-name</code></td>
+              <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+              <td><code>none</code></td>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline-axis</code></td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td><code>block</code></td>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline</code></td>
+              <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
+            </tr>
+          </table>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Name a scroll timeline on a
+              container */</span>
+            <span class="syn-se">.scroll-container</span> {
+            <span class="syn-p">overflow-y</span>: <span class="syn-v">scroll</span>;
+            <span class="syn-p">scroll-timeline-name</span>: <span class="syn-v">--page-scroll</span>;
+            <span class="syn-p">scroll-timeline-axis</span>: <span class="syn-v">block</span>;
+            }
 
-        <div class="code-block"><span class="code-label">CSS</span>/* Name a scroll timeline on a container */
-          .scroll-container {
-          overflow-y: scroll;
-          scroll-timeline-name: --page-scroll;
-          scroll-timeline-axis: block; /* default */
-          }
-
-          /* Shorthand */
-          .scroll-container {
-          overflow-y: scroll;
-          scroll-timeline: --page-scroll block;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 4. view-timeline -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="view-timeline" class="section">
-        <h2 class="section-title">4. view-timeline <span class="badge">Property</span></h2>
-        <p>Declares a <strong>view progress timeline</strong> that measures how much of an element is currently visible
-          inside a scrollport.</p>
-
-        <table>
-          <tr>
-            <th>Property</th>
-            <th>Values</th>
-            <th>Default</th>
-          </tr>
-          <tr>
-            <td><code>view-timeline-name</code></td>
-            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
-            <td><code>none</code></td>
-          </tr>
-          <tr>
-            <td><code>view-timeline-axis</code></td>
-            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
-            <td><code>block</code></td>
-          </tr>
-          <tr>
-            <td><code>view-timeline-inset</code></td>
-            <td><code>auto</code> | <code>&lt;length-percentage&gt;{1,2}</code></td>
-            <td><code>auto</code></td>
-          </tr>
-          <tr>
-            <td><code>view-timeline</code></td>
-            <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
-          </tr>
-        </table>
-
-        <div class="code-block"><span class="code-label">CSS</span>/* Track visibility of an element */
-          .card {
-          view-timeline-name: --card-reveal;
-          view-timeline-axis: block;
-          }
-
-          /* Shorthand */
-          .card {
-          view-timeline: --card-reveal block;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 5. animation-timeline -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="animation-timeline" class="section">
-        <h2 class="section-title">5. animation-timeline <span class="badge">Core</span></h2>
-        <p>Links an animation to a scroll timeline instead of the default document timeline (time-based). This is the
-          <strong>single most important property</strong> for scroll-driven animations.</p>
-
-        <table>
-          <tr>
-            <th>Value</th>
-            <th>Description</th>
-          </tr>
-          <tr>
-            <td><code>auto</code></td>
-            <td>Default document timeline (time-based)</td>
-          </tr>
-          <tr>
-            <td><code>none</code></td>
-            <td>No timeline, animation won't progress</td>
-          </tr>
-          <tr>
-            <td><code>scroll()</code></td>
-            <td>Anonymous scroll progress timeline</td>
-          </tr>
-          <tr>
-            <td><code>view()</code></td>
-            <td>Anonymous view progress timeline</td>
-          </tr>
-          <tr>
-            <td><code>&lt;dashed-ident&gt;</code></td>
-            <td>Named timeline (from scroll-timeline-name or view-timeline-name)</td>
-          </tr>
-        </table>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes fade-in {
-          from { opacity: 0; transform: translateY(40px); }
-          to { opacity: 1; transform: translateY(0); }
-          }
-
-          .element {
-          animation: fade-in linear both;
-          animation-timeline: scroll(); /* tied to nearest scroll ancestor */
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="info-box">
-          <div class="label">ℹ️ Note</div>
-          <p>When using <code>animation-timeline</code>, the <code>animation-duration</code> is ignored because progress
-            is measured by scroll position, not time. Use <code>auto</code> or any value — it doesn't matter.</p>
+            <span class="syn-c">/* Shorthand */</span>
+            <span class="syn-se">.scroll-container</span> {
+            <span class="syn-p">overflow-y</span>: <span class="syn-v">scroll</span>;
+            <span class="syn-p">scroll-timeline</span>: <span class="syn-v">--page-scroll block</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
+
+        <!-- view-timeline -->
+        <div class="section-card">
+          <h3>view-timeline <span class="badge">Property</span></h3>
+          <p>Declares a <strong>view progress timeline</strong> — measures how much of an element is visible in the
+            scrollport.</p>
+          <table>
+            <tr>
+              <th>Property</th>
+              <th>Values</th>
+              <th>Default</th>
+            </tr>
+            <tr>
+              <td><code>view-timeline-name</code></td>
+              <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+              <td><code>none</code></td>
+            </tr>
+            <tr>
+              <td><code>view-timeline-axis</code></td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td><code>block</code></td>
+            </tr>
+            <tr>
+              <td><code>view-timeline-inset</code></td>
+              <td><code>auto</code> | <code>&lt;length-percentage&gt;{1,2}</code></td>
+              <td><code>auto</code></td>
+            </tr>
+            <tr>
+              <td><code>view-timeline</code></td>
+              <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
+            </tr>
+          </table>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-se">.card</span> {
+            <span class="syn-p">view-timeline-name</span>: <span class="syn-v">--card-reveal</span>;
+            <span class="syn-p">view-timeline-axis</span>: <span class="syn-v">block</span>;
+            }
+
+            <span class="syn-c">/* Shorthand */</span>
+            <span class="syn-se">.card</span> {
+            <span class="syn-p">view-timeline</span>: <span class="syn-v">--card-reveal block</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- animation-timeline -->
+        <div class="section-card">
+          <h3>animation-timeline <span class="badge">Core</span></h3>
+          <p>The <strong>single most important property</strong> — links an animation to a scroll or view timeline.</p>
+          <table>
+            <tr>
+              <th>Value</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td><code>auto</code></td>
+              <td>Default time-based timeline</td>
+            </tr>
+            <tr>
+              <td><code>none</code></td>
+              <td>No timeline — animation won't progress</td>
+            </tr>
+            <tr>
+              <td><code>scroll()</code></td>
+              <td>Anonymous scroll progress timeline</td>
+            </tr>
+            <tr>
+              <td><code>view()</code></td>
+              <td>Anonymous view progress timeline</td>
+            </tr>
+            <tr>
+              <td><code>&lt;dashed-ident&gt;</code></td>
+              <td>Named timeline reference</td>
+            </tr>
+          </table>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">fade-in</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">opacity</span>: <span class="syn-n">0</span>; <span
+                      class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span
+                      class="syn-n">40px</span>); }
+            <span class="syn-k">to</span> { <span class="syn-p">opacity</span>: <span class="syn-n">1</span>; <span
+                      class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span
+                      class="syn-n">0</span>); }
+            }
+
+            <span class="syn-se">.element</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">fade-in linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>();
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="info-box">
+            <span class="box-label">ℹ️ Note</span>
+            When using <code>animation-timeline</code>, <code>animation-duration</code> is effectively ignored —
+            progress comes from scroll position, not time.
+          </div>
+        </div>
+
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 6. animation-range -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="animation-range" class="section">
-        <h2 class="section-title">6. animation-range <span class="badge">Core</span></h2>
-        <p>Controls <strong>which portion of the timeline</strong> the animation maps to. Lets you fine-tune exactly
-          when the animation starts and ends within scroll or view progress.</p>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: FUNCTIONS                                 -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-functions">
 
-        <table>
-          <tr>
-            <th>Property</th>
-            <th>Values</th>
-          </tr>
-          <tr>
-            <td><code>animation-range-start</code></td>
-            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> |
-              <code>&lt;timeline-range-name&gt; &lt;length-percentage&gt;</code></td>
-          </tr>
-          <tr>
-            <td><code>animation-range-end</code></td>
-            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> |
-              <code>&lt;timeline-range-name&gt; &lt;length-percentage&gt;</code></td>
-          </tr>
-          <tr>
-            <td><code>animation-range</code></td>
-            <td>Shorthand: <code>&lt;start&gt; &lt;end&gt;</code></td>
-          </tr>
-        </table>
+        <!-- scroll() -->
+        <div class="section-card">
+          <h3>scroll() Function <span class="badge">Anonymous</span></h3>
+          <p>Creates an <strong>anonymous scroll progress timeline</strong> inline.</p>
+          <div class="code-block"><span class="code-label">Syntax</span><span class="syn-p">animation-timeline</span>:
+            <span class="syn-f">scroll</span>(<span class="syn-v">&lt;scroller&gt;</span> <span
+                      class="syn-v">&lt;axis&gt;</span>);
 
-        <div class="subsection">
-          <h3 class="subsection-title">Timeline Range Names (for ViewTimeline)</h3>
+            <span class="syn-c">/* &lt;scroller&gt; values */</span>
+            <span class="syn-v">nearest</span> <span class="syn-c">/* default — nearest scroll ancestor */</span>
+            <span class="syn-v">root</span> <span class="syn-c">/* document viewport */</span>
+            <span class="syn-v">self</span> <span class="syn-c">/* the element itself */</span>
+
+            <span class="syn-c">/* &lt;axis&gt; values */</span>
+            <span class="syn-v">block</span> <span class="syn-c">/* default — vertical in LTR */</span>
+            <span class="syn-v">inline</span> <span class="syn-c">/* horizontal in LTR */</span>
+            <span class="syn-v">x</span> <span class="syn-c">/* explicit horizontal */</span>
+            <span class="syn-v">y</span> <span class="syn-c">/* explicit vertical */</span>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Progress bar tied to root
+              scroll */</span>
+            <span class="syn-se">.progress-bar</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">grow-width linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>(<span class="syn-v">root
+              block</span>);
+            }
+
+            <span class="syn-c">/* Element scrolls itself */</span>
+            <span class="syn-se">.self-scroll</span> {
+            <span class="syn-p">overflow-y</span>: <span class="syn-v">scroll</span>;
+            <span class="syn-p">animation</span>: <span class="syn-v">highlight linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>(<span
+                      class="syn-v">self</span>);
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- view() -->
+        <div class="section-card">
+          <h3>view() Function <span class="badge">Anonymous</span></h3>
+          <p>Creates an <strong>anonymous view progress timeline</strong> — tracks element visibility in scrollport.</p>
+          <div class="code-block"><span class="code-label">Syntax</span><span class="syn-p">animation-timeline</span>:
+            <span class="syn-f">view</span>(<span class="syn-v">&lt;axis&gt;</span> <span
+                      class="syn-v">&lt;inset&gt;</span>);
+
+            <span class="syn-c">/* &lt;inset&gt; — shrink scrollport trigger area */</span>
+            <span class="syn-v">auto</span> <span class="syn-c">/* default */</span>
+            <span class="syn-n">100px</span> <span class="syn-c">/* both start and end */</span>
+            <span class="syn-n">20%</span> <span class="syn-c">/* percentage */</span>
+            <span class="syn-n">100px</span> <span class="syn-n">50px</span> <span class="syn-c">/* start-inset
+              end-inset */</span>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Fade in when element enters
+              viewport */</span>
+            <span class="syn-se">.card</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">fade-in linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            }
+
+            <span class="syn-c">/* With inset — trigger 100px before edge */</span>
+            <span class="syn-se">.card</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">fade-in linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>(<span
+                      class="syn-v">block</span> <span class="syn-n">100px</span>);
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="info-box">
+            <span class="box-label">ℹ️ Insets Explained</span>
+            <code>view(block 100px)</code> virtually shrinks the scrollport by 100px on each side. The element must
+            scroll 100px past the edge before the animation begins.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: RANGES                                    -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-ranges">
+
+        <!-- animation-range -->
+        <div class="section-card">
+          <h3>animation-range <span class="badge">Core</span></h3>
+          <p>Controls <strong>which portion of the timeline</strong> the animation maps to.</p>
+          <table>
+            <tr>
+              <th>Property</th>
+              <th>Values</th>
+            </tr>
+            <tr>
+              <td><code>animation-range-start</code></td>
+              <td><code>normal</code> | <code>&lt;length-%&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>animation-range-end</code></td>
+              <td><code>normal</code> | <code>&lt;length-%&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>animation-range</code></td>
+              <td>Shorthand: <code>&lt;start&gt; &lt;end&gt;</code></td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Range Names -->
+        <div class="section-card">
+          <h3>Timeline Range Names <span class="badge">ViewTimeline</span></h3>
           <div class="keyword-grid">
-            <div class="keyword-item">
-              <code>cover</code>
-              <div class="desc">Full range: element enters → fully exits scrollport</div>
+            <div class="keyword-item"><code>cover</code>
+              <div class="desc">Element enters → fully exits scrollport</div>
             </div>
-            <div class="keyword-item">
-              <code>contain</code>
-              <div class="desc">Element is fully visible inside scrollport</div>
+            <div class="keyword-item"><code>contain</code>
+              <div class="desc">Element fully visible inside scrollport</div>
             </div>
-            <div class="keyword-item">
-              <code>entry</code>
-              <div class="desc">Element starts entering → fully entered</div>
+            <div class="keyword-item"><code>entry</code>
+              <div class="desc">Starts entering → fully entered</div>
             </div>
-            <div class="keyword-item">
-              <code>exit</code>
-              <div class="desc">Element starts exiting → fully exited</div>
+            <div class="keyword-item"><code>exit</code>
+              <div class="desc">Starts exiting → fully exited</div>
             </div>
-            <div class="keyword-item">
-              <code>entry-crossing</code>
-              <div class="desc">Element crosses the entry edge of scrollport</div>
+            <div class="keyword-item"><code>entry-crossing</code>
+              <div class="desc">Crosses the entry edge</div>
             </div>
-            <div class="keyword-item">
-              <code>exit-crossing</code>
-              <div class="desc">Element crosses the exit edge of scrollport</div>
+            <div class="keyword-item"><code>exit-crossing</code>
+              <div class="desc">Crosses the exit edge</div>
             </div>
           </div>
         </div>
 
-        <div class="code-block"><span class="code-label">CSS</span>/* Animate only during the entry phase */
-          .card {
-          animation: slide-up linear both;
-          animation-timeline: view();
-          animation-range: entry 0% entry 100%;
-          }
-
-          /* Animate from 25% to 75% of scroll */
-          .progress {
-          animation: grow linear both;
-          animation-timeline: scroll();
-          animation-range: 25% 75%;
-          }
-
-          /* Cover range — full visibility cycle */
-          .element {
-          animation: fade linear both;
-          animation-timeline: view();
-          animation-range: cover 0% cover 100%;
-          }
-
-          /* Contain — only while fully in view */
-          .element {
-          animation: scale-up linear both;
-          animation-timeline: view();
-          animation-range: contain 0% contain 100%;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="info-box tip">
-          <div class="label">💡 Tip</div>
-          <p>Use Chrome DevTools → Animations panel → "Scroll-driven" to visually debug animation-range values.</p>
-        </div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 7. scroll() Function -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="scroll-function" class="section">
-        <h2 class="section-title">7. scroll() Function <span class="badge">Anonymous</span></h2>
-        <p>Creates an <strong>anonymous scroll progress timeline</strong> inline. No need to name a timeline.</p>
-
-        <div class="code-block"><span class="code-label">Syntax</span>animation-timeline: scroll(&lt;scroller&gt;
-          &lt;axis&gt;);
-
-          /* &lt;scroller&gt; values */
-          nearest /* default – nearest ancestor scroll container */
-          root /* document viewport / root scroller */
-          self /* the element itself (if it scrolls) */
-
-          /* &lt;axis&gt; values */
-          block /* default – block axis (vertical in LTR) */
-          inline /* inline axis (horizontal in LTR) */
-          x /* horizontal axis */
-          y /* vertical axis */</div>
-
-        <div class="code-block"><span class="code-label">CSS</span>/* Progress bar tied to root scroll */
-          .progress-bar {
-          animation: grow-width linear both;
-          animation-timeline: scroll(root block);
-          }
-
-          /* Element scrolls itself */
-          .self-scroll {
-          overflow-y: scroll;
-          animation: highlight linear both;
-          animation-timeline: scroll(self);
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 8. view() Function -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="view-function" class="section">
-        <h2 class="section-title">8. view() Function <span class="badge">Anonymous</span></h2>
-        <p>Creates an <strong>anonymous view progress timeline</strong> based on the element's visibility in its nearest
-          scroll ancestor.</p>
-
-        <div class="code-block"><span class="code-label">Syntax</span>animation-timeline: view(&lt;axis&gt;
-          &lt;inset&gt;);
-
-          /* &lt;axis&gt; values */
-          block /* default */
-          inline
-          x
-          y
-
-          /* &lt;inset&gt; – shrink the scrollport for trigger area */
-          auto /* default, no inset */
-          &lt;length&gt; /* e.g., 100px — both start and end */
-          &lt;percentage&gt; /* e.g., 20% */
-          &lt;len&gt; &lt;len&gt; /* start-inset end-inset */</div>
-
-        <div class="code-block"><span class="code-label">CSS</span>/* Fade in when element enters viewport */
-          .card {
-          animation: fade-in linear both;
-          animation-timeline: view();
-          }
-
-          /* With inset — trigger 100px before reaching edge */
-          .card {
-          animation: fade-in linear both;
-          animation-timeline: view(block 100px);
-          }
-
-          /* Different start/end insets */
-          .card {
-          animation: fade-in linear both;
-          animation-timeline: view(block 100px 50px);
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="info-box">
-          <div class="label">ℹ️ Insets Explained</div>
-          <p><code>view(block 100px)</code> means the scrollport is virtually shrunk by 100px on both sides. The element
-            must scroll 100px past the edge before the animation begins. Great for "trigger before reaching screen edge"
-            patterns.</p>
-        </div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 9. Named Timelines -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="named-timelines" class="section">
-        <h2 class="section-title">9. Named Timelines <span class="badge">Advanced</span></h2>
-        <p>Named timelines let you explicitly reference a specific scroller or element, enabling cross-element
-          animations.</p>
-
-        <div class="code-block"><span class="code-label">CSS</span>/* Container defines the named scroll timeline */
-          .scroll-container {
-          overflow-y: scroll;
-          scroll-timeline: --main-scroll block;
-          }
-
-          /* Any descendant can reference it */
-          .progress-bar {
-          animation: grow linear both;
-          animation-timeline: --main-scroll;
-          }
-
-          .sidebar-indicator {
-          animation: move-dot linear both;
-          animation-timeline: --main-scroll;
-          }
-
-          /* Named view timeline */
-          .hero-image {
-          view-timeline: --hero-visibility block;
-          }
-
-          .hero-caption {
-          animation: fade-in linear both;
-          animation-timeline: --hero-visibility;
-          animation-range: contain;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 10. timeline-scope -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="timeline-scope" class="section">
-        <h2 class="section-title">10. timeline-scope <span class="badge">Advanced</span></h2>
-        <p>By default, a named timeline is only accessible to descendants. <code>timeline-scope</code> on an ancestor
-          "hoists" the timeline's scope so <strong>sibling elements</strong> can reference it.</p>
-
-        <div class="code-block"><span class="code-label">CSS</span>/* The common ancestor hoists the scope */
-          .layout {
-          timeline-scope: --card-timeline;
-          }
-
-          /* Child A: defines the timeline */
-          .layout .card {
-          view-timeline: --card-timeline block;
-          }
-
-          /* Child B (sibling of .card): uses the timeline */
-          .layout .sidebar-marker {
-          animation: slide linear both;
-          animation-timeline: --card-timeline;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="info-box warn">
-          <div class="label">⚠️ Important</div>
-          <p><code>timeline-scope</code> must be set on a <strong>common ancestor</strong> of both the timeline source
-            and the animation consumer. It doesn't create a timeline — it merely widens accessibility of an existing
-            named timeline.</p>
-        </div>
-      </div>
-
-      <hr>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 11. SCROLL PROGRESS BAR -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="progress-bar" class="section">
-        <h2 class="section-title">11. Scroll Progress Bar <span class="badge">Recipe</span></h2>
-        <p>The classic reading-progress indicator — zero JavaScript required.</p>
-
-        <div class="code-block"><span class="code-label">HTML</span>&lt;div class="progress-bar"&gt;&lt;/div&gt;
-          &lt;main class="content"&gt;
-          &lt;!-- long content --&gt;
-          &lt;/main&gt;<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes grow-width {
-          from { transform: scaleX(0); }
-          to { transform: scaleX(1); }
-          }
-
-          .progress-bar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: #00a8ff;
-          transform-origin: left;
-          animation: grow-width linear both;
-          animation-timeline: scroll(root);
-          z-index: 9999;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 12. REVEAL ON SCROLL -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="reveal-on-scroll" class="section">
-        <h2 class="section-title">12. Reveal on Scroll <span class="badge">Recipe</span></h2>
-        <p>Animate elements into view as you scroll down the page.</p>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes reveal {
-          from {
-          opacity: 0;
-          transform: translateY(60px) scale(0.95);
-          filter: blur(4px);
-          }
-          to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-          filter: blur(0);
-          }
-          }
-
-          .reveal-card {
-          animation: reveal linear both;
-          animation-timeline: view();
-          animation-range: entry 0% entry 100%;
-          }
-
-          /* Stagger children with animation-delay offsets */
-          .reveal-card:nth-child(2) { animation-range: entry 10% entry 100%; }
-          .reveal-card:nth-child(3) { animation-range: entry 20% entry 100%; }<button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 13. PARALLAX -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="parallax" class="section">
-        <h2 class="section-title">13. Parallax Effects <span class="badge">Recipe</span></h2>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes parallax-slow {
-          from { transform: translateY(100px); }
-          to { transform: translateY(-100px); }
-          }
-
-          @keyframes parallax-fast {
-          from { transform: translateY(200px); }
-          to { transform: translateY(-200px); }
-          }
-
-          .bg-layer {
-          animation: parallax-slow linear both;
-          animation-timeline: scroll();
-          }
-
-          .fg-layer {
-          animation: parallax-fast linear both;
-          animation-timeline: scroll();
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 14. HORIZONTAL SCROLL -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="horizontal" class="section">
-        <h2 class="section-title">14. Horizontal Scroll Animations <span class="badge">Recipe</span></h2>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes slide-in {
-          from { opacity: 0; transform: translateX(-60px); }
-          to { opacity: 1; transform: translateX(0); }
-          }
-
-          .horizontal-scroller {
-          overflow-x: scroll;
-          scroll-timeline: --hz-scroll inline;
-          }
-
-          .horizontal-scroller .item {
-          animation: slide-in linear both;
-          animation-timeline: view(inline);
-          animation-range: entry;
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 15. STICKY HEADER -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="sticky-header" class="section">
-        <h2 class="section-title">15. Sticky Header Animation <span class="badge">Recipe</span></h2>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes shrink-header {
-          from {
-          padding-block: 24px;
-          background: transparent;
-          box-shadow: none;
-          }
-          to {
-          padding-block: 8px;
-          background: rgba(0, 0, 0, 0.85);
-          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-          }
-          }
-
-          .site-header {
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          animation: shrink-header linear both;
-          animation-timeline: scroll(root);
-          animation-range: 0px 200px; /* shrink over first 200px of scroll */
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 16. IMAGE SEQUENCE -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="image-sequence" class="section">
-        <h2 class="section-title">16. Image Sequence on Scroll <span class="badge">Recipe</span></h2>
-        <p>Drive a sprite / frame animation by scroll position.</p>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes sprite-walk {
-          from { background-position: 0% 0; }
-          to { background-position: 100% 0; }
-          }
-
-          .sprite-player {
-          width: 200px;
-          height: 200px;
-          background: url('spritesheet.png') 0 0 / 1000% 100% no-repeat;
-          animation: sprite-walk steps(9) both;
-          animation-timeline: scroll(root);
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 17. TEXT REVEAL -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="text-reveal" class="section">
-        <h2 class="section-title">17. Text Reveal on Scroll <span class="badge">Recipe</span></h2>
-
-        <div class="code-block"><span class="code-label">HTML</span>&lt;h2 class="text-reveal"&gt;
-          &lt;span&gt;Scroll&lt;/span&gt;
-          &lt;span&gt;animations&lt;/span&gt;
-          &lt;span&gt;are&lt;/span&gt;
-          &lt;span&gt;amazing!&lt;/span&gt;
-          &lt;/h2&gt;<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="code-block"><span class="code-label">CSS</span>@keyframes word-reveal {
-          from {
-          opacity: 0;
-          transform: translateY(100%) rotateX(-80deg);
-          filter: blur(6px);
-          }
-          to {
-          opacity: 1;
-          transform: translateY(0) rotateX(0deg);
-          filter: blur(0);
-          }
-          }
-
-          .text-reveal {
-          perspective: 600px;
-          }
-
-          .text-reveal span {
-          display: inline-block;
-          animation: word-reveal linear both;
-          animation-timeline: view();
-          animation-range: entry 0% entry 80%;
-          }
-
-          /* Stagger each word */
-          .text-reveal span:nth-child(1) { animation-range: entry 0% entry 60%; }
-          .text-reveal span:nth-child(2) { animation-range: entry 10% entry 70%; }
-          .text-reveal span:nth-child(3) { animation-range: entry 20% entry 80%; }
-          .text-reveal span:nth-child(4) { animation-range: entry 30% entry 90%; }<button class="copy-btn"
-                    onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 18. COMBINING WITH KEYFRAMES -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="combined" class="section">
-        <h2 class="section-title">18. Combining with @keyframes <span class="badge">Patterns</span></h2>
-
-        <div class="subsection">
-          <h3 class="subsection-title">Multiple Animations, Different Timelines</h3>
-          <div class="code-block"><span class="code-label">CSS</span>@keyframes scroll-fade { from { opacity: 0; } to {
-            opacity: 1; } }
-            @keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
-
-            .card {
-            /* First: scroll-driven, Second: time-based */
-            animation:
-            scroll-fade linear both,
-            pulse 2s ease-in-out infinite;
-            animation-timeline:
-            view(), /* for scroll-fade */
-            auto; /* for pulse (regular time) */
-            }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <!-- Live Range Scope Demo -->
+        <div class="section-card">
+          <h3>Interactive Range Demo <span class="badge">Live</span></h3>
+          <p>Select a range and <strong>scroll the box below</strong> to see how each range affects the animation:</p>
+          <div class="range-btns" id="rangeBtns">
+            <button class="active" data-range="cover">cover</button>
+            <button data-range="entry">entry</button>
+            <button data-range="exit">exit</button>
+            <button data-range="contain">contain</button>
+            <button data-range="entry-crossing">entry-crossing</button>
+            <button data-range="exit-crossing">exit-crossing</button>
+          </div>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label" id="rangeLabel">Range: cover 0% → 100%</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="range-visualizer" id="rangeVisualizer">
+              <div class="range-indicator">
+                <span style="min-width:54px;">Progress</span>
+                <div class="bar">
+                  <div class="bar-fill" id="rangeFill"></div>
+                </div>
+                <span class="pct" id="rangePct">0%</span>
+              </div>
+              <div class="range-scope-box">
+                <div class="anim-rect" id="rangeBox">■</div>
+              </div>
+              <div class="filler"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-se">.element</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">fade-scale linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-v" id="rangeCodeValue">cover 0% cover
+              100%</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
 
-        <div class="subsection">
-          <h3 class="subsection-title">Keyframes with Percentage Ranges</h3>
-          <div class="code-block"><span class="code-label">CSS</span>@keyframes multi-step {
-            0% { opacity: 0; transform: scale(0.8); }
-            30% { opacity: 1; transform: scale(1); }
-            70% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.1); }
+        <!-- animation-range examples -->
+        <div class="section-card">
+          <h3>animation-range Examples</h3>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Animate only during entry
+              */</span>
+            <span class="syn-se">.card</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">slide-up linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-v">entry</span> <span class="syn-n">0%</span>
+            <span class="syn-v">entry</span> <span class="syn-n">100%</span>;
             }
 
-            /* Element fades in at entry, stays visible, fades out at exit */
-            .element {
-            animation: multi-step linear both;
-            animation-timeline: view();
-            animation-range: cover;
-            }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <span class="syn-c">/* 25% to 75% of scroll progress */</span>
+            <span class="syn-se">.progress</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">grow linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-n">25%</span> <span class="syn-n">75%</span>;
+            }
+
+            <span class="syn-c">/* Contain — only while fully visible */</span>
+            <span class="syn-se">.element</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">scale-up linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-v">contain</span> <span class="syn-n">0%</span>
+            <span class="syn-v">contain</span> <span class="syn-n">100%</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
 
-        <div class="subsection">
-          <h3 class="subsection-title">animation-fill-mode Behavior</h3>
+        <!-- fill-mode table -->
+        <div class="section-card">
+          <h3>animation-fill-mode Behavior</h3>
           <table>
             <tr>
               <th>Fill Mode</th>
@@ -1202,252 +1339,875 @@
             </tr>
           </table>
           <div class="info-box tip">
-            <div class="label">💡 Tip</div>
-            <p>For scroll-driven animations, always use <code>animation-fill-mode: both</code> so the element holds its
-              animated state before entering and after exiting the animation range.</p>
+            <span class="box-label">💡 Tip</span>
+            Always use <code>animation-fill-mode: both</code> for scroll-driven animations so the element holds its
+            state before entering and after exiting the range.
           </div>
         </div>
+
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 19. JAVASCRIPT FALLBACK -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="js-fallback" class="section">
-        <h2 class="section-title">19. JavaScript Fallback <span class="badge">Compat</span></h2>
-        <p>For browsers without support, use the <strong>scroll-timeline polyfill</strong> or a lightweight
-          IntersectionObserver fallback.</p>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: RECIPES                                   -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-recipes">
 
-        <div class="code-block"><span class="code-label">JS — Polyfill</span>&lt;!-- Add before your CSS to polyfill
-          scroll-driven animations --&gt;
-          &lt;script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js"&gt;&lt;/script&gt;<button
-                    class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <!-- Recipe 1: Progress Bar -->
+        <div class="section-card">
+          <h3>Scroll Progress Bar <span class="badge">Recipe</span></h3>
+          <p>Reading-progress indicator — <strong>scroll the preview</strong> to see it in action:</p>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="demo-progress-track" id="progressDemo">
+              <div class="demo-progress-bar" id="progressBar"></div>
+              <div class="filler"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">grow-width</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">scaleX</span>(<span class="syn-n">0</span>); }
+            <span class="syn-k">to</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">scaleX</span>(<span class="syn-n">1</span>); }
+            }
 
-        <div class="code-block"><span class="code-label">JS — IntersectionObserver Fallback</span>// Feature detection +
-          fallback
-          if (!CSS.supports('animation-timeline', 'scroll()')) {
-          const observer = new IntersectionObserver((entries) =&gt; {
-          entries.forEach(entry =&gt; {
-          if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          }
-          });
-          }, { threshold: 0.1 });
-
-          document.querySelectorAll('.reveal-card').forEach(el =&gt; {
-          observer.observe(el);
-          });
-          }
-
-          // Scroll progress bar fallback
-          if (!CSS.supports('animation-timeline', 'scroll()')) {
-          const bar = document.querySelector('.progress-bar');
-          window.addEventListener('scroll', () =&gt; {
-          const scrolled = window.scrollY;
-          const height = document.body.scrollHeight - window.innerHeight;
-          bar.style.transform = `scaleX(${scrolled / height})`;
-          }, { passive: true });
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-
-        <div class="code-block"><span class="code-label">CSS — Fallback Classes</span>/* Styles for JS fallback */
-          @supports not (animation-timeline: scroll()) {
-          .reveal-card {
-          opacity: 0;
-          transform: translateY(60px);
-          transition: opacity 0.6s ease, transform 0.6s ease;
-          }
-          .reveal-card.visible {
-          opacity: 1;
-          transform: none;
-          }
-          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- 20. BEST PRACTICES -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <div id="best-practices" class="section">
-        <h2 class="section-title">20. Best Practices <span class="badge">Guide</span></h2>
-
-        <table>
-          <tr>
-            <th>#</th>
-            <th>Guideline</th>
-            <th>Why</th>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>Use <code>transform</code> &amp; <code>opacity</code> only</td>
-            <td>Compositor-friendly — avoids layout/paint, smooth 60fps</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Always add <code>animation-fill-mode: both</code></td>
-            <td>Prevents flashing before/after the animation range</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Use <code>@supports</code> for feature detection</td>
-            <td>Graceful degradation in unsupported browsers</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Prefer <code>view()</code> for element-level animations</td>
-            <td>Simpler than named timelines for single-element use</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td>Prefer <code>scroll(root)</code> for page-level animations</td>
-            <td>Explicit about which scroller drives the animation</td>
-          </tr>
-          <tr>
-            <td>6</td>
-            <td>Use <code>will-change: transform</code> sparingly</td>
-            <td>Promotes to own layer — helpful for complex cases, wasteful for simple ones</td>
-          </tr>
-          <tr>
-            <td>7</td>
-            <td>Test with Chrome DevTools Animations panel</td>
-            <td>Visual debugging of scroll-driven timelines and ranges</td>
-          </tr>
-          <tr>
-            <td>8</td>
-            <td>Use <code>linear</code> easing for scroll animations</td>
-            <td>Non-linear easing feels odd because user controls speed via scrolling</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td>Add polyfill for production sites</td>
-            <td>Safari &amp; Firefox support is still limited</td>
-          </tr>
-          <tr>
-            <td>10</td>
-            <td>Avoid animating <code>height</code>, <code>width</code>, <code>top</code>, <code>left</code></td>
-            <td>These trigger expensive layout recalculations</td>
-          </tr>
-        </table>
-
-        <div class="info-box tip">
-          <div class="label">💡 Performance Note</div>
-          <p>CSS scroll-driven animations are <strong>significantly faster</strong> than JS scroll listeners because
-            they run off the main thread. Prefer them over <code>requestAnimationFrame</code> scroll handlers whenever
-            possible.</p>
+            <span class="syn-se">.progress-bar</span> {
+            <span class="syn-p">position</span>: <span class="syn-v">fixed</span>;
+            <span class="syn-p">top</span>: <span class="syn-n">0</span>; <span class="syn-p">left</span>: <span
+                      class="syn-n">0</span>; <span class="syn-p">right</span>: <span class="syn-n">0</span>;
+            <span class="syn-p">height</span>: <span class="syn-n">4px</span>;
+            <span class="syn-p">background</span>: <span class="syn-v">#00a8ff</span>;
+            <span class="syn-p">transform-origin</span>: <span class="syn-v">left</span>;
+            <span class="syn-p">animation</span>: <span class="syn-v">grow-width linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>(<span
+                      class="syn-v">root</span>);
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
+
+        <!-- Recipe 2: Reveal on Scroll -->
+        <div class="section-card">
+          <h3>Reveal on Scroll <span class="badge">Recipe</span></h3>
+          <p>Cards animate into view as you scroll — <strong>scroll the preview:</strong></p>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="demo-reveal-track" id="revealDemo">
+              <div class="spacer"></div>
+              <div class="demo-reveal-card"><span class="card-dot"></span>Card 1 — Fade + slide up</div>
+              <div class="demo-reveal-card"><span class="card-dot"></span>Card 2 — Staggered delay</div>
+              <div class="demo-reveal-card"><span class="card-dot"></span>Card 3 — Smooth reveal</div>
+              <div class="demo-reveal-card"><span class="card-dot"></span>Card 4 — Last card</div>
+              <div class="spacer"></div>
+              <div class="spacer"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">reveal</span> {
+            <span class="syn-k">from</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">0</span>;
+            <span class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span class="syn-n">60px</span>)
+            <span class="syn-f">scale</span>(<span class="syn-n">0.95</span>);
+            <span class="syn-p">filter</span>: <span class="syn-f">blur</span>(<span class="syn-n">4px</span>);
+            }
+            <span class="syn-k">to</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">1</span>;
+            <span class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span class="syn-n">0</span>)
+            <span class="syn-f">scale</span>(<span class="syn-n">1</span>);
+            <span class="syn-p">filter</span>: <span class="syn-f">blur</span>(<span class="syn-n">0</span>);
+            }
+            }
+
+            <span class="syn-se">.reveal-card</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">reveal linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-v">entry</span> <span class="syn-n">0%</span>
+            <span class="syn-v">entry</span> <span class="syn-n">100%</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Recipe 3: Parallax -->
+        <div class="section-card">
+          <h3>Parallax Effect <span class="badge">Recipe</span></h3>
+          <p>Two layers moving at different speeds — <strong>scroll to see:</strong></p>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="demo-parallax-track" id="parallaxDemo">
+              <div class="parallax-layer parallax-bg" id="parallaxBg">Background Layer (slow)</div>
+              <div class="parallax-layer parallax-fg" id="parallaxFg">Foreground Layer (fast)</div>
+              <div class="filler"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">parallax-slow</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">translateY</span>(<span class="syn-n">100px</span>); }
+            <span class="syn-k">to</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">translateY</span>(<span class="syn-n">-100px</span>); }
+            }
+            <span class="syn-ar">@keyframes</span> <span class="syn-f">parallax-fast</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">translateY</span>(<span class="syn-n">200px</span>); }
+            <span class="syn-k">to</span> { <span class="syn-p">transform</span>: <span
+                      class="syn-f">translateY</span>(<span class="syn-n">-200px</span>); }
+            }
+
+            <span class="syn-se">.bg-layer</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">parallax-slow linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>();
+            }
+            <span class="syn-se">.fg-layer</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">parallax-fast linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>();
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Recipe 4: Horizontal Scroll -->
+        <div class="section-card">
+          <h3>Horizontal Scroll <span class="badge">Recipe</span></h3>
+          <p><strong>Scroll horizontally</strong> to see items reveal:</p>
+          <div class="preview-box" style="padding: 0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↔ Scroll me</span>
+            <div class="demo-hz-track" id="hzDemo">
+              <div class="demo-hz-item">Item 1</div>
+              <div class="demo-hz-item">Item 2</div>
+              <div class="demo-hz-item">Item 3</div>
+              <div class="demo-hz-item">Item 4</div>
+              <div class="demo-hz-item">Item 5</div>
+              <div class="demo-hz-item">Item 6</div>
+              <div class="demo-hz-item">Item 7</div>
+              <div class="demo-hz-item">Item 8</div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">slide-in</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">opacity</span>: <span class="syn-n">0</span>; <span
+                      class="syn-p">transform</span>: <span class="syn-f">translateX</span>(<span
+                      class="syn-n">-60px</span>); }
+            <span class="syn-k">to</span> { <span class="syn-p">opacity</span>: <span class="syn-n">1</span>; <span
+                      class="syn-p">transform</span>: <span class="syn-f">translateX</span>(<span
+                      class="syn-n">0</span>); }
+            }
+
+            <span class="syn-se">.horizontal-scroller .item</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">slide-in linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>(<span
+                      class="syn-v">inline</span>);
+            <span class="syn-p">animation-range</span>: <span class="syn-v">entry</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Recipe 5: Sticky Header -->
+        <div class="section-card">
+          <h3>Sticky Header Shrink <span class="badge">Recipe</span></h3>
+          <p>Header shrinks as you scroll — <strong>scroll to see:</strong></p>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="demo-sticky-track" id="stickyDemo">
+              <div class="demo-sticky-header" id="stickyHeader"><span class="header-dot"></span>My Website Header</div>
+              <div class="filler"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">shrink-header</span> {
+            <span class="syn-k">from</span> {
+            <span class="syn-p">padding-block</span>: <span class="syn-n">24px</span>;
+            <span class="syn-p">background</span>: <span class="syn-v">transparent</span>;
+            <span class="syn-p">box-shadow</span>: <span class="syn-v">none</span>;
+            }
+            <span class="syn-k">to</span> {
+            <span class="syn-p">padding-block</span>: <span class="syn-n">8px</span>;
+            <span class="syn-p">background</span>: <span class="syn-f">rgba</span>(<span class="syn-n">0, 0, 0,
+              0.85</span>);
+            <span class="syn-p">box-shadow</span>: <span class="syn-n">0 2px 20px</span> <span
+                      class="syn-f">rgba</span>(<span class="syn-n">0, 0, 0, 0.3</span>);
+            }
+            }
+
+            <span class="syn-se">.site-header</span> {
+            <span class="syn-p">position</span>: <span class="syn-v">sticky</span>; <span class="syn-p">top</span>:
+            <span class="syn-n">0</span>;
+            <span class="syn-p">animation</span>: <span class="syn-v">shrink-header linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>(<span
+                      class="syn-v">root</span>);
+            <span class="syn-p">animation-range</span>: <span class="syn-n">0px</span> <span class="syn-n">200px</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Recipe 6: Text Reveal -->
+        <div class="section-card">
+          <h3>Text Reveal on Scroll <span class="badge">Recipe</span></h3>
+          <p>Words reveal one by one — <strong>scroll to see:</strong></p>
+          <div class="preview-box" style="padding:0;">
+            <span class="preview-label">Live Preview</span>
+            <span class="preview-hint">↕ Scroll me</span>
+            <div class="demo-text-track" id="textDemo">
+              <div class="spacer"></div>
+              <div class="demo-text-words" id="textWords">
+                <span>Scroll</span>
+                <span>animations</span>
+                <span>are</span>
+                <span>amazing!</span>
+              </div>
+              <div class="spacer"></div>
+              <div class="spacer"></div>
+            </div>
+          </div>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">word-reveal</span> {
+            <span class="syn-k">from</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">0</span>;
+            <span class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span class="syn-n">100%</span>)
+            <span class="syn-f">rotateX</span>(<span class="syn-n">-80deg</span>);
+            <span class="syn-p">filter</span>: <span class="syn-f">blur</span>(<span class="syn-n">6px</span>);
+            }
+            <span class="syn-k">to</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">1</span>;
+            <span class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span class="syn-n">0</span>)
+            <span class="syn-f">rotateX</span>(<span class="syn-n">0deg</span>);
+            <span class="syn-p">filter</span>: <span class="syn-f">blur</span>(<span class="syn-n">0</span>);
+            }
+            }
+
+            <span class="syn-se">.text-reveal span</span> {
+            <span class="syn-p">display</span>: <span class="syn-v">inline-block</span>;
+            <span class="syn-p">animation</span>: <span class="syn-v">word-reveal linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">view</span>();
+            <span class="syn-p">animation-range</span>: <span class="syn-v">entry</span> <span class="syn-n">0%</span>
+            <span class="syn-v">entry</span> <span class="syn-n">80%</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Recipe 7: Image Sprite -->
+        <div class="section-card">
+          <h3>Image Sequence on Scroll <span class="badge">Recipe</span></h3>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">sprite-walk</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">background-position</span>: <span
+                      class="syn-n">0%</span> <span class="syn-n">0</span>; }
+            <span class="syn-k">to</span> { <span class="syn-p">background-position</span>: <span
+                      class="syn-n">100%</span> <span class="syn-n">0</span>; }
+            }
+
+            <span class="syn-se">.sprite-player</span> {
+            <span class="syn-p">width</span>: <span class="syn-n">200px</span>; <span class="syn-p">height</span>: <span
+                      class="syn-n">200px</span>;
+            <span class="syn-p">background</span>: <span class="syn-f">url</span>(<span
+                      class="syn-s">'spritesheet.png'</span>) <span class="syn-n">0 0</span> / <span
+                      class="syn-n">1000%</span> <span class="syn-n">100%</span> <span class="syn-v">no-repeat</span>;
+            <span class="syn-p">animation</span>: <span class="syn-v">sprite-walk</span> <span
+                      class="syn-f">steps</span>(<span class="syn-n">9</span>) <span class="syn-v">both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-f">scroll</span>(<span
+                      class="syn-v">root</span>);
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <!-- QUICK REFERENCE TABLE -->
-      <!-- ═══════════════════════════════════════════════════════════ -->
-      <hr>
-      <div class="section">
-        <h2 class="section-title">Quick Reference — All Properties</h2>
-        <table>
-          <tr>
-            <th>Property</th>
-            <th>Values</th>
-            <th>Applies To</th>
-          </tr>
-          <tr>
-            <td><code>animation-timeline</code></td>
-            <td><code>auto</code> | <code>none</code> | <code>scroll()</code> | <code>view()</code> |
-              <code>&lt;dashed-ident&gt;</code></td>
-            <td>Animated element</td>
-          </tr>
-          <tr>
-            <td><code>animation-range</code></td>
-            <td><code>normal</code> | <code>&lt;range-start&gt; &lt;range-end&gt;</code></td>
-            <td>Animated element</td>
-          </tr>
-          <tr>
-            <td><code>animation-range-start</code></td>
-            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code>
-            </td>
-            <td>Animated element</td>
-          </tr>
-          <tr>
-            <td><code>animation-range-end</code></td>
-            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code>
-            </td>
-            <td>Animated element</td>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline</code></td>
-            <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
-            <td>Scroll container</td>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline-name</code></td>
-            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
-            <td>Scroll container</td>
-          </tr>
-          <tr>
-            <td><code>scroll-timeline-axis</code></td>
-            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
-            <td>Scroll container</td>
-          </tr>
-          <tr>
-            <td><code>view-timeline</code></td>
-            <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
-            <td>Observed element</td>
-          </tr>
-          <tr>
-            <td><code>view-timeline-name</code></td>
-            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
-            <td>Observed element</td>
-          </tr>
-          <tr>
-            <td><code>view-timeline-axis</code></td>
-            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
-            <td>Observed element</td>
-          </tr>
-          <tr>
-            <td><code>view-timeline-inset</code></td>
-            <td><code>auto</code> | <code>&lt;length-percentage&gt;{1,2}</code></td>
-            <td>Observed element</td>
-          </tr>
-          <tr>
-            <td><code>timeline-scope</code></td>
-            <td><code>none</code> | <code>&lt;dashed-ident&gt;#</code></td>
-            <td>Common ancestor</td>
-          </tr>
-        </table>
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: ADVANCED                                  -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-advanced">
+
+        <!-- Named Timelines -->
+        <div class="section-card">
+          <h3>Named Timelines <span class="badge">Advanced</span></h3>
+          <p>Reference a specific scroller or element for cross-element animations.</p>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Container defines the named
+              scroll timeline */</span>
+            <span class="syn-se">.scroll-container</span> {
+            <span class="syn-p">overflow-y</span>: <span class="syn-v">scroll</span>;
+            <span class="syn-p">scroll-timeline</span>: <span class="syn-v">--main-scroll block</span>;
+            }
+
+            <span class="syn-c">/* Any descendant can reference it */</span>
+            <span class="syn-se">.progress-bar</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">grow linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-v">--main-scroll</span>;
+            }
+
+            <span class="syn-se">.sidebar-indicator</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">move-dot linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-v">--main-scroll</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- timeline-scope -->
+        <div class="section-card">
+          <h3>timeline-scope <span class="badge">Advanced</span></h3>
+          <p><code>timeline-scope</code> on an ancestor "hoists" a named timeline so <strong>sibling elements</strong>
+            can reference it.</p>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* The common ancestor hoists
+              the scope */</span>
+            <span class="syn-se">.layout</span> {
+            <span class="syn-p">timeline-scope</span>: <span class="syn-v">--card-timeline</span>;
+            }
+
+            <span class="syn-c">/* Child A defines the timeline */</span>
+            <span class="syn-se">.layout .card</span> {
+            <span class="syn-p">view-timeline</span>: <span class="syn-v">--card-timeline block</span>;
+            }
+
+            <span class="syn-c">/* Child B (sibling) uses the timeline */</span>
+            <span class="syn-se">.layout .sidebar-marker</span> {
+            <span class="syn-p">animation</span>: <span class="syn-v">slide linear both</span>;
+            <span class="syn-p">animation-timeline</span>: <span class="syn-v">--card-timeline</span>;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+          <div class="info-box warn">
+            <span class="box-label">⚠️ Important</span>
+            <code>timeline-scope</code> must be on a <strong>common ancestor</strong> of both the timeline source and
+            consumer. It doesn't create a timeline — it widens accessibility.
+          </div>
+        </div>
+
+        <!-- Combining animations -->
+        <div class="section-card">
+          <h3>Multiple Animations, Different Timelines <span class="badge">Pattern</span></h3>
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-ar">@keyframes</span> <span
+                      class="syn-f">scroll-fade</span> {
+            <span class="syn-k">from</span> { <span class="syn-p">opacity</span>: <span class="syn-n">0</span>; }
+            <span class="syn-k">to</span> { <span class="syn-p">opacity</span>: <span class="syn-n">1</span>; }
+            }
+            <span class="syn-ar">@keyframes</span> <span class="syn-f">pulse</span> {
+            <span class="syn-n">0%</span>, <span class="syn-n">100%</span> { <span class="syn-p">scale</span>: <span
+                      class="syn-n">1</span>; }
+            <span class="syn-n">50%</span> { <span class="syn-p">scale</span>: <span class="syn-n">1.05</span>; }
+            }
+
+            <span class="syn-se">.card</span> {
+            <span class="syn-c">/* First: scroll-driven, Second: time-based */</span>
+            <span class="syn-p">animation</span>:
+            <span class="syn-v">scroll-fade linear both</span>,
+            <span class="syn-v">pulse 2s ease-in-out infinite</span>;
+            <span class="syn-p">animation-timeline</span>:
+            <span class="syn-f">view</span>(), <span class="syn-c">/* scroll-fade */</span>
+            <span class="syn-v">auto</span>; <span class="syn-c">/* pulse (time-based) */</span>
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- JS Fallback -->
+        <div class="section-card">
+          <h3>JavaScript Fallback <span class="badge">Compat</span></h3>
+          <div class="code-block"><span class="code-label">HTML</span><span class="syn-c">&lt;!-- Polyfill: add before
+              your CSS --&gt;</span>
+            <span class="syn-t">&lt;script</span> <span class="syn-a">src</span>=<span
+                      class="syn-s">"https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js"</span><span
+                      class="syn-t">&gt;&lt;/script&gt;</span><button class="copy-btn"
+                      onclick="copyCode(this)">Copy</button>
+          </div>
+
+          <div class="code-block"><span class="code-label">JS</span><span class="syn-c">// Feature detection +
+              IntersectionObserver fallback</span>
+            <span class="syn-k">if</span> (!CSS.<span class="syn-f">supports</span>(<span
+                      class="syn-s">'animation-timeline'</span>, <span class="syn-s">'scroll()'</span>)) {
+            <span class="syn-k">const</span> <span class="syn-v">observer</span> = <span class="syn-k">new</span> <span
+                      class="syn-f">IntersectionObserver</span>((<span class="syn-v">entries</span>) =&gt; {
+            entries.<span class="syn-f">forEach</span>(<span class="syn-v">entry</span> =&gt; {
+            <span class="syn-k">if</span> (entry.isIntersecting)
+            entry.target.classList.<span class="syn-f">add</span>(<span class="syn-s">'visible'</span>);
+            });
+            }, { <span class="syn-p">threshold</span>: <span class="syn-n">0.1</span> });
+
+            document.<span class="syn-f">querySelectorAll</span>(<span class="syn-s">'.reveal-card'</span>)
+            .<span class="syn-f">forEach</span>(<span class="syn-v">el</span> =&gt; observer.<span
+                      class="syn-f">observe</span>(<span class="syn-v">el</span>));
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+
+          <div class="code-block"><span class="code-label">CSS</span><span class="syn-c">/* Fallback transition classes
+              */</span>
+            <span class="syn-ar">@supports not</span> (<span class="syn-p">animation-timeline</span>: <span
+                      class="syn-f">scroll</span>()) {
+            <span class="syn-se">.reveal-card</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">0</span>;
+            <span class="syn-p">transform</span>: <span class="syn-f">translateY</span>(<span
+                      class="syn-n">60px</span>);
+            <span class="syn-p">transition</span>: <span class="syn-v">opacity 0.6s ease, transform 0.6s ease</span>;
+            }
+            <span class="syn-se">.reveal-card.visible</span> {
+            <span class="syn-p">opacity</span>: <span class="syn-n">1</span>;
+            <span class="syn-p">transform</span>: <span class="syn-v">none</span>;
+            }
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="section-card">
+          <h3>Best Practices <span class="badge">Guide</span></h3>
+          <table>
+            <tr>
+              <th>#</th>
+              <th>Guideline</th>
+              <th>Why</th>
+            </tr>
+            <tr>
+              <td>1</td>
+              <td>Use <code>transform</code> &amp; <code>opacity</code> only</td>
+              <td>Compositor-friendly — smooth 60fps</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Always <code>animation-fill-mode: both</code></td>
+              <td>No flashing before/after range</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><code>@supports</code> for detection</td>
+              <td>Graceful degradation</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Prefer <code>view()</code> for per-element</td>
+              <td>Simpler than named timelines</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><code>scroll(root)</code> for page-level</td>
+              <td>Explicit scroller reference</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><code>will-change: transform</code> sparingly</td>
+              <td>Saves GPU memory</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Use <code>linear</code> easing</td>
+              <td>User controls speed via scroll</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Add polyfill for production</td>
+              <td>Safari/Firefox still limited</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Avoid <code>height</code>/<code>width</code>/<code>top</code>/<code>left</code></td>
+              <td>Trigger layout recalc</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Test with DevTools Animations panel</td>
+              <td>Visual scroll-timeline debugging</td>
+            </tr>
+          </table>
+          <div class="info-box tip">
+            <span class="box-label">💡 Performance</span>
+            CSS scroll-driven animations are <strong>significantly faster</strong> than JS scroll listeners — they run
+            off the main thread. Always prefer them over <code>requestAnimationFrame</code> scroll handlers.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════ -->
+      <!-- TAB: REFERENCE                                 -->
+      <!-- ═══════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-reference">
+
+        <div class="section-card">
+          <h3>Quick Reference — All Properties</h3>
+          <table>
+            <tr>
+              <th>Property</th>
+              <th>Values</th>
+              <th>Applies To</th>
+            </tr>
+            <tr>
+              <td><code>animation-timeline</code></td>
+              <td><code>auto</code> | <code>none</code> | <code>scroll()</code> | <code>view()</code> |
+                <code>&lt;ident&gt;</code></td>
+              <td>Animated element</td>
+            </tr>
+            <tr>
+              <td><code>animation-range</code></td>
+              <td><code>normal</code> | <code>&lt;start&gt; &lt;end&gt;</code></td>
+              <td>Animated element</td>
+            </tr>
+            <tr>
+              <td><code>animation-range-start</code></td>
+              <td><code>normal</code> | <code>&lt;length-%&gt;</code> | <code>&lt;name&gt; &lt;%&gt;</code></td>
+              <td>Animated element</td>
+            </tr>
+            <tr>
+              <td><code>animation-range-end</code></td>
+              <td><code>normal</code> | <code>&lt;length-%&gt;</code> | <code>&lt;name&gt; &lt;%&gt;</code></td>
+              <td>Animated element</td>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline</code></td>
+              <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
+              <td>Scroll container</td>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline-name</code></td>
+              <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+              <td>Scroll container</td>
+            </tr>
+            <tr>
+              <td><code>scroll-timeline-axis</code></td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td>Scroll container</td>
+            </tr>
+            <tr>
+              <td><code>view-timeline</code></td>
+              <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
+              <td>Observed element</td>
+            </tr>
+            <tr>
+              <td><code>view-timeline-name</code></td>
+              <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+              <td>Observed element</td>
+            </tr>
+            <tr>
+              <td><code>view-timeline-axis</code></td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td>Observed element</td>
+            </tr>
+            <tr>
+              <td><code>view-timeline-inset</code></td>
+              <td><code>auto</code> | <code>&lt;length-%&gt;{1,2}</code></td>
+              <td>Observed element</td>
+            </tr>
+            <tr>
+              <td><code>timeline-scope</code></td>
+              <td><code>none</code> | <code>&lt;dashed-ident&gt;#</code></td>
+              <td>Common ancestor</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="section-card">
+          <h3>scroll() Parameters</h3>
+          <table>
+            <tr>
+              <th>Param</th>
+              <th>Options</th>
+              <th>Default</th>
+            </tr>
+            <tr>
+              <td>scroller</td>
+              <td><code>nearest</code> | <code>root</code> | <code>self</code></td>
+              <td><code>nearest</code></td>
+            </tr>
+            <tr>
+              <td>axis</td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td><code>block</code></td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="section-card">
+          <h3>view() Parameters</h3>
+          <table>
+            <tr>
+              <th>Param</th>
+              <th>Options</th>
+              <th>Default</th>
+            </tr>
+            <tr>
+              <td>axis</td>
+              <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+              <td><code>block</code></td>
+            </tr>
+            <tr>
+              <td>inset</td>
+              <td><code>auto</code> | <code>&lt;length&gt;</code> | <code>&lt;length&gt; &lt;length&gt;</code></td>
+              <td><code>auto</code></td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="section-card">
+          <h3>Timeline Range Names</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Use With</th>
+            </tr>
+            <tr>
+              <td><code>cover</code></td>
+              <td>Full lifecycle: enters → exits</td>
+              <td>ViewTimeline</td>
+            </tr>
+            <tr>
+              <td><code>contain</code></td>
+              <td>Fully visible in scrollport</td>
+              <td>ViewTimeline</td>
+            </tr>
+            <tr>
+              <td><code>entry</code></td>
+              <td>Entering → fully entered</td>
+              <td>ViewTimeline</td>
+            </tr>
+            <tr>
+              <td><code>exit</code></td>
+              <td>Exiting → fully exited</td>
+              <td>ViewTimeline</td>
+            </tr>
+            <tr>
+              <td><code>entry-crossing</code></td>
+              <td>Crosses entry edge</td>
+              <td>ViewTimeline</td>
+            </tr>
+            <tr>
+              <td><code>exit-crossing</code></td>
+              <td>Crosses exit edge</td>
+              <td>ViewTimeline</td>
+            </tr>
+          </table>
+        </div>
+
       </div>
 
     </div>
 
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- JAVASCRIPT — Tabs + Live Preview Demos         -->
+    <!-- ═══════════════════════════════════════════════ -->
     <script>
-      // ── Copy button logic ──
+      // ── VS Code API ──
+      const vscodeApi = ( typeof acquireVsCodeApi !== 'undefined' ) ? acquireVsCodeApi() : null;
+
+      // ── Copy ──
       function copyCode ( btn )
       {
         const block = btn.closest( '.code-block' );
-        // Get text content minus the label and button text
         const label = block.querySelector( '.code-label' );
         let text = block.textContent;
         if ( label ) text = text.replace( label.textContent, '' );
-        text = text.replace( 'Copy', '' ).trim();
-
-        const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : null;
-        if ( vscode )
+        text = text.replace( /Copy$/, '' ).trim();
+        if ( vscodeApi )
         {
-          vscode.postMessage( { command: 'copyToClipboard', value: text } );
+          vscodeApi.postMessage( { command: 'copyToClipboard', value: text } );
         } else
         {
           navigator.clipboard.writeText( text );
         }
-
         btn.textContent = 'Copied!';
-        setTimeout( () => { btn.textContent = 'Copy'; }, 1500 );
+        setTimeout( () => { btn.textContent = 'Copy'; }, 1200 );
       }
 
-      // ── Smooth-scroll for TOC ──
-      document.querySelectorAll( '.toc a' ).forEach( link =>
+      // ── Tab switching ──
+      const tabNav = document.getElementById( 'tabNav' );
+      tabNav.addEventListener( 'click', e =>
       {
-        link.addEventListener( 'click', e =>
-        {
-          e.preventDefault();
-          const target = document.querySelector( link.getAttribute( 'href' ) );
-          if ( target ) target.scrollIntoView( { behavior: 'smooth', block: 'start' } );
-        } );
+        const btn = e.target.closest( 'button[data-tab]' );
+        if ( !btn ) return;
+        tabNav.querySelectorAll( 'button' ).forEach( b => b.classList.remove( 'active' ) );
+        btn.classList.add( 'active' );
+        document.querySelectorAll( '.tab-content' ).forEach( tc => tc.classList.remove( 'active' ) );
+        document.getElementById( 'tab-' + btn.dataset.tab ).classList.add( 'active' );
       } );
+
+      // ═══════════════════════════════════════════════
+      // LIVE DEMOS
+      // ═══════════════════════════════════════════════
+
+      // 1. Progress bar demo
+      const progressDemo = document.getElementById( 'progressDemo' );
+      const progressBar = document.getElementById( 'progressBar' );
+      if ( progressDemo && progressBar )
+      {
+        progressDemo.addEventListener( 'scroll', () =>
+        {
+          const pct = progressDemo.scrollTop / ( progressDemo.scrollHeight - progressDemo.clientHeight );
+          progressBar.style.width = ( pct * 100 ) + '%';
+        } );
+      }
+
+      // 2. Reveal cards demo
+      const revealDemo = document.getElementById( 'revealDemo' );
+      if ( revealDemo )
+      {
+        const revealCards = revealDemo.querySelectorAll( '.demo-reveal-card' );
+        const checkReveal = () =>
+        {
+          const trackTop = revealDemo.scrollTop;
+          const trackH = revealDemo.clientHeight;
+          revealCards.forEach( ( card, i ) =>
+          {
+            const cardTop = card.offsetTop - trackTop;
+            const threshold = trackH * 0.85;
+            if ( cardTop < threshold && cardTop > -card.offsetHeight )
+            {
+              setTimeout( () => card.classList.add( 'visible' ), i * 80 );
+            } else
+            {
+              card.classList.remove( 'visible' );
+            }
+          } );
+        };
+        revealDemo.addEventListener( 'scroll', checkReveal );
+        checkReveal();
+      }
+
+      // 3. Parallax demo
+      const parallaxDemo = document.getElementById( 'parallaxDemo' );
+      const parallaxBg = document.getElementById( 'parallaxBg' );
+      const parallaxFg = document.getElementById( 'parallaxFg' );
+      if ( parallaxDemo && parallaxBg && parallaxFg )
+      {
+        parallaxDemo.addEventListener( 'scroll', () =>
+        {
+          const pct = parallaxDemo.scrollTop / ( parallaxDemo.scrollHeight - parallaxDemo.clientHeight );
+          parallaxBg.style.transform = 'translateY(' + ( pct * -60 ) + 'px)';
+          parallaxFg.style.transform = 'translateY(' + ( pct * -140 ) + 'px)';
+        } );
+      }
+
+      // 4. Horizontal scroll demo
+      const hzDemo = document.getElementById( 'hzDemo' );
+      if ( hzDemo )
+      {
+        const hzItems = hzDemo.querySelectorAll( '.demo-hz-item' );
+        const checkHz = () =>
+        {
+          const trackLeft = hzDemo.scrollLeft;
+          const trackW = hzDemo.clientWidth;
+          hzItems.forEach( item =>
+          {
+            const itemLeft = item.offsetLeft - trackLeft;
+            if ( itemLeft >= -item.offsetWidth && itemLeft < trackW * 0.8 )
+            {
+              item.classList.add( 'visible' );
+            } else
+            {
+              item.classList.remove( 'visible' );
+            }
+          } );
+        };
+        hzDemo.addEventListener( 'scroll', checkHz );
+        checkHz();
+      }
+
+      // 5. Sticky header demo
+      const stickyDemo = document.getElementById( 'stickyDemo' );
+      const stickyHeader = document.getElementById( 'stickyHeader' );
+      if ( stickyDemo && stickyHeader )
+      {
+        stickyDemo.addEventListener( 'scroll', () =>
+        {
+          stickyHeader.classList.toggle( 'shrunk', stickyDemo.scrollTop > 40 );
+        } );
+      }
+
+      // 6. Text reveal demo
+      const textDemo = document.getElementById( 'textDemo' );
+      if ( textDemo )
+      {
+        const words = textDemo.querySelectorAll( '.demo-text-words span' );
+        const checkText = () =>
+        {
+          const trackTop = textDemo.scrollTop;
+          const trackH = textDemo.clientHeight;
+          const wordsEl = document.getElementById( 'textWords' );
+          if ( !wordsEl ) return;
+          const wordsTop = wordsEl.offsetTop - trackTop;
+          words.forEach( ( w, i ) =>
+          {
+            const triggerThreshold = trackH * 0.75;
+            if ( wordsTop < triggerThreshold )
+            {
+              setTimeout( () => w.classList.add( 'visible' ), i * 120 );
+            } else
+            {
+              w.classList.remove( 'visible' );
+            }
+          } );
+        };
+        textDemo.addEventListener( 'scroll', checkText );
+        checkText();
+      }
+
+      // 7. Interactive range demo
+      const rangeVisualizer = document.getElementById( 'rangeVisualizer' );
+      const rangeFill = document.getElementById( 'rangeFill' );
+      const rangePct = document.getElementById( 'rangePct' );
+      const rangeBox = document.getElementById( 'rangeBox' );
+      const rangeLabel = document.getElementById( 'rangeLabel' );
+      const rangeCodeValue = document.getElementById( 'rangeCodeValue' );
+      const rangeBtns = document.getElementById( 'rangeBtns' );
+      let currentRange = 'cover';
+
+      if ( rangeBtns )
+      {
+        rangeBtns.addEventListener( 'click', e =>
+        {
+          const btn = e.target.closest( 'button[data-range]' );
+          if ( !btn ) return;
+          rangeBtns.querySelectorAll( 'button' ).forEach( b => b.classList.remove( 'active' ) );
+          btn.classList.add( 'active' );
+          currentRange = btn.dataset.range;
+          if ( rangeLabel ) rangeLabel.textContent = 'Range: ' + currentRange + ' 0% \u2192 100%';
+          if ( rangeCodeValue ) rangeCodeValue.textContent = currentRange + ' 0% ' + currentRange + ' 100%';
+          updateRange();
+        } );
+      }
+
+      function updateRange ()
+      {
+        if ( !rangeVisualizer ) return;
+        const scrollTop = rangeVisualizer.scrollTop;
+        const scrollMax = rangeVisualizer.scrollHeight - rangeVisualizer.clientHeight;
+        const rawPct = scrollMax > 0 ? scrollTop / scrollMax : 0;
+
+        // Simulate different range behaviors
+        let effectPct = 0;
+        switch ( currentRange )
+        {
+          case 'cover':
+            effectPct = rawPct;
+            break;
+          case 'entry':
+            effectPct = Math.min( 1, rawPct * 2.5 );
+            break;
+          case 'exit':
+            effectPct = Math.max( 0, ( rawPct - 0.6 ) * 2.5 );
+            break;
+          case 'contain':
+            effectPct = rawPct > 0.2 && rawPct < 0.8 ? ( rawPct - 0.2 ) / 0.6 : ( rawPct <= 0.2 ? 0 : 1 );
+            break;
+          case 'entry-crossing':
+            effectPct = Math.min( 1, rawPct * 4 );
+            break;
+          case 'exit-crossing':
+            effectPct = Math.max( 0, ( rawPct - 0.75 ) * 4 );
+            break;
+        }
+
+        effectPct = Math.max( 0, Math.min( 1, effectPct ) );
+
+        if ( rangeFill ) rangeFill.style.width = ( effectPct * 100 ) + '%';
+        if ( rangePct ) rangePct.textContent = Math.round( effectPct * 100 ) + '%';
+        if ( rangeBox )
+        {
+          rangeBox.style.opacity = 0.15 + effectPct * 0.85;
+          rangeBox.style.transform = 'scale(' + ( 0.5 + effectPct * 0.5 ) + ') rotate(' + ( effectPct * 360 ) + 'deg)';
+        }
+      }
+
+      if ( rangeVisualizer )
+      {
+        rangeVisualizer.addEventListener( 'scroll', updateRange );
+        updateRange();
+      }
     </script>
   </body>
 
