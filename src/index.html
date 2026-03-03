@@ -495,7 +495,7 @@
 
       nav {
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: repeat(3, 1fr);
         gap: 8px;
         padding-bottom: 8px;
         border-bottom: 1px solid var(--vscode-input-border, var(--fallback-input-border));
@@ -885,6 +885,37 @@
         border-radius: 4px;
       }
 
+      .range-control-row.range-control-stacked {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .range-control-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .range-control-top select {
+        flex: 1;
+      }
+
+      .range-control-bottom {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .range-control-bottom input[type="range"] {
+        flex: 1;
+        min-width: 0;
+        min-height: 4px;
+        cursor: pointer;
+      }
+
       .range-control-row label {
         font-size: 11px;
         font-weight: 500;
@@ -1065,7 +1096,7 @@
       </div>
 
       <div class="editor-section">
-        <nav style="grid-template-columns: auto auto auto;">
+        <nav>
           <button id="easingTab" class="active">Easing</button>
           <button id="springTab">Spring</button>
           <button id="rangesTab">Ranges</button>
@@ -1389,32 +1420,40 @@
 
             <h3 style="margin-top: 12px;">Animation Range</h3>
             <div class="range-select-group">
-              <div class="range-control-row" style="grid-template-columns: auto auto 1fr auto;">
-                <label>Start:</label>
-                <select id="rangeStartName">
-                  <option value="cover" selected>cover</option>
-                  <option value="contain">contain</option>
-                  <option value="entry">entry</option>
-                  <option value="exit">exit</option>
-                  <option value="entry-crossing">entry-crossing</option>
-                  <option value="exit-crossing">exit-crossing</option>
-                </select>
-                <input type="range" id="rangeStartPct" min="0" max="100" step="1" value="0">
-                <div class="range-pct-value" id="rangeStartPctValue">0%</div>
+              <div class="range-control-row range-control-stacked">
+                <div class="range-control-top">
+                  <label>Start:</label>
+                  <select id="rangeStartName">
+                    <option value="cover" selected>cover</option>
+                    <option value="contain">contain</option>
+                    <option value="entry">entry</option>
+                    <option value="exit">exit</option>
+                    <option value="entry-crossing">entry-crossing</option>
+                    <option value="exit-crossing">exit-crossing</option>
+                  </select>
+                </div>
+                <div class="range-control-bottom">
+                  <input type="range" id="rangeStartPct" min="0" max="100" step="1" value="0">
+                  <div class="range-pct-value" id="rangeStartPctValue">0%</div>
+                </div>
               </div>
 
-              <div class="range-control-row" style="grid-template-columns: auto auto 1fr auto;">
-                <label>End:</label>
-                <select id="rangeEndName">
-                  <option value="cover" selected>cover</option>
-                  <option value="contain">contain</option>
-                  <option value="entry">entry</option>
-                  <option value="exit">exit</option>
-                  <option value="entry-crossing">entry-crossing</option>
-                  <option value="exit-crossing">exit-crossing</option>
-                </select>
-                <input type="range" id="rangeEndPct" min="0" max="100" step="1" value="100">
-                <div class="range-pct-value" id="rangeEndPctValue">100%</div>
+              <div class="range-control-row range-control-stacked">
+                <div class="range-control-top">
+                  <label>End:</label>
+                  <select id="rangeEndName">
+                    <option value="cover" selected>cover</option>
+                    <option value="contain">contain</option>
+                    <option value="entry">entry</option>
+                    <option value="exit">exit</option>
+                    <option value="entry-crossing">entry-crossing</option>
+                    <option value="exit-crossing">exit-crossing</option>
+                  </select>
+                </div>
+                <div class="range-control-bottom">
+                  <input type="range" id="rangeEndPct" min="0" max="100" step="1" value="100">
+                  <div class="range-pct-value" id="rangeEndPctValue">100%</div>
+                </div>
               </div>
             </div>
 
