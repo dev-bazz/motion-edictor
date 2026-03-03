@@ -1537,6 +1537,84 @@
       .ranges-info-banner strong {
         color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
       }
+
+      /* === Live Preview Improvements === */
+      .ranges-section-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 12px;
+        margin-bottom: 4px;
+      }
+
+      .ranges-section-label-row .ranges-section-label {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      .ranges-play-btn {
+        padding: 3px 10px;
+        font-size: 10px;
+        background: var(--vscode-button-background, var(--fallback-button-background));
+        color: var(--vscode-button-foreground, var(--fallback-button-foreground));
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .ranges-play-btn:hover {
+        background: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+      }
+
+      .ranges-preview-state-overlay {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 9px;
+        font-family: monospace;
+        font-weight: 600;
+        z-index: 12;
+        pointer-events: none;
+        transition: color 0.15s ease;
+        color: #ff9800;
+      }
+
+      .ranges-preview-state-overlay.before {
+        color: #ff9800;
+      }
+
+      .ranges-preview-state-overlay.in-range {
+        color: #4caf50;
+      }
+
+      .ranges-preview-state-overlay.after {
+        color: #00a8ff;
+      }
+
+      .ranges-progress-tick {
+        position: absolute;
+        top: -3px;
+        width: 2px;
+        height: 14px;
+        border-radius: 1px;
+        z-index: 2;
+        pointer-events: none;
+        transition: left 0.15s ease;
+      }
+
+      .ranges-progress-tick.from {
+        background: #4CAF50;
+      }
+
+      .ranges-progress-tick.to {
+        background: #f44336;
+      }
     </style>
   </head>
 
@@ -1853,18 +1931,27 @@
                 <span class="ranges-progress-title">Animation Progress</span>
                 <span class="ranges-progress-pct" id="rangesProgressPct">0%</span>
               </div>
-              <div class="ranges-progress-bar">
+              <div class="ranges-progress-bar" style="position:relative">
                 <div class="ranges-progress-fill" id="rangesProgressFill"></div>
+                <div class="ranges-progress-tick from" id="rangesProgressFrom"></div>
+                <div class="ranges-progress-tick to" id="rangesProgressTo"></div>
               </div>
-              <div style="display:flex; justify-content:space-between; margin-top:3px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px;">
                 <span class="ranges-phase-badge before" id="rangesPhaseBadge">
                   <span class="phase-dot"></span>
                   Before range
                 </span>
+                <span style="font-size:8px; opacity:0.5; font-family:monospace;">
+                  <span style="color:#4CAF50;">■</span> from
+                  <span style="color:#f44336; margin-left:4px;">■</span> to
+                </span>
               </div>
             </div>
 
-            <div class="ranges-section-label">Live Preview</div>
+            <div class="ranges-section-label-row">
+              <div class="ranges-section-label" style="margin:0">Live Preview</div>
+              <button class="ranges-play-btn" id="rangesPlayBtn" title="Auto-scroll the preview">▶ Play</button>
+            </div>
             <div class="ranges-preview-area" id="rangesPreviewArea">
               <div class="ranges-preview-scrollport">
                 <div class="ranges-preview-content" id="rangesPreviewContent">
@@ -1886,12 +1973,7 @@
               <div class="ranges-preview-viewport-border bottom"></div>
               <span class="ranges-preview-viewport-label top-label">viewport</span>
               <span class="ranges-preview-viewport-label bottom-label">viewport</span>
-              <div class="ranges-preview-from-marker" id="rangesPreviewFrom">
-                <span class="ranges-preview-marker-label">from</span>
-              </div>
-              <div class="ranges-preview-to-marker" id="rangesPreviewTo">
-                <span class="ranges-preview-marker-label">to</span>
-              </div>
+              <div class="ranges-preview-state-overlay" id="rangesPreviewState">Before Range</div>
               <div class="ranges-preview-scrolltrack">
                 <div class="ranges-preview-scrollthumb" id="rangesPreviewThumb"></div>
               </div>
@@ -3054,9 +3136,20 @@
         const subject = document.getElementById( 'rangesPreviewSubject' );
         if ( !subject ) return;
 
-        // Toggle glow class
-        if ( progress > 0.01 && progress < 0.99 ) subject.classList.add( 'animating' );
-        else subject.classList.remove( 'animating' );
+        // Toggle glow class and show progress text on subject
+        if ( progress > 0.01 && progress < 0.99 )
+        {
+          subject.classList.add( 'animating' );
+          subject.textContent = ( progress * 100 ).toFixed( 0 ) + '%';
+        } else if ( progress >= 0.99 )
+        {
+          subject.classList.remove( 'animating' );
+          subject.textContent = '✓ done';
+        } else
+        {
+          subject.classList.remove( 'animating' );
+          subject.textContent = 'subject';
+        }
 
         switch ( rangesState.animation )
         {
@@ -3088,17 +3181,15 @@
       {
         const previewArea = document.getElementById( 'rangesPreviewArea' );
         const content = document.getElementById( 'rangesPreviewContent' );
-        const overlay = document.getElementById( 'rangesViewportOverlay' );
         const thumb = document.getElementById( 'rangesPreviewThumb' );
-        const fromMarker = document.getElementById( 'rangesPreviewFrom' );
-        const toMarker = document.getElementById( 'rangesPreviewTo' );
+        const stateOverlay = document.getElementById( 'rangesPreviewState' );
 
         if ( !previewArea || !content ) return;
 
         const areaH = previewArea.offsetHeight || 240;
 
-        // Viewport region: middle 45% of the preview area
-        const vpFraction = 0.45;
+        // Viewport region: middle 50% of the preview area for better visibility
+        const vpFraction = 0.50;
         const vpTop = areaH * ( ( 1 - vpFraction ) / 2 );
         const vpHeight = areaH * vpFraction;
 
@@ -3106,18 +3197,14 @@
         previewArea.style.setProperty( '--viewport-top-mask', vpTop + 'px' );
         previewArea.style.setProperty( '--viewport-bottom-mask', vpTop + 'px' );
 
-        // Content height represents the full scrollable page.
-        // We want realistic scrolling: the content is taller than the viewport,
-        // and scrolling moves it upward through the viewport window.
-        const numBlocks = content.children.length;
-        const blockH = 38; // approximate block + gap height
-        const subjectH = 62; // approximate subject height
-        const contentH = numBlocks * blockH + subjectH;
+        // Content height: 10 blocks × (28px + 10px gap) + subject (52px + 10px gap) + padding
+        const blockH = 38;
+        const subjectH = 62;
+        const contentPad = 28;
+        const contentH = 10 * blockH + subjectH + contentPad;
 
-        // Total scrollable distance: content overflows beyond the viewport
-        // At scrollPos=0: the top of content is at the top of viewport (beginning of page)
-        // At scrollPos=1: the bottom of content is at the bottom of viewport (end of page)
-        const maxScroll = contentH - vpHeight;
+        // Scrollable distance
+        const maxScroll = Math.max( 1, contentH - vpHeight );
         const scrollOffset = scrollPos * maxScroll;
 
         // Position content so it scrolls through the viewport window
@@ -3133,21 +3220,29 @@
           thumb.style.top = ( 4 + thumbTop ) + 'px';
         }
 
-        // Position FROM/TO markers.
-        // These show the scroll position at which the range boundary is hit.
-        // startFrac/endFrac are scroll fractions (0-1). We map them to Y positions
-        // within the viewport area to show where the trigger points are.
-        if ( fromMarker )
-        {
-          // At startFrac, the animation begins — show where in the viewport that happens
-          const fromY = vpTop + startFrac * vpHeight;
-          fromMarker.style.top = Math.max( 0, Math.min( areaH, fromY ) ) + 'px';
-        }
+        // Update FROM/TO tick marks on the progress bar
+        const fromTick = document.getElementById( 'rangesProgressFrom' );
+        const toTick = document.getElementById( 'rangesProgressTo' );
+        if ( fromTick ) fromTick.style.left = ( startFrac * 100 ) + '%';
+        if ( toTick ) toTick.style.left = ( endFrac * 100 ) + '%';
 
-        if ( toMarker )
+        // Update state overlay on the preview
+        if ( stateOverlay )
         {
-          const toY = vpTop + endFrac * vpHeight;
-          toMarker.style.top = Math.max( 0, Math.min( areaH, toY ) ) + 'px';
+          stateOverlay.classList.remove( 'before', 'in-range', 'after' );
+          if ( progress <= 0 )
+          {
+            stateOverlay.textContent = 'Before Range';
+            stateOverlay.classList.add( 'before' );
+          } else if ( progress >= 1 )
+          {
+            stateOverlay.textContent = 'Complete ✓';
+            stateOverlay.classList.add( 'after' );
+          } else
+          {
+            stateOverlay.textContent = 'Animating ' + ( progress * 100 ).toFixed( 0 ) + '%';
+            stateOverlay.classList.add( 'in-range' );
+          }
         }
       }
 
@@ -3287,6 +3382,73 @@
         const originalText = btn.textContent;
         btn.textContent = '✓ Copied!';
         setTimeout( () => { btn.textContent = originalText; }, 1500 );
+      } );
+
+      // ===== Auto-Play for Live Preview =====
+      let rangesAutoPlayId = null;
+
+      document.getElementById( 'rangesPlayBtn' ).addEventListener( 'click', function ()
+      {
+        const btn = this;
+
+        // If already playing, stop
+        if ( rangesAutoPlayId !== null )
+        {
+          cancelAnimationFrame( rangesAutoPlayId );
+          rangesAutoPlayId = null;
+          btn.textContent = '▶ Play';
+          return;
+        }
+
+        btn.textContent = '⏹ Stop';
+
+        // Reset scroll to 0 before playing
+        rangesState.scrollPosition = 0;
+        document.getElementById( 'scrollPositionSlider' ).value = 0;
+        document.getElementById( 'scrollPositionValue' ).textContent = '0%';
+        updateRangesVisualization();
+
+        const totalDuration = 3000; // 3 seconds for full scroll
+        const startTime = performance.now();
+
+        function animateScroll ( now )
+        {
+          const elapsed = now - startTime;
+          const t = Math.min( 1, elapsed / totalDuration );
+
+          // Smooth ease-in-out curve
+          const eased = t < 0.5
+            ? 2 * t * t
+            : 1 - Math.pow( -2 * t + 2, 2 ) / 2;
+
+          rangesState.scrollPosition = eased;
+          const pct = Math.round( eased * 100 );
+          document.getElementById( 'scrollPositionSlider' ).value = pct;
+          document.getElementById( 'scrollPositionValue' ).textContent = pct + '%';
+          updateRangesVisualization();
+
+          if ( t < 1 )
+          {
+            rangesAutoPlayId = requestAnimationFrame( animateScroll );
+          } else
+          {
+            rangesAutoPlayId = null;
+            btn.textContent = '▶ Play';
+          }
+        }
+
+        rangesAutoPlayId = requestAnimationFrame( animateScroll );
+      } );
+
+      // Stop auto-play when user manually adjusts scroll
+      document.getElementById( 'scrollPositionSlider' ).addEventListener( 'pointerdown', () =>
+      {
+        if ( rangesAutoPlayId !== null )
+        {
+          cancelAnimationFrame( rangesAutoPlayId );
+          rangesAutoPlayId = null;
+          document.getElementById( 'rangesPlayBtn' ).textContent = '▶ Play';
+        }
       } );
 
       // Initialize ranges visualization
