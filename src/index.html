@@ -826,6 +826,233 @@
           padding: 4px;
         }
       }
+
+      /* ===== Ranges Tab Styles ===== */
+      .ranges-visualizer {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .ranges-guide-text {
+        font-size: 10px;
+        opacity: 0.4;
+        fill: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        pointer-events: none;
+        font-weight: 500;
+      }
+
+      .ranges-label {
+        font-size: 9px;
+        fill: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+        opacity: 0.5;
+      }
+
+      .range-zone-bar {
+        opacity: 0.25;
+        transition: opacity 0.2s ease;
+      }
+
+      .range-zone-bar.active {
+        opacity: 0.5;
+      }
+
+      .range-zone-label {
+        font-size: 8px;
+        fill: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        opacity: 0.7;
+        pointer-events: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .range-select-group {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .range-control-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+      }
+
+      .range-control-row label {
+        font-size: 11px;
+        font-weight: 500;
+        min-width: 50px;
+      }
+
+      .range-control-row select {
+        padding: 4px 6px;
+        background: var(--vscode-input-background, var(--fallback-input-background));
+        color: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        font-size: 11px;
+        cursor: pointer;
+        min-width: 0;
+      }
+
+      .range-control-row select:focus {
+        outline: 1px solid var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .range-control-row input[type="range"] {
+        flex: 1;
+        min-width: 0;
+        min-height: 4px;
+        cursor: pointer;
+      }
+
+      .range-pct-value {
+        font-family: monospace;
+        font-size: 11px;
+        min-width: 40px;
+        text-align: right;
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
+
+      .range-sub-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+      }
+
+      .range-sub-row label {
+        font-size: 10px;
+        opacity: 0.7;
+        min-width: 50px;
+      }
+
+      .ranges-progress-section {
+        margin-top: 4px;
+      }
+
+      .ranges-progress-bar {
+        width: 100%;
+        height: 6px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 4px;
+      }
+
+      .ranges-progress-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        border-radius: 3px;
+        transition: width 0.1s ease;
+      }
+
+      .ranges-progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        margin-top: 2px;
+        opacity: 0.6;
+        font-family: monospace;
+      }
+
+      .ranges-preview-area {
+        position: relative;
+        width: 100%;
+        height: 120px;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .ranges-preview-scrollport {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .ranges-preview-subject {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg,
+            var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
+            rgba(0, 168, 255, 0.6));
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
+        transition: transform 0.1s ease, opacity 0.1s ease;
+      }
+
+      .range-chip {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .range-chip.cover {
+        background: rgba(0, 168, 255, 0.3);
+        color: #00a8ff;
+      }
+
+      .range-chip.contain {
+        background: rgba(76, 175, 80, 0.3);
+        color: #4caf50;
+      }
+
+      .range-chip.entry {
+        background: rgba(255, 152, 0, 0.3);
+        color: #ff9800;
+      }
+
+      .range-chip.exit {
+        background: rgba(244, 67, 54, 0.3);
+        color: #f44336;
+      }
+
+      .range-chip.entry-crossing {
+        background: rgba(156, 39, 176, 0.3);
+        color: #9c27b0;
+      }
+
+      .range-chip.exit-crossing {
+        background: rgba(255, 235, 59, 0.3);
+        color: #cddc39;
+      }
+
+      .ranges-info-banner {
+        background: rgba(0, 168, 255, 0.05);
+        border: 1px solid rgba(0, 168, 255, 0.2);
+        border-radius: 3px;
+        padding: 6px;
+        font-size: 9px;
+        line-height: 1.4;
+        color: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      .ranges-info-banner strong {
+        color: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+      }
     </style>
   </head>
 
@@ -838,9 +1065,10 @@
       </div>
 
       <div class="editor-section">
-        <nav>
+        <nav style="grid-template-columns: auto auto auto;">
           <button id="easingTab" class="active">Easing</button>
           <button id="springTab">Spring</button>
+          <button id="rangesTab">Ranges</button>
         </nav>
 
         <div id="easingEditor" class="editor-content active">
@@ -1065,6 +1293,170 @@
 
           </div>
         </div>
+
+        <!-- ===== Ranges Editor Tab ===== -->
+        <div id="rangesEditor" class="editor-content">
+          <div class="canvas-wrapper">
+            <svg id="rangesCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420">
+              <!-- Background -->
+              <rect width="300" height="420" fill="transparent" />
+
+              <!-- Range zone bars (left side) -->
+              <g id="rangeZoneBars"></g>
+
+              <!-- Full scroll area -->
+              <rect x="55" y="10" width="190" height="400" rx="4" fill="rgba(255,255,255,0.02)"
+                        stroke="var(--vscode-input-border, var(--fallback-input-border))" stroke-width="0.5"
+                        opacity="0.3" />
+
+              <!-- Viewport area -->
+              <rect id="rvViewport" x="55" y="110" width="190" height="200" rx="2" fill="rgba(0,168,255,0.04)"
+                        stroke="rgba(0,168,255,0.3)" stroke-width="1.5" />
+
+              <!-- Viewport labels -->
+              <text class="ranges-guide-text" x="150" y="105" text-anchor="middle" font-size="9">scrollport top</text>
+              <text class="ranges-guide-text" x="150" y="325" text-anchor="middle" font-size="9">scrollport
+                bottom</text>
+
+              <!-- Before/after content zones -->
+              <text class="ranges-label" x="150" y="55" text-anchor="middle">content before</text>
+              <text class="ranges-label" x="150" y="388" text-anchor="middle">content after</text>
+
+              <!-- Subject element -->
+              <rect id="rvSubject" x="100" y="250" width="100" height="60" rx="6" fill="rgba(0,168,255,0.2)"
+                        stroke="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        stroke-width="2" />
+              <text id="rvSubjectLabel" x="150" y="285" text-anchor="middle" font-size="10"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        opacity="0.8">subject</text>
+
+              <!-- Range start marker -->
+              <line id="rvRangeStart" x1="55" y1="310" x2="245" y2="310" stroke="#4CAF50" stroke-width="2"
+                        stroke-dasharray="6,3" />
+              <text id="rvRangeStartLabel" x="248" y="314" font-size="9" fill="#4CAF50" font-weight="600">FROM</text>
+
+              <!-- Range end marker -->
+              <line id="rvRangeEnd" x1="55" y1="110" x2="245" y2="110" stroke="#f44336" stroke-width="2"
+                        stroke-dasharray="6,3" />
+              <text id="rvRangeEndLabel" x="248" y="114" font-size="9" fill="#f44336" font-weight="600">TO</text>
+
+              <!-- Active range zone overlay -->
+              <rect id="rvActiveRange" x="55" y="110" width="190" height="200" rx="2"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        opacity="0.06" />
+
+              <!-- Scroll progress bar (right side) -->
+              <rect x="252" y="110" width="6" height="200" rx="3" fill="rgba(255,255,255,0.05)" />
+              <rect id="rvProgressBar" x="252" y="110" width="6" height="0" rx="3"
+                        fill="var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground))"
+                        opacity="0.6" />
+            </svg>
+          </div>
+
+          <div class="output-section">
+            <div class="ranges-info-banner">
+              <strong>Scroll-Driven Animations:</strong> Define when an animation starts and ends
+              based on a subject's visibility in the scrollport.
+            </div>
+
+            <h3 style="margin-top: 12px;">Scroll Position</h3>
+            <div class="range-control-row">
+              <label for="scrollPositionSlider">Scroll:</label>
+              <input type="range" id="scrollPositionSlider" min="0" max="100" step="1" value="0">
+              <div class="range-pct-value" id="scrollPositionValue">0%</div>
+            </div>
+
+            <div class="ranges-progress-section">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span
+                          style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Animation
+                  Progress</span>
+                <span id="rangesProgressPct"
+                          style="font-size:11px; font-family:monospace; color:var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));">0%</span>
+              </div>
+              <div class="ranges-progress-bar">
+                <div class="ranges-progress-fill" id="rangesProgressFill"></div>
+              </div>
+            </div>
+
+            <h3 style="margin-top: 12px;">Preview</h3>
+            <div class="ranges-preview-area">
+              <div class="ranges-preview-scrollport">
+                <div class="ranges-preview-subject" id="rangesPreviewSubject"></div>
+              </div>
+            </div>
+            <div class="preview-info" id="rangesPreviewInfo">Scroll to see animation</div>
+
+            <h3 style="margin-top: 12px;">Animation Range</h3>
+            <div class="range-select-group">
+              <div class="range-control-row" style="grid-template-columns: auto auto 1fr auto;">
+                <label>Start:</label>
+                <select id="rangeStartName">
+                  <option value="cover" selected>cover</option>
+                  <option value="contain">contain</option>
+                  <option value="entry">entry</option>
+                  <option value="exit">exit</option>
+                  <option value="entry-crossing">entry-crossing</option>
+                  <option value="exit-crossing">exit-crossing</option>
+                </select>
+                <input type="range" id="rangeStartPct" min="0" max="100" step="1" value="0">
+                <div class="range-pct-value" id="rangeStartPctValue">0%</div>
+              </div>
+
+              <div class="range-control-row" style="grid-template-columns: auto auto 1fr auto;">
+                <label>End:</label>
+                <select id="rangeEndName">
+                  <option value="cover" selected>cover</option>
+                  <option value="contain">contain</option>
+                  <option value="entry">entry</option>
+                  <option value="exit">exit</option>
+                  <option value="entry-crossing">entry-crossing</option>
+                  <option value="exit-crossing">exit-crossing</option>
+                </select>
+                <input type="range" id="rangeEndPct" min="0" max="100" step="1" value="100">
+                <div class="range-pct-value" id="rangeEndPctValue">100%</div>
+              </div>
+            </div>
+
+            <h3 style="margin-top: 12px;">Options</h3>
+            <div class="range-control-row" style="grid-template-columns: auto 1fr;">
+              <label>Subject Size:</label>
+              <select id="rangesSubjectSize">
+                <option value="smaller" selected>Smaller</option>
+                <option value="same">Same as viewport</option>
+                <option value="taller">Taller than viewport</option>
+              </select>
+            </div>
+            <div class="range-control-row">
+              <label>Inset:</label>
+              <input type="range" id="rangesInset" min="0" max="50" step="1" value="0">
+              <div class="range-pct-value" id="rangesInsetValue">0px</div>
+            </div>
+            <div class="range-control-row" style="grid-template-columns: auto 1fr;">
+              <label>Animation:</label>
+              <select id="rangesAnimation">
+                <option value="reveal" selected>Reveal (scale)</option>
+                <option value="fade">Fade in</option>
+                <option value="slide">Slide up</option>
+                <option value="rotate">Rotate</option>
+              </select>
+            </div>
+
+            <div class="ranges-info-banner" style="margin-top: 8px;">
+              <strong>💡 Range Names:</strong>
+              <strong>cover</strong> = entire visibility &bull;
+              <strong>entry</strong> = entering viewport &bull;
+              <strong>exit</strong> = leaving viewport &bull;
+              <strong>contain</strong> = fully visible &bull;
+              <strong>entry-crossing</strong> = leading edge crosses &bull;
+              <strong>exit-crossing</strong> = trailing edge crosses
+            </div>
+
+            <h3 style="margin-top: 12px;">CSS Output</h3>
+            <div class="code-block" id="rangesCssOutput">animation-range: cover 0% cover 100%;</div>
+            <button class="copy-btn" id="rangesCopyBtn">Copy</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1086,28 +1478,38 @@
       // Tab switching functionality
       const easingTab = document.getElementById( 'easingTab' );
       const springTab = document.getElementById( 'springTab' );
+      const rangesTab = document.getElementById( 'rangesTab' );
       const easingEditor = document.getElementById( 'easingEditor' );
       const springEditor = document.getElementById( 'springEditor' );
+      const rangesEditor = document.getElementById( 'rangesEditor' );
+
+      const allTabs = [ easingTab, springTab, rangesTab ];
+      const allEditors = [ easingEditor, springEditor, rangesEditor ];
 
       function switchTab ( tabName )
       {
+        allTabs.forEach( t => t.classList.remove( 'active' ) );
+        allEditors.forEach( e => e.classList.remove( 'active' ) );
+
         if ( tabName === 'easing' )
         {
           easingEditor.classList.add( 'active' );
-          springEditor.classList.remove( 'active' );
           easingTab.classList.add( 'active' );
-          springTab.classList.remove( 'active' );
-        } else
+        } else if ( tabName === 'spring' )
         {
           springEditor.classList.add( 'active' );
-          easingEditor.classList.remove( 'active' );
           springTab.classList.add( 'active' );
-          easingTab.classList.remove( 'active' );
+        } else if ( tabName === 'ranges' )
+        {
+          rangesEditor.classList.add( 'active' );
+          rangesTab.classList.add( 'active' );
+          updateRangesVisualization();
         }
       }
 
       easingTab.addEventListener( 'click', () => switchTab( 'easing' ) );
       springTab.addEventListener( 'click', () => switchTab( 'spring' ) );
+      rangesTab.addEventListener( 'click', () => switchTab( 'ranges' ) );
 
       const svg = document.getElementById( 'easeCanvas' );
       const cssOutput = document.getElementById( 'cssOutput' );
@@ -1886,6 +2288,334 @@
 
       // Initial SVG update
       updateSvg();
+
+      // =============================================
+      // ===== RANGES TAB LOGIC =====
+      // =============================================
+
+      const rangesState = {
+        scrollPosition: 0,       // 0 to 1
+        rangeStartName: 'cover',
+        rangeStartPct: 0,
+        rangeEndName: 'cover',
+        rangeEndPct: 100,
+        subjectSize: 'smaller',  // smaller | same | taller
+        inset: 0,
+        animation: 'reveal'
+      };
+
+      // SVG layout constants for ranges visualization
+      const RV = {
+        viewportY: 110,
+        viewportH: 200,
+        viewportX: 55,
+        viewportW: 190,
+        svgH: 420
+      };
+
+      // Get subject height in SVG units based on size selection
+      function getSubjectSvgHeight ()
+      {
+        switch ( rangesState.subjectSize )
+        {
+          case 'smaller': return 60;
+          case 'same': return RV.viewportH;
+          case 'taller': return RV.viewportH * 1.5;
+          default: return 60;
+        }
+      }
+
+      // Compute the scroll-fraction bounds for each named range
+      // V = viewport height, S = subject height (both in same units)
+      function getRangeBounds ( V, S )
+      {
+        const total = V + S;
+        return {
+          'cover': { start: 0, end: 1 },
+          'entry': { start: 0, end: S / total },
+          'exit': { start: V / total, end: 1 },
+          'contain': { start: S / total, end: V / total },
+          'entry-crossing': { start: 0, end: V / total },
+          'exit-crossing': { start: S / total, end: 1 }
+        };
+      }
+
+      // Convert a named range + percentage to a scroll fraction (0-1 within cover range)
+      function rangeToScrollFraction ( name, pct, V, S )
+      {
+        const bounds = getRangeBounds( V, S );
+        const b = bounds[ name ];
+        if ( !b ) return 0;
+        return b.start + ( pct / 100 ) * ( b.end - b.start );
+      }
+
+      // Given current scroll position (0-1), calculate animation progress (0-1)
+      function calculateAnimationProgress ( scrollPos, V, S )
+      {
+        const startFrac = rangeToScrollFraction( rangesState.rangeStartName, rangesState.rangeStartPct, V, S );
+        const endFrac = rangeToScrollFraction( rangesState.rangeEndName, rangesState.rangeEndPct, V, S );
+
+        if ( endFrac <= startFrac ) return scrollPos >= startFrac ? 1 : 0;
+
+        if ( scrollPos <= startFrac ) return 0;
+        if ( scrollPos >= endFrac ) return 1;
+        return ( scrollPos - startFrac ) / ( endFrac - startFrac );
+      }
+
+      // Convert scroll fraction to subject Y position in SVG
+      function scrollToSubjectY ( scrollFrac, subjectH )
+      {
+        // At scroll 0%: subject top is at viewport bottom
+        // At scroll 100%: subject bottom is at viewport top
+        const startY = RV.viewportY + RV.viewportH; // subject top at viewport bottom
+        const endY = RV.viewportY - subjectH;        // subject top at viewport top minus height
+        return startY - scrollFrac * ( startY - endY );
+      }
+
+      // Range zone colors
+      const RANGE_COLORS = {
+        'cover': '#00a8ff',
+        'contain': '#4caf50',
+        'entry': '#ff9800',
+        'exit': '#f44336',
+        'entry-crossing': '#9c27b0',
+        'exit-crossing': '#cddc39'
+      };
+
+      function updateRangesVisualization ()
+      {
+        const subjectH = getSubjectSvgHeight();
+        const V = RV.viewportH;
+        const S = subjectH;
+        const bounds = getRangeBounds( V, S );
+
+        // Update subject position
+        const subjectY = scrollToSubjectY( rangesState.scrollPosition, subjectH );
+        const subjectEl = document.getElementById( 'rvSubject' );
+        const subjectLabel = document.getElementById( 'rvSubjectLabel' );
+        subjectEl.setAttribute( 'y', subjectY );
+        subjectEl.setAttribute( 'height', subjectH );
+        subjectLabel.setAttribute( 'y', subjectY + subjectH / 2 + 4 );
+
+        // Update range zone bars on left side
+        const zonesG = document.getElementById( 'rangeZoneBars' );
+        zonesG.innerHTML = '';
+
+        const barX = 5;
+        const barW = 40;
+        const timelineY = RV.viewportY;
+        const timelineH = RV.viewportH;
+
+        // Show all ranges as bars mapped to the viewport area
+        const rangeNames = [ 'entry', 'entry-crossing', 'contain', 'exit-crossing', 'exit' ];
+        const barOffsets = {};
+        let barCol = 0;
+
+        rangeNames.forEach( ( name ) =>
+        {
+          const b = bounds[ name ];
+          const yStart = timelineY + b.start * timelineH / 1 * ( V + S ) / V;
+          const yEnd = timelineY + b.end * timelineH / 1 * ( V + S ) / V;
+
+          // Clamp to SVG bounds
+          const y1 = Math.max( 10, Math.min( RV.svgH - 10, timelineY - ( V * 0.3 ) + b.start * ( timelineH + V * 0.6 ) ) );
+          const y2 = Math.max( 10, Math.min( RV.svgH - 10, timelineY - ( V * 0.3 ) + b.end * ( timelineH + V * 0.6 ) ) );
+          const h = Math.max( 2, y2 - y1 );
+
+          const isActiveStart = rangesState.rangeStartName === name;
+          const isActiveEnd = rangesState.rangeEndName === name;
+          const isActive = isActiveStart || isActiveEnd;
+
+          const rect = document.createElementNS( 'http://www.w3.org/2000/svg', 'rect' );
+          rect.setAttribute( 'x', barX );
+          rect.setAttribute( 'y', y1 );
+          rect.setAttribute( 'width', barW );
+          rect.setAttribute( 'height', h );
+          rect.setAttribute( 'rx', '2' );
+          rect.setAttribute( 'fill', RANGE_COLORS[ name ] );
+          rect.setAttribute( 'opacity', isActive ? '0.45' : '0.15' );
+          rect.classList.add( 'range-zone-bar' );
+          if ( isActive ) rect.classList.add( 'active' );
+          zonesG.appendChild( rect );
+
+          // Label
+          const text = document.createElementNS( 'http://www.w3.org/2000/svg', 'text' );
+          text.setAttribute( 'x', barX + barW / 2 );
+          text.setAttribute( 'y', y1 + h / 2 + 3 );
+          text.setAttribute( 'text-anchor', 'middle' );
+          text.setAttribute( 'font-size', h > 20 ? '7' : '6' );
+          text.setAttribute( 'fill', RANGE_COLORS[ name ] );
+          text.setAttribute( 'opacity', isActive ? '0.9' : '0.5' );
+          text.setAttribute( 'font-weight', '600' );
+          text.textContent = name.replace( '-crossing', '\u2194' );
+          zonesG.appendChild( text );
+        } );
+
+        // Update range start/end markers
+        const startFrac = rangeToScrollFraction( rangesState.rangeStartName, rangesState.rangeStartPct, V, S );
+        const endFrac = rangeToScrollFraction( rangesState.rangeEndName, rangesState.rangeEndPct, V, S );
+
+        const startMarkerY = scrollToSubjectY( startFrac, 0 );
+        const endMarkerY = scrollToSubjectY( endFrac, 0 );
+
+        document.getElementById( 'rvRangeStart' ).setAttribute( 'y1', startMarkerY );
+        document.getElementById( 'rvRangeStart' ).setAttribute( 'y2', startMarkerY );
+        document.getElementById( 'rvRangeStartLabel' ).setAttribute( 'y', startMarkerY + 4 );
+
+        document.getElementById( 'rvRangeEnd' ).setAttribute( 'y1', endMarkerY );
+        document.getElementById( 'rvRangeEnd' ).setAttribute( 'y2', endMarkerY );
+        document.getElementById( 'rvRangeEndLabel' ).setAttribute( 'y', endMarkerY + 4 );
+
+        // Active range overlay
+        const overlayY = Math.min( startMarkerY, endMarkerY );
+        const overlayH = Math.abs( endMarkerY - startMarkerY );
+        const activeRange = document.getElementById( 'rvActiveRange' );
+        activeRange.setAttribute( 'y', overlayY );
+        activeRange.setAttribute( 'height', Math.max( 0, overlayH ) );
+
+        // Update animation progress
+        const progress = calculateAnimationProgress( rangesState.scrollPosition, V, S );
+        const progressPct = ( progress * 100 ).toFixed( 1 );
+
+        document.getElementById( 'rangesProgressFill' ).style.width = progressPct + '%';
+        document.getElementById( 'rangesProgressPct' ).textContent = progressPct + '%';
+
+        // Update SVG progress bar
+        const svgProgressBar = document.getElementById( 'rvProgressBar' );
+        svgProgressBar.setAttribute( 'height', progress * RV.viewportH );
+
+        // Update preview subject animation
+        applyRangesPreviewAnimation( progress );
+
+        // Update CSS output
+        updateRangesCssOutput();
+
+        // Update preview info
+        const infoEl = document.getElementById( 'rangesPreviewInfo' );
+        if ( infoEl )
+        {
+          const phase = progress <= 0 ? 'Before range' :
+            progress >= 1 ? 'After range' : 'In range';
+          infoEl.textContent = `${ phase } | Progress: ${ progressPct }%`;
+        }
+      }
+
+      function applyRangesPreviewAnimation ( progress )
+      {
+        const subject = document.getElementById( 'rangesPreviewSubject' );
+        if ( !subject ) return;
+
+        switch ( rangesState.animation )
+        {
+          case 'reveal':
+            subject.style.transform = `scale(${ 0.3 + progress * 0.7 })`;
+            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.borderRadius = '8px';
+            break;
+          case 'fade':
+            subject.style.transform = 'scale(1)';
+            subject.style.opacity = progress;
+            subject.style.borderRadius = '8px';
+            break;
+          case 'slide':
+            subject.style.transform = `translateY(${ ( 1 - progress ) * 60 }px)`;
+            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.borderRadius = '8px';
+            break;
+          case 'rotate':
+            subject.style.transform = `rotate(${ progress * 360 }deg) scale(${ 0.5 + progress * 0.5 })`;
+            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.borderRadius = progress > 0.5 ? '50%' : '8px';
+            break;
+        }
+      }
+
+      function updateRangesCssOutput ()
+      {
+        const startName = rangesState.rangeStartName;
+        const startPct = rangesState.rangeStartPct;
+        const endName = rangesState.rangeEndName;
+        const endPct = rangesState.rangeEndPct;
+        const inset = rangesState.inset;
+
+        let css = `animation-range: ${ startName } ${ startPct }% ${ endName } ${ endPct }%;`;
+
+        const fullCss = [
+          `animation-timeline: view(${ inset > 0 ? 'block ' + inset + 'px' : '' });`,
+          css
+        ].join( '\n' );
+
+        document.getElementById( 'rangesCssOutput' ).textContent = fullCss;
+      }
+
+      // Ranges event listeners
+      document.getElementById( 'scrollPositionSlider' ).addEventListener( 'input', ( e ) =>
+      {
+        rangesState.scrollPosition = parseFloat( e.target.value ) / 100;
+        document.getElementById( 'scrollPositionValue' ).textContent = e.target.value + '%';
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangeStartName' ).addEventListener( 'change', ( e ) =>
+      {
+        rangesState.rangeStartName = e.target.value;
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangeStartPct' ).addEventListener( 'input', ( e ) =>
+      {
+        rangesState.rangeStartPct = parseFloat( e.target.value );
+        document.getElementById( 'rangeStartPctValue' ).textContent = e.target.value + '%';
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangeEndName' ).addEventListener( 'change', ( e ) =>
+      {
+        rangesState.rangeEndName = e.target.value;
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangeEndPct' ).addEventListener( 'input', ( e ) =>
+      {
+        rangesState.rangeEndPct = parseFloat( e.target.value );
+        document.getElementById( 'rangeEndPctValue' ).textContent = e.target.value + '%';
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangesSubjectSize' ).addEventListener( 'change', ( e ) =>
+      {
+        rangesState.subjectSize = e.target.value;
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangesInset' ).addEventListener( 'input', ( e ) =>
+      {
+        rangesState.inset = parseFloat( e.target.value );
+        document.getElementById( 'rangesInsetValue' ).textContent = e.target.value + 'px';
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangesAnimation' ).addEventListener( 'change', ( e ) =>
+      {
+        rangesState.animation = e.target.value;
+        updateRangesVisualization();
+      } );
+
+      document.getElementById( 'rangesCopyBtn' ).addEventListener( 'click', () =>
+      {
+        const text = document.getElementById( 'rangesCssOutput' ).textContent;
+        vscode.postMessage( {
+          command: 'copyToClipboard',
+          value: text
+        } );
+        const btn = document.getElementById( 'rangesCopyBtn' );
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout( () => { btn.textContent = originalText; }, 1500 );
+      } );
+
+      // Initialize ranges visualization
+      updateRangesVisualization();
     </script>
   </body>
 
