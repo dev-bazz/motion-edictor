@@ -1345,77 +1345,6 @@
         box-shadow: 0 6px 24px rgba(0, 168, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
       }
 
-      /* Viewport overlay frame */
-      .ranges-preview-viewport-overlay {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        pointer-events: none;
-        z-index: 5;
-      }
-
-      .ranges-preview-viewport-overlay::before,
-      .ranges-preview-viewport-overlay::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        background: var(--vscode-editor-background, var(--fallback-editor-background));
-        opacity: 0.8;
-        z-index: 5;
-      }
-
-      .ranges-preview-viewport-overlay::before {
-        top: 0;
-        height: var(--viewport-top-mask, 0px);
-      }
-
-      .ranges-preview-viewport-overlay::after {
-        bottom: 0;
-        height: var(--viewport-bottom-mask, 0px);
-      }
-
-      .ranges-preview-viewport-border {
-        position: absolute;
-        left: 0;
-        right: 0;
-        pointer-events: none;
-        z-index: 6;
-      }
-
-      .ranges-preview-viewport-border.top {
-        top: var(--viewport-top-mask, 0px);
-        border-top: 1.5px solid rgba(0, 168, 255, 0.35);
-      }
-
-      .ranges-preview-viewport-border.bottom {
-        bottom: var(--viewport-bottom-mask, 0px);
-        border-bottom: 1.5px solid rgba(0, 168, 255, 0.35);
-      }
-
-      .ranges-preview-viewport-label {
-        position: absolute;
-        font-size: 7px;
-        font-weight: 700;
-        color: rgba(0, 168, 255, 0.5);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        pointer-events: none;
-        z-index: 7;
-      }
-
-      .ranges-preview-viewport-label.top-label {
-        top: calc(var(--viewport-top-mask, 0px) + 3px);
-        left: 8px;
-      }
-
-      .ranges-preview-viewport-label.bottom-label {
-        bottom: calc(var(--viewport-bottom-mask, 0px) + 3px);
-        left: 8px;
-      }
-
       /* Range marker lines in preview */
       .ranges-preview-from-marker,
       .ranges-preview-to-marker {
@@ -1968,11 +1897,6 @@
                   <div class="ranges-preview-block"></div>
                 </div>
               </div>
-              <div class="ranges-preview-viewport-overlay" id="rangesViewportOverlay"></div>
-              <div class="ranges-preview-viewport-border top"></div>
-              <div class="ranges-preview-viewport-border bottom"></div>
-              <span class="ranges-preview-viewport-label top-label">viewport</span>
-              <span class="ranges-preview-viewport-label bottom-label">viewport</span>
               <div class="ranges-preview-state-overlay" id="rangesPreviewState">Before Range</div>
               <div class="ranges-preview-scrolltrack">
                 <div class="ranges-preview-scrollthumb" id="rangesPreviewThumb"></div>
@@ -3192,10 +3116,6 @@
         const vpFraction = 0.50;
         const vpTop = areaH * ( ( 1 - vpFraction ) / 2 );
         const vpHeight = areaH * vpFraction;
-
-        // Set viewport mask CSS variables
-        previewArea.style.setProperty( '--viewport-top-mask', vpTop + 'px' );
-        previewArea.style.setProperty( '--viewport-bottom-mask', vpTop + 'px' );
 
         // Content height: 10 blocks × (28px + 10px gap) + subject (52px + 10px gap) + padding
         const blockH = 38;
