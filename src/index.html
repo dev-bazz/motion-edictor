@@ -1338,7 +1338,8 @@
         color: white;
         letter-spacing: 1px;
         text-transform: uppercase;
-        transition: transform 0.15s ease, opacity 0.15s ease, border-radius 0.15s ease, box-shadow 0.15s ease;
+        transition: transform 0.15s ease, opacity 0.15s ease, border-radius 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, clip-path 0.15s ease;
+        will-change: transform, opacity, filter, clip-path;
       }
 
       .ranges-preview-subject.animating {
@@ -1968,7 +1969,14 @@
                   <option value="reveal" selected>Reveal (scale)</option>
                   <option value="fade">Fade in</option>
                   <option value="slide">Slide up</option>
+                  <option value="slide-left">Slide left</option>
+                  <option value="slide-right">Slide right</option>
                   <option value="rotate">Rotate</option>
+                  <option value="flip">Flip</option>
+                  <option value="blur">Blur reveal</option>
+                  <option value="clip-circle">Clip circle</option>
+                  <option value="clip-inset">Clip inset</option>
+                  <option value="bounce">Bounce in</option>
                 </select>
               </div>
               <div class="range-option-slider-row">
@@ -3075,27 +3083,75 @@
           subject.textContent = 'subject';
         }
 
+        // Reset all styles so switching effects doesn't leave stale values
+        subject.style.transform = '';
+        subject.style.opacity = '';
+        subject.style.borderRadius = '';
+        subject.style.filter = '';
+        subject.style.clipPath = '';
+
+        const p = progress;
+        const op = Math.max( 0.08, p );
+
         switch ( rangesState.animation )
         {
           case 'reveal':
-            subject.style.transform = `scale(${ 0.3 + progress * 0.7 })`;
-            subject.style.opacity = Math.max( 0.15, progress );
-            subject.style.borderRadius = '8px';
+            subject.style.transform = `scale(${ 0.3 + p * 0.7 })`;
+            subject.style.opacity = op;
             break;
           case 'fade':
-            subject.style.transform = 'scale(1)';
-            subject.style.opacity = Math.max( 0.1, progress );
-            subject.style.borderRadius = '8px';
+            subject.style.opacity = op;
             break;
           case 'slide':
-            subject.style.transform = `translateY(${ ( 1 - progress ) * 30 }px)`;
-            subject.style.opacity = Math.max( 0.15, progress );
-            subject.style.borderRadius = '8px';
+            subject.style.transform = `translateY(${ ( 1 - p ) * 40 }px)`;
+            subject.style.opacity = op;
+            break;
+          case 'slide-left':
+            subject.style.transform = `translateX(${ ( 1 - p ) * 60 }px)`;
+            subject.style.opacity = op;
+            break;
+          case 'slide-right':
+            subject.style.transform = `translateX(${ -( 1 - p ) * 60 }px)`;
+            subject.style.opacity = op;
             break;
           case 'rotate':
-            subject.style.transform = `rotate(${ progress * 360 }deg) scale(${ 0.5 + progress * 0.5 })`;
-            subject.style.opacity = Math.max( 0.15, progress );
-            subject.style.borderRadius = progress > 0.5 ? '50%' : '8px';
+            subject.style.transform = `rotate(${ p * 360 }deg) scale(${ 0.5 + p * 0.5 })`;
+            subject.style.opacity = op;
+            subject.style.borderRadius = p > 0.5 ? '50%' : '8px';
+            break;
+          case 'flip':
+            subject.style.transform = `perspective(300px) rotateY(${ ( 1 - p ) * 90 }deg)`;
+            subject.style.opacity = op;
+            break;
+          case 'blur':
+            subject.style.filter = `blur(${ ( 1 - p ) * 12 }px)`;
+            subject.style.opacity = op;
+            break;
+          case 'clip-circle':
+            subject.style.clipPath = `circle(${ p * 75 }% at 50% 50%)`;
+            subject.style.opacity = 1;
+            break;
+          case 'clip-inset':
+            const insetVal = ( 1 - p ) * 50;
+            subject.style.clipPath = `inset(${ insetVal }% ${ insetVal }% ${ insetVal }% ${ insetVal }% round 8px)`;
+            subject.style.opacity = 1;
+            break;
+          case 'bounce':
+            // Bounce easing: overshoot then settle
+            let bp = p;
+            if ( p < 1 )
+            {
+              const t = p;
+              bp = t < 0.4
+                ? ( t / 0.4 ) * 1.2
+                : t < 0.7
+                  ? 1.2 - ( ( t - 0.4 ) / 0.3 ) * 0.3
+                  : t < 0.85
+                    ? 0.9 + ( ( t - 0.7 ) / 0.15 ) * 0.15
+                    : 1.05 - ( ( t - 0.85 ) / 0.15 ) * 0.05;
+            }
+            subject.style.transform = `scale(${ Math.min( bp, 1.2 ) })`;
+            subject.style.opacity = op;
             break;
         }
       }
@@ -3112,29 +3168,21 @@
 
         const areaH = previewArea.offsetHeight || 240;
 
-        // Viewport region: middle 50% of the preview area for better visibility
-        const vpFraction = 0.50;
-        const vpTop = areaH * ( ( 1 - vpFraction ) / 2 );
-        const vpHeight = areaH * vpFraction;
+        // Measure actual content height from the DOM for accuracy
+        const contentH = content.scrollHeight || content.offsetHeight || 480;
 
-        // Content height: 10 blocks × (28px + 10px gap) + subject (52px + 10px gap) + padding
-        const blockH = 38;
-        const subjectH = 62;
-        const contentPad = 28;
-        const contentH = 10 * blockH + subjectH + contentPad;
-
-        // Scrollable distance
-        const maxScroll = Math.max( 1, contentH - vpHeight );
+        // Scrollable distance: content extends beyond the visible area
+        const maxScroll = Math.max( 1, contentH - areaH );
         const scrollOffset = scrollPos * maxScroll;
 
-        // Position content so it scrolls through the viewport window
-        content.style.top = ( vpTop - scrollOffset ) + 'px';
+        // Position content so it scrolls from top to bottom of the area
+        content.style.top = -scrollOffset + 'px';
 
         // Scrollbar thumb
         if ( thumb )
         {
           const trackH = areaH - 12;
-          const thumbH = Math.max( 20, ( vpHeight / contentH ) * trackH );
+          const thumbH = Math.max( 20, ( areaH / contentH ) * trackH );
           const thumbTop = scrollPos * ( trackH - thumbH );
           thumb.style.height = thumbH + 'px';
           thumb.style.top = ( 4 + thumbTop ) + 'px';
