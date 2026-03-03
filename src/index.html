@@ -1000,7 +1000,7 @@
       .ranges-preview-area {
         position: relative;
         width: 100%;
-        height: 120px;
+        height: 200px;
         background: var(--vscode-editor-background, var(--fallback-editor-background));
         border: 2px solid var(--vscode-input-border, var(--fallback-input-border));
         border-radius: 4px;
@@ -1014,21 +1014,191 @@
         right: 0;
         top: 0;
         bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         overflow: hidden;
       }
 
+      /* The tall scrollable content strip */
+      .ranges-preview-content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 600px;
+        /* tall content area */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        transition: top 0.1s ease;
+      }
+
+      .ranges-preview-block {
+        width: 80%;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--vscode-input-border, var(--fallback-input-border));
+        border-radius: 4px;
+        flex-shrink: 0;
+        opacity: 0.5;
+      }
+
+      .ranges-preview-block.placeholder-text::after {
+        content: '';
+        display: block;
+        width: 60%;
+        height: 6px;
+        margin: 13px auto;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 3px;
+      }
+
       .ranges-preview-subject {
-        width: 50px;
+        width: 80%;
         height: 50px;
         background: linear-gradient(135deg,
             var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground)),
             rgba(0, 168, 255, 0.6));
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 168, 255, 0.5);
-        transition: transform 0.1s ease, opacity 0.1s ease;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: white;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        transition: transform 0.15s ease, opacity 0.15s ease, border-radius 0.15s ease;
+      }
+
+      /* Viewport overlay frame */
+      .ranges-preview-viewport-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .ranges-preview-viewport-overlay::before,
+      .ranges-preview-viewport-overlay::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        background: var(--vscode-editor-background, var(--fallback-editor-background));
+        opacity: 0.75;
+        z-index: 5;
+      }
+
+      .ranges-preview-viewport-overlay::before {
+        top: 0;
+        height: var(--viewport-top-mask, 0px);
+      }
+
+      .ranges-preview-viewport-overlay::after {
+        bottom: 0;
+        height: var(--viewport-bottom-mask, 0px);
+      }
+
+      .ranges-preview-viewport-border {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border: 1.5px dashed rgba(0, 168, 255, 0.5);
+        pointer-events: none;
+        z-index: 6;
+      }
+
+      .ranges-preview-viewport-border.top {
+        top: var(--viewport-top-mask, 0px);
+      }
+
+      .ranges-preview-viewport-border.bottom {
+        bottom: var(--viewport-bottom-mask, 0px);
+      }
+
+      .ranges-preview-viewport-label {
+        position: absolute;
+        right: 6px;
+        font-size: 8px;
+        font-weight: 600;
+        color: rgba(0, 168, 255, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        pointer-events: none;
+        z-index: 7;
+      }
+
+      .ranges-preview-viewport-label.top-label {
+        top: calc(var(--viewport-top-mask, 0px) + 2px);
+      }
+
+      .ranges-preview-viewport-label.bottom-label {
+        bottom: calc(var(--viewport-bottom-mask, 0px) + 2px);
+      }
+
+      /* Range marker lines in preview */
+      .ranges-preview-from-marker,
+      .ranges-preview-to-marker {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 0;
+        border-top: 2px dashed;
+        pointer-events: none;
+        z-index: 8;
+        transition: top 0.1s ease;
+      }
+
+      .ranges-preview-from-marker {
+        border-color: #4CAF50;
+      }
+
+      .ranges-preview-to-marker {
+        border-color: #f44336;
+      }
+
+      .ranges-preview-marker-label {
+        position: absolute;
+        right: 4px;
+        top: 2px;
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .ranges-preview-from-marker .ranges-preview-marker-label {
+        color: #4CAF50;
+      }
+
+      .ranges-preview-to-marker .ranges-preview-marker-label {
+        color: #f44336;
+      }
+
+      /* Scroll track on the right */
+      .ranges-preview-scrolltrack {
+        position: absolute;
+        right: 2px;
+        top: 4px;
+        bottom: 4px;
+        width: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 2px;
+        z-index: 10;
+      }
+
+      .ranges-preview-scrollthumb {
+        position: absolute;
+        right: 0;
+        width: 4px;
+        background: rgba(0, 168, 255, 0.5);
+        border-radius: 2px;
+        transition: top 0.1s ease, height 0.1s ease;
       }
 
       .range-chip {
@@ -1385,44 +1555,80 @@
           </div>
 
           <div class="output-section">
-            <div class="ranges-info-banner">
-              <strong>Scroll-Driven Animations:</strong> Define when an animation starts and ends
-              based on a subject's visibility in the scrollport.
-            </div>
 
-            <h3 style="margin-top: 12px;">Scroll Position</h3>
-            <div class="range-control-row">
-              <label for="scrollPositionSlider">Scroll:</label>
-              <input type="range" id="scrollPositionSlider" min="0" max="100" step="1" value="0">
-              <div class="range-pct-value" id="scrollPositionValue">0%</div>
+            <div class="ranges-section-label">Scroll Simulation</div>
+            <div class="ranges-scroll-section">
+              <div class="range-control-row">
+                <label for="scrollPositionSlider">Scroll</label>
+                <input type="range" id="scrollPositionSlider" min="0" max="100" step="1" value="0">
+                <div class="range-pct-value" id="scrollPositionValue">0%</div>
+              </div>
             </div>
 
             <div class="ranges-progress-section">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span
-                          style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">Animation
-                  Progress</span>
-                <span id="rangesProgressPct"
-                          style="font-size:11px; font-family:monospace; color:var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));">0%</span>
+              <div class="ranges-progress-header">
+                <span class="ranges-progress-title">Animation Progress</span>
+                <span class="ranges-progress-pct" id="rangesProgressPct">0%</span>
               </div>
               <div class="ranges-progress-bar">
                 <div class="ranges-progress-fill" id="rangesProgressFill"></div>
               </div>
-            </div>
-
-            <h3 style="margin-top: 12px;">Preview</h3>
-            <div class="ranges-preview-area">
-              <div class="ranges-preview-scrollport">
-                <div class="ranges-preview-subject" id="rangesPreviewSubject"></div>
+              <div style="display:flex; justify-content:space-between; margin-top:3px;">
+                <span class="ranges-phase-badge before" id="rangesPhaseBadge">
+                  <span class="phase-dot"></span>
+                  Before range
+                </span>
               </div>
             </div>
-            <div class="preview-info" id="rangesPreviewInfo">Scroll to see animation</div>
 
-            <h3 style="margin-top: 12px;">Animation Range</h3>
+            <div class="ranges-section-label">Live Preview</div>
+            <div class="ranges-preview-area" id="rangesPreviewArea">
+              <div class="ranges-preview-scrollport">
+                <div class="ranges-preview-content" id="rangesPreviewContent">
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-subject" id="rangesPreviewSubject">subject</div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                  <div class="ranges-preview-block"></div>
+                </div>
+              </div>
+              <div class="ranges-preview-viewport-overlay" id="rangesViewportOverlay"></div>
+              <div class="ranges-preview-viewport-border top"></div>
+              <div class="ranges-preview-viewport-border bottom"></div>
+              <span class="ranges-preview-viewport-label top-label">viewport</span>
+              <span class="ranges-preview-viewport-label bottom-label">viewport</span>
+              <div class="ranges-preview-from-marker" id="rangesPreviewFrom">
+                <span class="ranges-preview-marker-label">from</span>
+              </div>
+              <div class="ranges-preview-to-marker" id="rangesPreviewTo">
+                <span class="ranges-preview-marker-label">to</span>
+              </div>
+              <div class="ranges-preview-scrolltrack">
+                <div class="ranges-preview-scrollthumb" id="rangesPreviewThumb"></div>
+              </div>
+            </div>
+
+            <div class="ranges-section-label">Quick Presets</div>
+            <div class="ranges-preset-grid" id="rangesPresetGrid">
+              <button class="ranges-preset-btn active" data-preset="full-cover">Full Cover</button>
+              <button class="ranges-preset-btn" data-preset="entry-only">Entry Only</button>
+              <button class="ranges-preset-btn" data-preset="exit-only">Exit Only</button>
+              <button class="ranges-preset-btn" data-preset="contained">Contained</button>
+              <button class="ranges-preset-btn" data-preset="entry-half">Entry 50%</button>
+              <button class="ranges-preset-btn" data-preset="exit-half">Exit 50%</button>
+            </div>
+
+            <div class="ranges-section-label">Animation Range</div>
             <div class="range-select-group">
-              <div class="range-control-row range-control-stacked">
+              <div class="range-control-row range-control-stacked range-start-row">
                 <div class="range-control-top">
-                  <label>Start:</label>
+                  <label>From</label>
                   <select id="rangeStartName">
                     <option value="cover" selected>cover</option>
                     <option value="contain">contain</option>
@@ -1438,9 +1644,9 @@
                 </div>
               </div>
 
-              <div class="range-control-row range-control-stacked">
+              <div class="range-control-row range-control-stacked range-end-row">
                 <div class="range-control-top">
-                  <label>End:</label>
+                  <label>To</label>
                   <select id="rangeEndName">
                     <option value="cover" selected>cover</option>
                     <option value="contain">contain</option>
@@ -1457,43 +1663,45 @@
               </div>
             </div>
 
-            <h3 style="margin-top: 12px;">Options</h3>
-            <div class="range-control-row" style="grid-template-columns: auto 1fr;">
-              <label>Subject Size:</label>
-              <select id="rangesSubjectSize">
-                <option value="smaller" selected>Smaller</option>
-                <option value="same">Same as viewport</option>
-                <option value="taller">Taller than viewport</option>
-              </select>
+            <div class="ranges-section-label">Options</div>
+            <div class="ranges-options-grid">
+              <div class="range-option-row">
+                <label>Size</label>
+                <select id="rangesSubjectSize">
+                  <option value="smaller" selected>Smaller</option>
+                  <option value="same">Same as viewport</option>
+                  <option value="taller">Taller</option>
+                </select>
+              </div>
+              <div class="range-option-row">
+                <label>Effect</label>
+                <select id="rangesAnimation">
+                  <option value="reveal" selected>Reveal (scale)</option>
+                  <option value="fade">Fade in</option>
+                  <option value="slide">Slide up</option>
+                  <option value="rotate">Rotate</option>
+                </select>
+              </div>
+              <div class="range-option-slider-row">
+                <label>Inset</label>
+                <input type="range" id="rangesInset" min="0" max="50" step="1" value="0">
+                <div class="range-option-value" id="rangesInsetValue">0px</div>
+              </div>
             </div>
-            <div class="range-control-row">
-              <label>Inset:</label>
-              <input type="range" id="rangesInset" min="0" max="50" step="1" value="0">
-              <div class="range-pct-value" id="rangesInsetValue">0px</div>
-            </div>
-            <div class="range-control-row" style="grid-template-columns: auto 1fr;">
-              <label>Animation:</label>
-              <select id="rangesAnimation">
-                <option value="reveal" selected>Reveal (scale)</option>
-                <option value="fade">Fade in</option>
-                <option value="slide">Slide up</option>
-                <option value="rotate">Rotate</option>
-              </select>
+
+            <div class="ranges-section-label">CSS Output</div>
+            <div class="ranges-css-output">
+              <div class="code-block" id="rangesCssOutput">animation-range: cover 0% cover 100%;</div>
+              <button class="copy-btn" id="rangesCopyBtn">Copy CSS</button>
             </div>
 
             <div class="ranges-info-banner" style="margin-top: 8px;">
-              <strong>💡 Range Names:</strong>
-              <strong>cover</strong> = entire visibility &bull;
-              <strong>entry</strong> = entering viewport &bull;
-              <strong>exit</strong> = leaving viewport &bull;
-              <strong>contain</strong> = fully visible &bull;
-              <strong>entry-crossing</strong> = leading edge crosses &bull;
-              <strong>exit-crossing</strong> = trailing edge crosses
+              <strong>💡 Tip:</strong> Use presets for common patterns, then fine-tune with the From/To controls.
+              <strong>cover</strong> = full visibility •
+              <strong>entry</strong> = entering •
+              <strong>exit</strong> = leaving •
+              <strong>contain</strong> = fully visible
             </div>
-
-            <h3 style="margin-top: 12px;">CSS Output</h3>
-            <div class="code-block" id="rangesCssOutput">animation-range: cover 0% cover 100%;</div>
-            <button class="copy-btn" id="rangesCopyBtn">Copy</button>
           </div>
         </div>
       </div>
@@ -2519,6 +2727,31 @@
         document.getElementById( 'rangesProgressFill' ).style.width = progressPct + '%';
         document.getElementById( 'rangesProgressPct' ).textContent = progressPct + '%';
 
+        // Update progress pct styling
+        const pctEl = document.getElementById( 'rangesProgressPct' );
+        if ( progress > 0 && progress < 1 ) pctEl.classList.add( 'active' );
+        else pctEl.classList.remove( 'active' );
+
+        // Update phase badge
+        const badge = document.getElementById( 'rangesPhaseBadge' );
+        if ( badge )
+        {
+          badge.classList.remove( 'before', 'in-range', 'after' );
+          if ( progress <= 0 )
+          {
+            badge.classList.add( 'before' );
+            badge.innerHTML = '<span class="phase-dot"></span>Before range';
+          } else if ( progress >= 1 )
+          {
+            badge.classList.add( 'after' );
+            badge.innerHTML = '<span class="phase-dot"></span>After range';
+          } else
+          {
+            badge.classList.add( 'in-range' );
+            badge.innerHTML = '<span class="phase-dot"></span>In range';
+          }
+        }
+
         // Update SVG progress bar
         const svgProgressBar = document.getElementById( 'rvProgressBar' );
         svgProgressBar.setAttribute( 'height', progress * RV.viewportH );
@@ -2526,17 +2759,11 @@
         // Update preview subject animation
         applyRangesPreviewAnimation( progress );
 
+        // Update scroll-view preview illustration
+        updateRangesScrollPreview( rangesState.scrollPosition, progress, startFrac, endFrac, V, S );
+
         // Update CSS output
         updateRangesCssOutput();
-
-        // Update preview info
-        const infoEl = document.getElementById( 'rangesPreviewInfo' );
-        if ( infoEl )
-        {
-          const phase = progress <= 0 ? 'Before range' :
-            progress >= 1 ? 'After range' : 'In range';
-          infoEl.textContent = `${ phase } | Progress: ${ progressPct }%`;
-        }
       }
 
       function applyRangesPreviewAnimation ( progress )
@@ -2544,28 +2771,90 @@
         const subject = document.getElementById( 'rangesPreviewSubject' );
         if ( !subject ) return;
 
+        // Toggle glow class
+        if ( progress > 0.01 && progress < 0.99 ) subject.classList.add( 'animating' );
+        else subject.classList.remove( 'animating' );
+
         switch ( rangesState.animation )
         {
           case 'reveal':
             subject.style.transform = `scale(${ 0.3 + progress * 0.7 })`;
-            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.opacity = Math.max( 0.15, progress );
             subject.style.borderRadius = '8px';
             break;
           case 'fade':
             subject.style.transform = 'scale(1)';
-            subject.style.opacity = progress;
+            subject.style.opacity = Math.max( 0.1, progress );
             subject.style.borderRadius = '8px';
             break;
           case 'slide':
-            subject.style.transform = `translateY(${ ( 1 - progress ) * 60 }px)`;
-            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.transform = `translateY(${ ( 1 - progress ) * 30 }px)`;
+            subject.style.opacity = Math.max( 0.15, progress );
             subject.style.borderRadius = '8px';
             break;
           case 'rotate':
             subject.style.transform = `rotate(${ progress * 360 }deg) scale(${ 0.5 + progress * 0.5 })`;
-            subject.style.opacity = progress < 0.01 ? '0.2' : '1';
+            subject.style.opacity = Math.max( 0.15, progress );
             subject.style.borderRadius = progress > 0.5 ? '50%' : '8px';
             break;
+        }
+      }
+
+      // Scroll-view illustration preview
+      function updateRangesScrollPreview ( scrollPos, progress, startFrac, endFrac, V, S )
+      {
+        const previewArea = document.getElementById( 'rangesPreviewArea' );
+        const content = document.getElementById( 'rangesPreviewContent' );
+        const overlay = document.getElementById( 'rangesViewportOverlay' );
+        const thumb = document.getElementById( 'rangesPreviewThumb' );
+        const fromMarker = document.getElementById( 'rangesPreviewFrom' );
+        const toMarker = document.getElementById( 'rangesPreviewTo' );
+
+        if ( !previewArea || !content ) return;
+
+        const areaH = previewArea.offsetHeight || 220;
+        const contentH = content.scrollHeight || 700;
+
+        // Viewport is the visible area — let's define it as the middle 40% of the preview
+        const vpFraction = 0.4;
+        const vpTop = areaH * ( ( 1 - vpFraction ) / 2 );
+        const vpBottom = areaH - vpTop;
+        const vpHeight = vpBottom - vpTop;
+
+        // Set CSS variables for viewport mask overlay
+        previewArea.style.setProperty( '--viewport-top-mask', vpTop + 'px' );
+        previewArea.style.setProperty( '--viewport-bottom-mask', vpTop + 'px' );
+
+        // Scroll the content strip: at scrollPos=0, content top is at viewport bottom;
+        // at scrollPos=1, content bottom is at viewport top
+        const maxScroll = contentH - vpHeight;
+        const scrollOffset = scrollPos * maxScroll;
+        content.style.top = ( vpTop - scrollOffset ) + 'px';
+
+        // Scrollbar thumb
+        if ( thumb )
+        {
+          const trackH = areaH - 8;
+          const thumbH = Math.max( 16, ( vpHeight / contentH ) * trackH );
+          const thumbTop = scrollPos * ( trackH - thumbH );
+          thumb.style.height = thumbH + 'px';
+          thumb.style.top = thumbTop + 'px';
+        }
+
+        // Position FROM/TO marker lines relative to the preview area
+        // These represent where in the scroll the range starts/ends
+        if ( fromMarker )
+        {
+          // Map startFrac to a Y position: at startFrac scroll, the subject hits the range start
+          // Show the marker at the viewport boundary that corresponds to the range edge
+          const fromY = vpTop + ( 1 - startFrac ) * vpHeight;
+          fromMarker.style.top = Math.max( 0, Math.min( areaH, fromY ) ) + 'px';
+        }
+
+        if ( toMarker )
+        {
+          const toY = vpTop + ( 1 - endFrac ) * vpHeight;
+          toMarker.style.top = Math.max( 0, Math.min( areaH, toY ) ) + 'px';
         }
       }
 
@@ -2638,6 +2927,60 @@
       {
         rangesState.animation = e.target.value;
         updateRangesVisualization();
+      } );
+
+      // Preset buttons
+      const RANGE_PRESETS = {
+        'full-cover': { startName: 'cover', startPct: 0, endName: 'cover', endPct: 100 },
+        'entry-only': { startName: 'entry', startPct: 0, endName: 'entry', endPct: 100 },
+        'exit-only': { startName: 'exit', startPct: 0, endName: 'exit', endPct: 100 },
+        'contained': { startName: 'contain', startPct: 0, endName: 'contain', endPct: 100 },
+        'entry-half': { startName: 'entry', startPct: 0, endName: 'entry', endPct: 50 },
+        'exit-half': { startName: 'exit', startPct: 50, endName: 'exit', endPct: 100 }
+      };
+
+      document.querySelectorAll( '.ranges-preset-btn' ).forEach( ( btn ) =>
+      {
+        btn.addEventListener( 'click', () =>
+        {
+          const preset = btn.dataset.preset;
+          const p = RANGE_PRESETS[ preset ];
+          if ( !p ) return;
+
+          // Update state
+          rangesState.rangeStartName = p.startName;
+          rangesState.rangeStartPct = p.startPct;
+          rangesState.rangeEndName = p.endName;
+          rangesState.rangeEndPct = p.endPct;
+
+          // Sync UI controls
+          document.getElementById( 'rangeStartName' ).value = p.startName;
+          document.getElementById( 'rangeStartPct' ).value = p.startPct;
+          document.getElementById( 'rangeStartPctValue' ).textContent = p.startPct + '%';
+          document.getElementById( 'rangeEndName' ).value = p.endName;
+          document.getElementById( 'rangeEndPct' ).value = p.endPct;
+          document.getElementById( 'rangeEndPctValue' ).textContent = p.endPct + '%';
+
+          // Toggle active class
+          document.querySelectorAll( '.ranges-preset-btn' ).forEach( b => b.classList.remove( 'active' ) );
+          btn.classList.add( 'active' );
+
+          updateRangesVisualization();
+        } );
+      } );
+
+      // Clear active preset when manually changing range
+      function clearActivePreset ()
+      {
+        document.querySelectorAll( '.ranges-preset-btn' ).forEach( b => b.classList.remove( 'active' ) );
+      }
+      [ 'rangeStartName', 'rangeEndName' ].forEach( id =>
+      {
+        document.getElementById( id ).addEventListener( 'change', clearActivePreset );
+      } );
+      [ 'rangeStartPct', 'rangeEndPct' ].forEach( id =>
+      {
+        document.getElementById( id ).addEventListener( 'input', clearActivePreset );
       } );
 
       document.getElementById( 'rangesCopyBtn' ).addEventListener( 'click', () =>
