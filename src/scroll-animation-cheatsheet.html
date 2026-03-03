@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Scroll Animation Cheat Sheet</title>
+    <style>
+      :root {
+        --fallback-editor-background: #1e1e1e;
+        --fallback-editor-foreground: #d4d4d4;
+        --fallback-button-background: #0e639c;
+        --fallback-button-foreground: #ffffff;
+        --fallback-button-hoverBackground: #1177bb;
+        --fallback-input-background: #2d2d2d;
+        --fallback-input-border: #555555;
+        --fallback-descriptionForeground: #b4b4b4;
+        --fallback-symbolIcon-colorForeground: #00a8ff;
+
+        --bg: var(--vscode-editor-background, var(--fallback-editor-background));
+        --fg: var(--vscode-editor-foreground, var(--fallback-editor-foreground));
+        --accent: var(--vscode-symbolIcon-colorForeground, var(--fallback-symbolIcon-colorForeground));
+        --card-bg: var(--vscode-input-background, var(--fallback-input-background));
+        --border: var(--vscode-input-border, var(--fallback-input-border));
+        --btn-bg: var(--vscode-button-background, var(--fallback-button-background));
+        --btn-fg: var(--vscode-button-foreground, var(--fallback-button-foreground));
+        --btn-hover: var(--vscode-button-hoverBackground, var(--fallback-button-hoverBackground));
+        --muted: var(--vscode-descriptionForeground, var(--fallback-descriptionForeground));
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.6;
+        overflow-y: auto;
+        padding: 0;
+      }
+
+      /* ── Layout ── */
+      .page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 20px 64px;
+      }
+
+      .page-title {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .page-title .icon {
+        font-size: 28px;
+      }
+
+      .page-subtitle {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 28px;
+      }
+
+      /* ── Table of Contents ── */
+      .toc {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 32px;
+      }
+
+      .toc h2 {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        opacity: 0.7;
+        margin-bottom: 10px;
+      }
+
+      .toc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 24px;
+      }
+
+      .toc a {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 13px;
+        padding: 3px 0;
+        display: block;
+        transition: opacity 0.15s;
+      }
+
+      .toc a:hover {
+        opacity: 0.75;
+        text-decoration: underline;
+      }
+
+      /* ── Section ── */
+      .section {
+        margin-bottom: 36px;
+      }
+
+      .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-title .badge {
+        font-size: 10px;
+        background: var(--accent);
+        color: var(--bg);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .subsection {
+        margin-bottom: 20px;
+      }
+
+      .subsection-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+
+      p {
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      p strong {
+        color: var(--fg);
+      }
+
+      /* ── Code Blocks ── */
+      .code-block {
+        position: relative;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.7;
+        overflow-x: auto;
+        white-space: pre;
+        color: var(--fg);
+        tab-size: 2;
+      }
+
+      .code-block:hover {
+        border-color: var(--accent);
+      }
+
+      .code-label {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        font-size: 10px;
+        color: var(--muted);
+        background: var(--card-bg);
+        padding: 1px 8px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+
+      .copy-btn {
+        position: absolute;
+        bottom: 6px;
+        right: 8px;
+        background: var(--btn-bg);
+        color: var(--btn-fg);
+        border: none;
+        border-radius: 3px;
+        padding: 3px 10px;
+        font-size: 11px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s, background 0.2s;
+      }
+
+      .code-block:hover .copy-btn {
+        opacity: 1;
+      }
+
+      .copy-btn:hover {
+        background: var(--btn-hover);
+      }
+
+      /* ── Tables ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 14px;
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+      }
+
+      th {
+        background: var(--card-bg);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      td {
+        color: var(--muted);
+      }
+
+      td code {
+        color: var(--accent);
+        background: var(--bg);
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 11.5px;
+      }
+
+      /* ── Info / Tip / Warning Boxes ── */
+      .info-box {
+        background: var(--card-bg);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 4px 4px 0;
+        padding: 10px 14px;
+        margin-bottom: 14px;
+        font-size: 12px;
+      }
+
+      .info-box.tip {
+        border-left-color: #4ec9b0;
+      }
+
+      .info-box.warn {
+        border-left-color: #d7ba7d;
+      }
+
+      .info-box .label {
+        font-weight: 700;
+        margin-bottom: 2px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .info-box.tip .label {
+        color: #4ec9b0;
+      }
+
+      .info-box.warn .label {
+        color: #d7ba7d;
+      }
+
+      .info-box p {
+        margin: 0;
+        color: var(--fg);
+      }
+
+      /* ── Visual Demo Boxes ── */
+      .demo-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 14px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .demo-label {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 12px;
+      }
+
+      /* Scroll-timeline demo */
+      .scroll-demo-track {
+        height: 150px;
+        overflow-y: scroll;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .scroll-demo-track .scroll-content {
+        height: 600px;
+        padding: 12px;
+        background: repeating-linear-gradient(180deg,
+            transparent,
+            transparent 49px,
+            var(--border) 49px,
+            var(--border) 50px);
+      }
+
+      .scroll-progress-bar {
+        position: sticky;
+        top: 0;
+        height: 4px;
+        background: var(--accent);
+        width: 0%;
+        transition: none;
+        border-radius: 0 2px 2px 0;
+        z-index: 2;
+      }
+
+      /* Animated box demos */
+      .anim-box {
+        width: 50px;
+        height: 50px;
+        background: var(--accent);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--bg);
+        font-weight: 700;
+      }
+
+      /* ── Keyword list ── */
+      .keyword-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .keyword-item {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .keyword-item code {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .keyword-item .desc {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+      }
+
+      /* ── Browser support badges ── */
+      .browser-support {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .browser-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+      }
+
+      .browser-badge.yes {
+        border-color: #4ec9b0;
+        color: #4ec9b0;
+      }
+
+      .browser-badge.partial {
+        border-color: #d7ba7d;
+        color: #d7ba7d;
+      }
+
+      .browser-badge.no {
+        border-color: #f44747;
+        color: #f44747;
+      }
+
+      /* ── Utility ── */
+      .mt-sm {
+        margin-top: 8px;
+      }
+
+      .mb-sm {
+        margin-bottom: 8px;
+      }
+
+      .flex-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 24px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- HEADER -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <h1 class="page-title"><span class="icon">📜</span> CSS Scroll Animation Cheat Sheet</h1>
+      <p class="page-subtitle">Everything you need to know about CSS Scroll-Driven Animations — properties, timelines,
+        ranges, and ready-to-use snippets.</p>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- TABLE OF CONTENTS -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <nav class="toc">
+        <h2>Contents</h2>
+        <div class="toc-grid">
+          <a href="#overview">1. Overview &amp; Concepts</a>
+          <a href="#browser-support">2. Browser Support</a>
+          <a href="#scroll-timeline">3. scroll-timeline</a>
+          <a href="#view-timeline">4. view-timeline</a>
+          <a href="#animation-timeline">5. animation-timeline</a>
+          <a href="#animation-range">6. animation-range</a>
+          <a href="#scroll-function">7. scroll() Function</a>
+          <a href="#view-function">8. view() Function</a>
+          <a href="#named-timelines">9. Named Timelines</a>
+          <a href="#timeline-scope">10. timeline-scope</a>
+          <a href="#progress-bar">11. Scroll Progress Bar</a>
+          <a href="#reveal-on-scroll">12. Reveal on Scroll</a>
+          <a href="#parallax">13. Parallax Effects</a>
+          <a href="#horizontal">14. Horizontal Scroll</a>
+          <a href="#sticky-header">15. Sticky Header Animation</a>
+          <a href="#image-sequence">16. Image Sequence on Scroll</a>
+          <a href="#text-reveal">17. Text Reveal on Scroll</a>
+          <a href="#combined">18. Combining with @keyframes</a>
+          <a href="#js-fallback">19. JavaScript Fallback</a>
+          <a href="#best-practices">20. Best Practices</a>
+        </div>
+      </nav>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 1. OVERVIEW -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="overview" class="section">
+        <h2 class="section-title">1. Overview &amp; Concepts</h2>
+        <p>CSS Scroll-Driven Animations let you tie <strong>@keyframes</strong> progress to scroll position instead of
+          time. There are two core timeline types:</p>
+
+        <table>
+          <tr>
+            <th>Timeline Type</th>
+            <th>What drives it</th>
+            <th>Use Case</th>
+          </tr>
+          <tr>
+            <td><code>ScrollTimeline</code></td>
+            <td>Position of scroll container</td>
+            <td>Progress bars, parallax, sticky animations</td>
+          </tr>
+          <tr>
+            <td><code>ViewTimeline</code></td>
+            <td>Element's visibility in scroll-port</td>
+            <td>Reveal-on-scroll, entrance/exit animations</td>
+          </tr>
+        </table>
+
+        <p>The animation's <strong>current time</strong> is determined by scroll progress (0% → 100%) rather than
+          elapsed seconds. All standard <code>@keyframes</code> rules apply — you just swap the time-based timeline for
+          a scroll-based one.</p>
+
+        <div class="info-box tip">
+          <div class="label">💡 Key Insight</div>
+          <p>Unlike JavaScript scroll listeners, CSS scroll-driven animations run on the <strong>compositor
+              thread</strong>, giving you buttery-smooth 60fps+ animations with zero main-thread jank.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 2. BROWSER SUPPORT -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="browser-support" class="section">
+        <h2 class="section-title">2. Browser Support</h2>
+        <div class="browser-support">
+          <span class="browser-badge yes">✅ Chrome 115+</span>
+          <span class="browser-badge yes">✅ Edge 115+</span>
+          <span class="browser-badge yes">✅ Opera 101+</span>
+          <span class="browser-badge yes">✅ Chrome Android 115+</span>
+          <span class="browser-badge partial">⚠️ Safari 18+ (partial)</span>
+          <span class="browser-badge partial">⚠️ Firefox 110+ (flag)</span>
+        </div>
+        <div class="code-block"><span class="code-label">CSS</span>/* Feature detection */
+          @supports (animation-timeline: scroll()) {
+          /* scroll-driven styles */
+          }
+
+          @supports not (animation-timeline: scroll()) {
+          /* fallback styles */
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 3. scroll-timeline -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="scroll-timeline" class="section">
+        <h2 class="section-title">3. scroll-timeline <span class="badge">Property</span></h2>
+        <p>Declares a <strong>named scroll progress timeline</strong> on a scroll container. Child elements (or the
+          element itself) can reference it via <code>animation-timeline</code>.</p>
+
+        <table>
+          <tr>
+            <th>Property</th>
+            <th>Values</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline-name</code></td>
+            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+            <td><code>none</code></td>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline-axis</code></td>
+            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+            <td><code>block</code></td>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline</code></td>
+            <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
+          </tr>
+        </table>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Name a scroll timeline on a container */
+          .scroll-container {
+          overflow-y: scroll;
+          scroll-timeline-name: --page-scroll;
+          scroll-timeline-axis: block; /* default */
+          }
+
+          /* Shorthand */
+          .scroll-container {
+          overflow-y: scroll;
+          scroll-timeline: --page-scroll block;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 4. view-timeline -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="view-timeline" class="section">
+        <h2 class="section-title">4. view-timeline <span class="badge">Property</span></h2>
+        <p>Declares a <strong>view progress timeline</strong> that measures how much of an element is currently visible
+          inside a scrollport.</p>
+
+        <table>
+          <tr>
+            <th>Property</th>
+            <th>Values</th>
+            <th>Default</th>
+          </tr>
+          <tr>
+            <td><code>view-timeline-name</code></td>
+            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+            <td><code>none</code></td>
+          </tr>
+          <tr>
+            <td><code>view-timeline-axis</code></td>
+            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+            <td><code>block</code></td>
+          </tr>
+          <tr>
+            <td><code>view-timeline-inset</code></td>
+            <td><code>auto</code> | <code>&lt;length-percentage&gt;{1,2}</code></td>
+            <td><code>auto</code></td>
+          </tr>
+          <tr>
+            <td><code>view-timeline</code></td>
+            <td colspan="2">Shorthand: <code>&lt;name&gt; &lt;axis&gt;</code></td>
+          </tr>
+        </table>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Track visibility of an element */
+          .card {
+          view-timeline-name: --card-reveal;
+          view-timeline-axis: block;
+          }
+
+          /* Shorthand */
+          .card {
+          view-timeline: --card-reveal block;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 5. animation-timeline -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="animation-timeline" class="section">
+        <h2 class="section-title">5. animation-timeline <span class="badge">Core</span></h2>
+        <p>Links an animation to a scroll timeline instead of the default document timeline (time-based). This is the
+          <strong>single most important property</strong> for scroll-driven animations.</p>
+
+        <table>
+          <tr>
+            <th>Value</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><code>auto</code></td>
+            <td>Default document timeline (time-based)</td>
+          </tr>
+          <tr>
+            <td><code>none</code></td>
+            <td>No timeline, animation won't progress</td>
+          </tr>
+          <tr>
+            <td><code>scroll()</code></td>
+            <td>Anonymous scroll progress timeline</td>
+          </tr>
+          <tr>
+            <td><code>view()</code></td>
+            <td>Anonymous view progress timeline</td>
+          </tr>
+          <tr>
+            <td><code>&lt;dashed-ident&gt;</code></td>
+            <td>Named timeline (from scroll-timeline-name or view-timeline-name)</td>
+          </tr>
+        </table>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes fade-in {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+          }
+
+          .element {
+          animation: fade-in linear both;
+          animation-timeline: scroll(); /* tied to nearest scroll ancestor */
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="info-box">
+          <div class="label">ℹ️ Note</div>
+          <p>When using <code>animation-timeline</code>, the <code>animation-duration</code> is ignored because progress
+            is measured by scroll position, not time. Use <code>auto</code> or any value — it doesn't matter.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 6. animation-range -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="animation-range" class="section">
+        <h2 class="section-title">6. animation-range <span class="badge">Core</span></h2>
+        <p>Controls <strong>which portion of the timeline</strong> the animation maps to. Lets you fine-tune exactly
+          when the animation starts and ends within scroll or view progress.</p>
+
+        <table>
+          <tr>
+            <th>Property</th>
+            <th>Values</th>
+          </tr>
+          <tr>
+            <td><code>animation-range-start</code></td>
+            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> |
+              <code>&lt;timeline-range-name&gt; &lt;length-percentage&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>animation-range-end</code></td>
+            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> |
+              <code>&lt;timeline-range-name&gt; &lt;length-percentage&gt;</code></td>
+          </tr>
+          <tr>
+            <td><code>animation-range</code></td>
+            <td>Shorthand: <code>&lt;start&gt; &lt;end&gt;</code></td>
+          </tr>
+        </table>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Timeline Range Names (for ViewTimeline)</h3>
+          <div class="keyword-grid">
+            <div class="keyword-item">
+              <code>cover</code>
+              <div class="desc">Full range: element enters → fully exits scrollport</div>
+            </div>
+            <div class="keyword-item">
+              <code>contain</code>
+              <div class="desc">Element is fully visible inside scrollport</div>
+            </div>
+            <div class="keyword-item">
+              <code>entry</code>
+              <div class="desc">Element starts entering → fully entered</div>
+            </div>
+            <div class="keyword-item">
+              <code>exit</code>
+              <div class="desc">Element starts exiting → fully exited</div>
+            </div>
+            <div class="keyword-item">
+              <code>entry-crossing</code>
+              <div class="desc">Element crosses the entry edge of scrollport</div>
+            </div>
+            <div class="keyword-item">
+              <code>exit-crossing</code>
+              <div class="desc">Element crosses the exit edge of scrollport</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Animate only during the entry phase */
+          .card {
+          animation: slide-up linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 100%;
+          }
+
+          /* Animate from 25% to 75% of scroll */
+          .progress {
+          animation: grow linear both;
+          animation-timeline: scroll();
+          animation-range: 25% 75%;
+          }
+
+          /* Cover range — full visibility cycle */
+          .element {
+          animation: fade linear both;
+          animation-timeline: view();
+          animation-range: cover 0% cover 100%;
+          }
+
+          /* Contain — only while fully in view */
+          .element {
+          animation: scale-up linear both;
+          animation-timeline: view();
+          animation-range: contain 0% contain 100%;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="info-box tip">
+          <div class="label">💡 Tip</div>
+          <p>Use Chrome DevTools → Animations panel → "Scroll-driven" to visually debug animation-range values.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 7. scroll() Function -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="scroll-function" class="section">
+        <h2 class="section-title">7. scroll() Function <span class="badge">Anonymous</span></h2>
+        <p>Creates an <strong>anonymous scroll progress timeline</strong> inline. No need to name a timeline.</p>
+
+        <div class="code-block"><span class="code-label">Syntax</span>animation-timeline: scroll(&lt;scroller&gt;
+          &lt;axis&gt;);
+
+          /* &lt;scroller&gt; values */
+          nearest /* default – nearest ancestor scroll container */
+          root /* document viewport / root scroller */
+          self /* the element itself (if it scrolls) */
+
+          /* &lt;axis&gt; values */
+          block /* default – block axis (vertical in LTR) */
+          inline /* inline axis (horizontal in LTR) */
+          x /* horizontal axis */
+          y /* vertical axis */</div>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Progress bar tied to root scroll */
+          .progress-bar {
+          animation: grow-width linear both;
+          animation-timeline: scroll(root block);
+          }
+
+          /* Element scrolls itself */
+          .self-scroll {
+          overflow-y: scroll;
+          animation: highlight linear both;
+          animation-timeline: scroll(self);
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 8. view() Function -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="view-function" class="section">
+        <h2 class="section-title">8. view() Function <span class="badge">Anonymous</span></h2>
+        <p>Creates an <strong>anonymous view progress timeline</strong> based on the element's visibility in its nearest
+          scroll ancestor.</p>
+
+        <div class="code-block"><span class="code-label">Syntax</span>animation-timeline: view(&lt;axis&gt;
+          &lt;inset&gt;);
+
+          /* &lt;axis&gt; values */
+          block /* default */
+          inline
+          x
+          y
+
+          /* &lt;inset&gt; – shrink the scrollport for trigger area */
+          auto /* default, no inset */
+          &lt;length&gt; /* e.g., 100px — both start and end */
+          &lt;percentage&gt; /* e.g., 20% */
+          &lt;len&gt; &lt;len&gt; /* start-inset end-inset */</div>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Fade in when element enters viewport */
+          .card {
+          animation: fade-in linear both;
+          animation-timeline: view();
+          }
+
+          /* With inset — trigger 100px before reaching edge */
+          .card {
+          animation: fade-in linear both;
+          animation-timeline: view(block 100px);
+          }
+
+          /* Different start/end insets */
+          .card {
+          animation: fade-in linear both;
+          animation-timeline: view(block 100px 50px);
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="info-box">
+          <div class="label">ℹ️ Insets Explained</div>
+          <p><code>view(block 100px)</code> means the scrollport is virtually shrunk by 100px on both sides. The element
+            must scroll 100px past the edge before the animation begins. Great for "trigger before reaching screen edge"
+            patterns.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 9. Named Timelines -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="named-timelines" class="section">
+        <h2 class="section-title">9. Named Timelines <span class="badge">Advanced</span></h2>
+        <p>Named timelines let you explicitly reference a specific scroller or element, enabling cross-element
+          animations.</p>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* Container defines the named scroll timeline */
+          .scroll-container {
+          overflow-y: scroll;
+          scroll-timeline: --main-scroll block;
+          }
+
+          /* Any descendant can reference it */
+          .progress-bar {
+          animation: grow linear both;
+          animation-timeline: --main-scroll;
+          }
+
+          .sidebar-indicator {
+          animation: move-dot linear both;
+          animation-timeline: --main-scroll;
+          }
+
+          /* Named view timeline */
+          .hero-image {
+          view-timeline: --hero-visibility block;
+          }
+
+          .hero-caption {
+          animation: fade-in linear both;
+          animation-timeline: --hero-visibility;
+          animation-range: contain;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 10. timeline-scope -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="timeline-scope" class="section">
+        <h2 class="section-title">10. timeline-scope <span class="badge">Advanced</span></h2>
+        <p>By default, a named timeline is only accessible to descendants. <code>timeline-scope</code> on an ancestor
+          "hoists" the timeline's scope so <strong>sibling elements</strong> can reference it.</p>
+
+        <div class="code-block"><span class="code-label">CSS</span>/* The common ancestor hoists the scope */
+          .layout {
+          timeline-scope: --card-timeline;
+          }
+
+          /* Child A: defines the timeline */
+          .layout .card {
+          view-timeline: --card-timeline block;
+          }
+
+          /* Child B (sibling of .card): uses the timeline */
+          .layout .sidebar-marker {
+          animation: slide linear both;
+          animation-timeline: --card-timeline;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="info-box warn">
+          <div class="label">⚠️ Important</div>
+          <p><code>timeline-scope</code> must be set on a <strong>common ancestor</strong> of both the timeline source
+            and the animation consumer. It doesn't create a timeline — it merely widens accessibility of an existing
+            named timeline.</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 11. SCROLL PROGRESS BAR -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="progress-bar" class="section">
+        <h2 class="section-title">11. Scroll Progress Bar <span class="badge">Recipe</span></h2>
+        <p>The classic reading-progress indicator — zero JavaScript required.</p>
+
+        <div class="code-block"><span class="code-label">HTML</span>&lt;div class="progress-bar"&gt;&lt;/div&gt;
+          &lt;main class="content"&gt;
+          &lt;!-- long content --&gt;
+          &lt;/main&gt;<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes grow-width {
+          from { transform: scaleX(0); }
+          to { transform: scaleX(1); }
+          }
+
+          .progress-bar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: #00a8ff;
+          transform-origin: left;
+          animation: grow-width linear both;
+          animation-timeline: scroll(root);
+          z-index: 9999;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 12. REVEAL ON SCROLL -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="reveal-on-scroll" class="section">
+        <h2 class="section-title">12. Reveal on Scroll <span class="badge">Recipe</span></h2>
+        <p>Animate elements into view as you scroll down the page.</p>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes reveal {
+          from {
+          opacity: 0;
+          transform: translateY(60px) scale(0.95);
+          filter: blur(4px);
+          }
+          to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+          }
+          }
+
+          .reveal-card {
+          animation: reveal linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 100%;
+          }
+
+          /* Stagger children with animation-delay offsets */
+          .reveal-card:nth-child(2) { animation-range: entry 10% entry 100%; }
+          .reveal-card:nth-child(3) { animation-range: entry 20% entry 100%; }<button class="copy-btn"
+                    onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 13. PARALLAX -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="parallax" class="section">
+        <h2 class="section-title">13. Parallax Effects <span class="badge">Recipe</span></h2>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes parallax-slow {
+          from { transform: translateY(100px); }
+          to { transform: translateY(-100px); }
+          }
+
+          @keyframes parallax-fast {
+          from { transform: translateY(200px); }
+          to { transform: translateY(-200px); }
+          }
+
+          .bg-layer {
+          animation: parallax-slow linear both;
+          animation-timeline: scroll();
+          }
+
+          .fg-layer {
+          animation: parallax-fast linear both;
+          animation-timeline: scroll();
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 14. HORIZONTAL SCROLL -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="horizontal" class="section">
+        <h2 class="section-title">14. Horizontal Scroll Animations <span class="badge">Recipe</span></h2>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes slide-in {
+          from { opacity: 0; transform: translateX(-60px); }
+          to { opacity: 1; transform: translateX(0); }
+          }
+
+          .horizontal-scroller {
+          overflow-x: scroll;
+          scroll-timeline: --hz-scroll inline;
+          }
+
+          .horizontal-scroller .item {
+          animation: slide-in linear both;
+          animation-timeline: view(inline);
+          animation-range: entry;
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 15. STICKY HEADER -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="sticky-header" class="section">
+        <h2 class="section-title">15. Sticky Header Animation <span class="badge">Recipe</span></h2>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes shrink-header {
+          from {
+          padding-block: 24px;
+          background: transparent;
+          box-shadow: none;
+          }
+          to {
+          padding-block: 8px;
+          background: rgba(0, 0, 0, 0.85);
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+          }
+          }
+
+          .site-header {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          animation: shrink-header linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0px 200px; /* shrink over first 200px of scroll */
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 16. IMAGE SEQUENCE -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="image-sequence" class="section">
+        <h2 class="section-title">16. Image Sequence on Scroll <span class="badge">Recipe</span></h2>
+        <p>Drive a sprite / frame animation by scroll position.</p>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes sprite-walk {
+          from { background-position: 0% 0; }
+          to { background-position: 100% 0; }
+          }
+
+          .sprite-player {
+          width: 200px;
+          height: 200px;
+          background: url('spritesheet.png') 0 0 / 1000% 100% no-repeat;
+          animation: sprite-walk steps(9) both;
+          animation-timeline: scroll(root);
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 17. TEXT REVEAL -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="text-reveal" class="section">
+        <h2 class="section-title">17. Text Reveal on Scroll <span class="badge">Recipe</span></h2>
+
+        <div class="code-block"><span class="code-label">HTML</span>&lt;h2 class="text-reveal"&gt;
+          &lt;span&gt;Scroll&lt;/span&gt;
+          &lt;span&gt;animations&lt;/span&gt;
+          &lt;span&gt;are&lt;/span&gt;
+          &lt;span&gt;amazing!&lt;/span&gt;
+          &lt;/h2&gt;<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="code-block"><span class="code-label">CSS</span>@keyframes word-reveal {
+          from {
+          opacity: 0;
+          transform: translateY(100%) rotateX(-80deg);
+          filter: blur(6px);
+          }
+          to {
+          opacity: 1;
+          transform: translateY(0) rotateX(0deg);
+          filter: blur(0);
+          }
+          }
+
+          .text-reveal {
+          perspective: 600px;
+          }
+
+          .text-reveal span {
+          display: inline-block;
+          animation: word-reveal linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 80%;
+          }
+
+          /* Stagger each word */
+          .text-reveal span:nth-child(1) { animation-range: entry 0% entry 60%; }
+          .text-reveal span:nth-child(2) { animation-range: entry 10% entry 70%; }
+          .text-reveal span:nth-child(3) { animation-range: entry 20% entry 80%; }
+          .text-reveal span:nth-child(4) { animation-range: entry 30% entry 90%; }<button class="copy-btn"
+                    onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 18. COMBINING WITH KEYFRAMES -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="combined" class="section">
+        <h2 class="section-title">18. Combining with @keyframes <span class="badge">Patterns</span></h2>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Multiple Animations, Different Timelines</h3>
+          <div class="code-block"><span class="code-label">CSS</span>@keyframes scroll-fade { from { opacity: 0; } to {
+            opacity: 1; } }
+            @keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
+
+            .card {
+            /* First: scroll-driven, Second: time-based */
+            animation:
+            scroll-fade linear both,
+            pulse 2s ease-in-out infinite;
+            animation-timeline:
+            view(), /* for scroll-fade */
+            auto; /* for pulse (regular time) */
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">Keyframes with Percentage Ranges</h3>
+          <div class="code-block"><span class="code-label">CSS</span>@keyframes multi-step {
+            0% { opacity: 0; transform: scale(0.8); }
+            30% { opacity: 1; transform: scale(1); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.1); }
+            }
+
+            /* Element fades in at entry, stays visible, fades out at exit */
+            .element {
+            animation: multi-step linear both;
+            animation-timeline: view();
+            animation-range: cover;
+            }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        </div>
+
+        <div class="subsection">
+          <h3 class="subsection-title">animation-fill-mode Behavior</h3>
+          <table>
+            <tr>
+              <th>Fill Mode</th>
+              <th>Before Range Start</th>
+              <th>After Range End</th>
+            </tr>
+            <tr>
+              <td><code>none</code></td>
+              <td>No applied styles</td>
+              <td>No applied styles</td>
+            </tr>
+            <tr>
+              <td><code>forwards</code></td>
+              <td>No applied styles</td>
+              <td>Final keyframe</td>
+            </tr>
+            <tr>
+              <td><code>backwards</code></td>
+              <td>First keyframe</td>
+              <td>No applied styles</td>
+            </tr>
+            <tr>
+              <td><code>both</code></td>
+              <td>First keyframe</td>
+              <td>Final keyframe</td>
+            </tr>
+          </table>
+          <div class="info-box tip">
+            <div class="label">💡 Tip</div>
+            <p>For scroll-driven animations, always use <code>animation-fill-mode: both</code> so the element holds its
+              animated state before entering and after exiting the animation range.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 19. JAVASCRIPT FALLBACK -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="js-fallback" class="section">
+        <h2 class="section-title">19. JavaScript Fallback <span class="badge">Compat</span></h2>
+        <p>For browsers without support, use the <strong>scroll-timeline polyfill</strong> or a lightweight
+          IntersectionObserver fallback.</p>
+
+        <div class="code-block"><span class="code-label">JS — Polyfill</span>&lt;!-- Add before your CSS to polyfill
+          scroll-driven animations --&gt;
+          &lt;script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js"&gt;&lt;/script&gt;<button
+                    class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="code-block"><span class="code-label">JS — IntersectionObserver Fallback</span>// Feature detection +
+          fallback
+          if (!CSS.supports('animation-timeline', 'scroll()')) {
+          const observer = new IntersectionObserver((entries) =&gt; {
+          entries.forEach(entry =&gt; {
+          if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          }
+          });
+          }, { threshold: 0.1 });
+
+          document.querySelectorAll('.reveal-card').forEach(el =&gt; {
+          observer.observe(el);
+          });
+          }
+
+          // Scroll progress bar fallback
+          if (!CSS.supports('animation-timeline', 'scroll()')) {
+          const bar = document.querySelector('.progress-bar');
+          window.addEventListener('scroll', () =&gt; {
+          const scrolled = window.scrollY;
+          const height = document.body.scrollHeight - window.innerHeight;
+          bar.style.transform = `scaleX(${scrolled / height})`;
+          }, { passive: true });
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+
+        <div class="code-block"><span class="code-label">CSS — Fallback Classes</span>/* Styles for JS fallback */
+          @supports not (animation-timeline: scroll()) {
+          .reveal-card {
+          opacity: 0;
+          transform: translateY(60px);
+          transition: opacity 0.6s ease, transform 0.6s ease;
+          }
+          .reveal-card.visible {
+          opacity: 1;
+          transform: none;
+          }
+          }<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- 20. BEST PRACTICES -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <div id="best-practices" class="section">
+        <h2 class="section-title">20. Best Practices <span class="badge">Guide</span></h2>
+
+        <table>
+          <tr>
+            <th>#</th>
+            <th>Guideline</th>
+            <th>Why</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Use <code>transform</code> &amp; <code>opacity</code> only</td>
+            <td>Compositor-friendly — avoids layout/paint, smooth 60fps</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Always add <code>animation-fill-mode: both</code></td>
+            <td>Prevents flashing before/after the animation range</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Use <code>@supports</code> for feature detection</td>
+            <td>Graceful degradation in unsupported browsers</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Prefer <code>view()</code> for element-level animations</td>
+            <td>Simpler than named timelines for single-element use</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Prefer <code>scroll(root)</code> for page-level animations</td>
+            <td>Explicit about which scroller drives the animation</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Use <code>will-change: transform</code> sparingly</td>
+            <td>Promotes to own layer — helpful for complex cases, wasteful for simple ones</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Test with Chrome DevTools Animations panel</td>
+            <td>Visual debugging of scroll-driven timelines and ranges</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Use <code>linear</code> easing for scroll animations</td>
+            <td>Non-linear easing feels odd because user controls speed via scrolling</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>Add polyfill for production sites</td>
+            <td>Safari &amp; Firefox support is still limited</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>Avoid animating <code>height</code>, <code>width</code>, <code>top</code>, <code>left</code></td>
+            <td>These trigger expensive layout recalculations</td>
+          </tr>
+        </table>
+
+        <div class="info-box tip">
+          <div class="label">💡 Performance Note</div>
+          <p>CSS scroll-driven animations are <strong>significantly faster</strong> than JS scroll listeners because
+            they run off the main thread. Prefer them over <code>requestAnimationFrame</code> scroll handlers whenever
+            possible.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- QUICK REFERENCE TABLE -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <hr>
+      <div class="section">
+        <h2 class="section-title">Quick Reference — All Properties</h2>
+        <table>
+          <tr>
+            <th>Property</th>
+            <th>Values</th>
+            <th>Applies To</th>
+          </tr>
+          <tr>
+            <td><code>animation-timeline</code></td>
+            <td><code>auto</code> | <code>none</code> | <code>scroll()</code> | <code>view()</code> |
+              <code>&lt;dashed-ident&gt;</code></td>
+            <td>Animated element</td>
+          </tr>
+          <tr>
+            <td><code>animation-range</code></td>
+            <td><code>normal</code> | <code>&lt;range-start&gt; &lt;range-end&gt;</code></td>
+            <td>Animated element</td>
+          </tr>
+          <tr>
+            <td><code>animation-range-start</code></td>
+            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code>
+            </td>
+            <td>Animated element</td>
+          </tr>
+          <tr>
+            <td><code>animation-range-end</code></td>
+            <td><code>normal</code> | <code>&lt;length-percentage&gt;</code> | <code>&lt;range-name&gt; &lt;%&gt;</code>
+            </td>
+            <td>Animated element</td>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline</code></td>
+            <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
+            <td>Scroll container</td>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline-name</code></td>
+            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+            <td>Scroll container</td>
+          </tr>
+          <tr>
+            <td><code>scroll-timeline-axis</code></td>
+            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+            <td>Scroll container</td>
+          </tr>
+          <tr>
+            <td><code>view-timeline</code></td>
+            <td><code>&lt;name&gt; &lt;axis&gt;</code></td>
+            <td>Observed element</td>
+          </tr>
+          <tr>
+            <td><code>view-timeline-name</code></td>
+            <td><code>none</code> | <code>&lt;dashed-ident&gt;</code></td>
+            <td>Observed element</td>
+          </tr>
+          <tr>
+            <td><code>view-timeline-axis</code></td>
+            <td><code>block</code> | <code>inline</code> | <code>x</code> | <code>y</code></td>
+            <td>Observed element</td>
+          </tr>
+          <tr>
+            <td><code>view-timeline-inset</code></td>
+            <td><code>auto</code> | <code>&lt;length-percentage&gt;{1,2}</code></td>
+            <td>Observed element</td>
+          </tr>
+          <tr>
+            <td><code>timeline-scope</code></td>
+            <td><code>none</code> | <code>&lt;dashed-ident&gt;#</code></td>
+            <td>Common ancestor</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+
+    <script>
+      // ── Copy button logic ──
+      function copyCode ( btn )
+      {
+        const block = btn.closest( '.code-block' );
+        // Get text content minus the label and button text
+        const label = block.querySelector( '.code-label' );
+        let text = block.textContent;
+        if ( label ) text = text.replace( label.textContent, '' );
+        text = text.replace( 'Copy', '' ).trim();
+
+        const vscode = typeof acquireVsCodeApi !== 'undefined' ? acquireVsCodeApi() : null;
+        if ( vscode )
+        {
+          vscode.postMessage( { command: 'copyToClipboard', value: text } );
+        } else
+        {
+          navigator.clipboard.writeText( text );
+        }
+
+        btn.textContent = 'Copied!';
+        setTimeout( () => { btn.textContent = 'Copy'; }, 1500 );
+      }
+
+      // ── Smooth-scroll for TOC ──
+      document.querySelectorAll( '.toc a' ).forEach( link =>
+      {
+        link.addEventListener( 'click', e =>
+        {
+          e.preventDefault();
+          const target = document.querySelector( link.getAttribute( 'href' ) );
+          if ( target ) target.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+        } );
+      } );
+    </script>
+  </body>
+
+</html>
