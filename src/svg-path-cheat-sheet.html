@@ -694,7 +694,38 @@
         animation: spin 3s linear infinite;
       }
 
-      /* motion path */
+      /*
+       * ⚠️  MOTION PATH ALIGNMENT GOTCHA
+       * ─────────────────────────────────────────────────────
+       * If your animated dot drifts away from the SVG path it
+       * should follow, the cause is almost always a COORDINATE
+       * SPACE MISMATCH:
+       *
+       *   • The SVG uses viewBox coords (e.g. 0 0 240 100) and
+       *     scales with its container.
+       *   • A separate HTML <div> with offset-path lives in CSS
+       *     pixel space and does NOT scale with the SVG.
+       *
+       * FIX: Place the moving element INSIDE the same <svg> so
+       * both the path and the dot share one coordinate system.
+       * Use <circle> + <animateMotion> (SMIL) with the SAME
+       * path data the stroke uses:
+       *
+       *   <svg viewBox="0 0 240 100">
+       *     <path id="track" d="M10,80 C40,10 ..." />
+       *     <circle r="6" fill="currentColor">
+       *       <animateMotion dur="3s" repeatCount="indefinite"
+       *         path="M10,80 C40,10 ..." />
+       *     </circle>
+       *   </svg>
+       *
+       * This guarantees the dot stays on the path at every
+       * container size. The CSS offset-path classes below are
+       * kept as teaching examples / fallbacks.
+       * ─────────────────────────────────────────────────────
+       */
+
+      /* motion path — CSS offset-path approach (see note above) */
       .demo-travel {
         offset-path: path("M10,80 C40,10 80,150 120,80 S180,10 220,80");
         offset-rotate: auto;
@@ -766,7 +797,10 @@
         stroke: var(--accent4);
       }
 
-      /* rotate around path */
+      /*
+       * Orbit: same alignment caveat applies.
+       * Prefer <animateMotion> inside <svg> for responsive previews.
+       */
       @keyframes orbit {
         from {
           offset-distance: 0%;
@@ -799,7 +833,26 @@
         animation: mask-reveal 3s ease-in-out infinite alternate;
       }
 
-      /* bounce on path */
+      /* handwriting text reveal — needs its own keyframes
+       * because the text path length (~800) differs from
+       * the generic mask-reveal value (500). Always match
+       * stroke-dasharray & stroke-dashoffset to the
+       * actual getTotalLength() of your text/path. */
+      @keyframes handwriting-reveal {
+        from {
+          stroke-dashoffset: 800;
+        }
+
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      /*
+       * Bounce: uses cubic-bezier easing in CSS, but the preview
+       * uses <animateMotion keyPoints/keySplines> for the same
+       * effect — keeps the dot inside the SVG coordinate space.
+       */
       @keyframes bounce-path {
 
         0%,
@@ -818,7 +871,13 @@
         animation: bounce-path 2s cubic-bezier(.36, .07, .19, .97) infinite;
       }
 
-      /* ─── CSS-IRL: Pen draw + motion path ─── */
+      /*
+       * CSS-IRL: Pen draw + motion path
+       * The preview uses <animateMotion> inside <svg> so the dot
+       * tracks the stroke perfectly. If you use offset-path on a
+       * separate <div>, make sure the div wrapper matches the
+       * SVG viewBox dimensions exactly and does not scale.
+       */
       .demo-pen-draw-path {
         stroke-dasharray: 520;
         stroke-dashoffset: 520;
@@ -847,7 +906,14 @@
         }
       }
 
-      /* ─── CSS-IRL: Draw & Erase ─── */
+      /*
+       * CSS-IRL: Draw & Erase
+       * The ball loops at half the stroke duration so it appears
+       * to ride the drawing tip both ways. In the preview we use
+       * <animateMotion dur="1s"> while stroke animates at 2s.
+       * If the erase direction looks wrong, check that your
+       * stroke-dashoffset goes from positive → 0 → negative.
+       */
       .demo-draw-erase-path {
         stroke-dasharray: 520;
         stroke-dashoffset: 520;
@@ -884,7 +950,13 @@
         }
       }
 
-      /* ─── CSS-IRL: Box-shadow motion blur ─── */
+      /*
+       * CSS-IRL: Box-shadow motion blur
+       * box-shadow only works on HTML elements, not SVG.
+       * For the SVG preview we simulate it with <animate> on
+       * the "filter" attribute using drop-shadow(). If you use
+       * offset-path on a <div>, you can use box-shadow directly.
+       */
       .demo-blur-ball {
         offset-path: path("M10,80 C60,10 120,150 180,80 S260,10 320,80");
         animation: blur-move 2s ease infinite;
@@ -1635,6 +1707,82 @@ path.style.<span class="fn">setProperty</span>(
             for max compatibility. Always prefix with <code>-webkit-</code> for older Safari.
           </div>
         </div>
+
+        <!-- Debug / Troubleshooting Card -->
+        <div style="margin-top:28px;margin-bottom:10px">
+          <span
+                    style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);opacity:0.8">//
+            troubleshooting</span>
+        </div>
+        <div class="grid-2">
+          <div class="card" style="border-color:var(--accent2)">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">🐛 Debug: Dot Drifts Off Path</span>
+              <span class="card-tag badge-pink">common fix</span>
+            </div>
+            <div class="preview" style="flex-direction:column;align-items:stretch;padding:20px 24px;gap:14px">
+              <!-- Bad example -->
+              <div
+                        style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase">
+                ❌ Problem — separate coordinate spaces</div>
+              <div
+                        style="background:var(--surface2);border:1px dashed var(--accent2);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;color:var(--muted)">
+                <span style="color:var(--accent2)">&lt;svg</span> viewBox="0 0 240 100"<span
+                          style="color:var(--accent2)">&gt;</span><br>
+                &nbsp;&nbsp;<span style="color:var(--muted)">&lt;path d="M10,80 ..." /&gt;</span><br>
+                <span style="color:var(--accent2)">&lt;/svg&gt;</span><br>
+                <span style="color:var(--accent2)">&lt;div</span> class="ball"<span
+                          style="color:var(--accent2)">&gt;&lt;/div&gt;</span>
+                <span style="color:#f87ea7"> ← CSS px ≠ SVG viewBox!</span>
+              </div>
+              <!-- Good example -->
+              <div
+                        style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);letter-spacing:0.1em;text-transform:uppercase">
+                ✅ Fix — keep everything inside &lt;svg&gt;</div>
+              <div
+                        style="background:var(--surface2);border:1px solid var(--accent3);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;color:var(--muted)">
+                <span style="color:var(--accent3)">&lt;svg</span> viewBox="0 0 240 100"<span
+                          style="color:var(--accent3)">&gt;</span><br>
+                &nbsp;&nbsp;&lt;path d="M10,80 ..." /&gt;<br>
+                &nbsp;&nbsp;<span style="color:var(--accent3)">&lt;circle r="6"&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent3)">&lt;animateMotion</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path="M10,80 ..." /&gt;<br>
+                &nbsp;&nbsp;<span style="color:var(--accent3)">&lt;/circle&gt;</span><br>
+                <span style="color:var(--accent3)">&lt;/svg&gt;</span>
+                <span style="color:#6dfab3"> ← same coord space ✓</span>
+              </div>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">Checklist</span></div>
+              <pre><span class="cmt">/* Motion Path alignment checklist */</span>
+
+<span class="cmt">/* 1. COORD MISMATCH?</span>
+<span class="cmt"> *    SVG scales via viewBox, but a &lt;div&gt;</span>
+<span class="cmt"> *    with offset-path uses CSS px.</span>
+<span class="cmt"> *    → Move the dot INSIDE the &lt;svg&gt; and</span>
+<span class="cmt"> *      use &lt;animateMotion&gt; (SMIL).</span>
+<span class="cmt"> */</span>
+
+<span class="cmt">/* 2. PATH DATA DIFFERS?</span>
+<span class="cmt"> *    The path string on the stroke and the</span>
+<span class="cmt"> *    path on animateMotion / offset-path</span>
+<span class="cmt"> *    must be IDENTICAL.</span>
+<span class="cmt"> */</span>
+
+<span class="cmt">/* 3. DASHARRAY ≠ KEYFRAMES?</span>
+<span class="cmt"> *    stroke-dasharray &amp; stroke-dashoffset</span>
+<span class="cmt"> *    must match the @keyframes values.</span>
+<span class="cmt"> *    Use el.getTotalLength() to measure.</span>
+<span class="cmt"> */</span>
+
+<span class="cmt">/* 4. TIMING OUT OF SYNC?</span>
+<span class="cmt"> *    Draw + move animations need the same</span>
+<span class="cmt"> *    duration &amp; easing to stay in sync.</span>
+<span class="cmt"> */</span></pre>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ════════════════════════════════════════════
@@ -1855,7 +2003,7 @@ paths.<span class="fn">forEach</span>((path, i) => {
               <svg width="220" height="80" viewBox="0 0 220 80">
                 <text x="10" y="60" font-family="Georgia,serif" font-size="52" fill="none" stroke="var(--accent)"
                           stroke-width="1.5"
-                          style="stroke-dasharray:800;stroke-dashoffset:800;animation:mask-reveal 4s ease-in-out infinite alternate">
+                          style="stroke-dasharray:800;stroke-dashoffset:800;animation:handwriting-reveal 4s ease-in-out infinite alternate">
                   hello
                 </text>
               </svg>
