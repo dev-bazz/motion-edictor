@@ -3,24 +3,60 @@
   <style>
     /* ── Draw-in / hold / draw-out loop — 4s total ── */
     @keyframes drawCurve {
-      0%   { stroke-dashoffset: 120; }   /* hidden */
-      35%  { stroke-dashoffset: 0; }     /* fully drawn */
-      65%  { stroke-dashoffset: 0; }     /* hold */
-      100% { stroke-dashoffset: -120; }  /* draw out the other end */
+      0% {
+        stroke-dashoffset: 120;
+      }
+
+      /* hidden */
+      35% {
+        stroke-dashoffset: 0;
+      }
+
+      /* fully drawn */
+      65% {
+        stroke-dashoffset: 0;
+      }
+
+      /* hold */
+      100% {
+        stroke-dashoffset: -120;
+      }
+
+      /* draw out the other end */
     }
 
     /* ── Gentle pulse on control-point halos ── */
     @keyframes pulse {
-      0%, 100% { r: 7; opacity: 0.18; }
-      50%      { r: 10; opacity: 0.08; }
+
+      0%,
+      100% {
+        r: 7;
+        opacity: 0.18;
+      }
+
+      50% {
+        r: 10;
+        opacity: 0.08;
+      }
     }
 
     /* ── Control points fade in sync with curve ── */
     @keyframes cpFade {
-      0%   { opacity: 0; }
-      35%  { opacity: 1; }
-      65%  { opacity: 1; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 0;
+      }
+
+      35% {
+        opacity: 1;
+      }
+
+      65% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
     }
 
     /* ── Axis stays visible ── */
@@ -29,20 +65,21 @@
     .curve {
       stroke-dasharray: 120;
       stroke-dashoffset: 120;
-      animation: drawCurve 4s cubic-bezier(.4,0,.2,1) infinite;
+      animation: drawCurve 4s cubic-bezier(.4, 0, .2, 1) infinite;
     }
 
     .halo {
       animation: pulse 2.8s ease-in-out infinite;
     }
 
-    .cp, .handle-line {
-      animation: cpFade 4s cubic-bezier(.4,0,.2,1) infinite;
+    .cp,
+    .handle-line {
+      animation: cpFade 4s cubic-bezier(.4, 0, .2, 1) infinite;
     }
 
     /* ── Hover state — glow + curve shift ── */
     svg:hover .curve {
-      filter: drop-shadow(0 0 4px rgba(167,139,250,0.6));
+      filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.6));
       stroke: url(#curveGradHover);
       transition: filter 0.3s ease, stroke 0.3s ease;
     }
@@ -62,7 +99,9 @@
     }
 
     /* ── Default transitions for smooth out ── */
-    .curve, .handle-line, .cp {
+    .curve,
+    .handle-line,
+    .cp {
       transition: all 0.3s ease;
     }
   </style>
@@ -70,76 +109,51 @@
   <defs>
     <!-- Gradient for the bezier curve — purple → teal -->
     <linearGradient id="curveGrad" x1="18" y1="62" x2="62" y2="14">
-      <stop offset="0%"   stop-color="#A78BFA"/>
-      <stop offset="100%" stop-color="#34D399"/>
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="100%" stop-color="#34D399" />
     </linearGradient>
 
     <!-- Brighter gradient on hover -->
     <linearGradient id="curveGradHover" x1="18" y1="62" x2="62" y2="14">
-      <stop offset="0%"   stop-color="#C4B5FD"/>
-      <stop offset="100%" stop-color="#6EE7B7"/>
+      <stop offset="0%" stop-color="#C4B5FD" />
+      <stop offset="100%" stop-color="#6EE7B7" />
     </linearGradient>
   </defs>
 
   <!-- ═══ Axes ═══ -->
-  <path
-    class="axis"
-    d="M 10 10 V 70 H 70"
-    stroke="currentColor"
-    stroke-width="3.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    opacity="0.55"
-  />
+  <path class="axis" d="M 10 10 V 70 H 70" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+            stroke-linejoin="round" opacity="0.55" />
 
   <!-- Subtle grid ticks -->
-  <line x1="10" y1="40" x2="13" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
-  <line x1="40" y1="70" x2="40" y2="67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+  <line x1="10" y1="40" x2="13" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            opacity="0.25" />
+  <line x1="40" y1="70" x2="40" y2="67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            opacity="0.25" />
 
   <!-- ═══ Control-point handles (dashed lines) ═══ -->
   <!-- P0 → CP1 -->
-  <line
-    class="handle-line"
-    x1="18" y1="62" x2="18" y2="16"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-dasharray="3 3"
-    stroke-linecap="round"
-    stroke-opacity="0.3"
-  />
+  <line class="handle-line" x1="18" y1="62" x2="18" y2="16" stroke="currentColor" stroke-width="1.5"
+            stroke-dasharray="3 3" stroke-linecap="round" stroke-opacity="0.3" />
 
   <!-- P3 → CP2 -->
-  <line
-    class="handle-line"
-    x1="62" y1="14" x2="62" y2="58"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-dasharray="3 3"
-    stroke-linecap="round"
-    stroke-opacity="0.3"
-  />
+  <line class="handle-line" x1="62" y1="14" x2="62" y2="58" stroke="currentColor" stroke-width="1.5"
+            stroke-dasharray="3 3" stroke-linecap="round" stroke-opacity="0.3" />
 
   <!-- ═══ Bezier curve ═══ -->
-  <path
-    class="curve"
-    d="M 18 62 C 18 16, 62 58, 62 14"
-    stroke="url(#curveGrad)"
-    stroke-width="3.5"
-    stroke-linecap="round"
-    fill="none"
-  />
+  <path class="curve" d="M 18 62 C 18 16, 62 58, 62 14" stroke="url(#curveGrad)" stroke-width="3.5"
+            stroke-linecap="round" fill="none" />
 
   <!-- ═══ Control points ═══ -->
   <!-- CP1 (top-left) — halo + dot -->
-  <circle class="halo" cx="18" cy="16" r="7" fill="#A78BFA" opacity="0.18"/>
-  <circle class="cp" cx="18" cy="16" r="4" fill="#A78BFA"/>
+  <circle class="halo" cx="18" cy="16" r="7" fill="#A78BFA" opacity="0.18" />
+  <circle class="cp" cx="18" cy="16" r="4" fill="#A78BFA" />
 
   <!-- CP2 (bottom-right) — halo + dot -->
-  <circle class="halo" cx="62" cy="58" r="7" fill="#34D399" opacity="0.18"/>
-  <circle class="cp" cx="62" cy="58" r="4" fill="#34D399"/>
+  <circle class="halo" cx="62" cy="58" r="7" fill="#34D399" opacity="0.18" />
+  <circle class="cp" cx="62" cy="58" r="4" fill="#34D399" />
 
   <!-- ═══ Anchor points (curve start / end) ═══ -->
-  <circle cx="18" cy="62" r="3" fill="currentColor" opacity="0.7"/>
-  <circle cx="62" cy="14" r="3" fill="currentColor" opacity="0.7"/>
+  <circle cx="18" cy="62" r="3" fill="currentColor" opacity="0.7" />
+  <circle cx="62" cy="14" r="3" fill="currentColor" opacity="0.7" />
 
 </svg>
