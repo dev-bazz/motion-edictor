@@ -121,39 +121,39 @@
   </defs>
 
   <!-- ═══ Axes ═══ -->
-  <path class="axis" d="M 10 10 V 70 H 70" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+  <path class="axis" d="M 10 10 V 70 H 70" stroke="currentColor" stroke-width="5" stroke-linecap="round"
             stroke-linejoin="round" opacity="0.55" />
 
   <!-- Subtle grid ticks -->
-  <line x1="10" y1="40" x2="13" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+  <line x1="10" y1="40" x2="13" y2="40" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
             opacity="0.25" />
-  <line x1="40" y1="70" x2="40" y2="67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+  <line x1="40" y1="70" x2="40" y2="67" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
             opacity="0.25" />
 
   <!-- ═══ Control-point handles (dashed lines) ═══ -->
   <!-- P0 → CP1 -->
-  <line class="handle-line" x1="18" y1="62" x2="18" y2="16" stroke="currentColor" stroke-width="1.5"
+  <line class="handle-line" x1="18" y1="62" x2="18" y2="16" stroke="currentColor" stroke-width="2.5"
             stroke-dasharray="3 3" stroke-linecap="round" stroke-opacity="0.3" />
 
   <!-- P3 → CP2 -->
-  <line class="handle-line" x1="62" y1="14" x2="62" y2="58" stroke="currentColor" stroke-width="1.5"
+  <line class="handle-line" x1="62" y1="14" x2="62" y2="58" stroke="currentColor" stroke-width="2.5"
             stroke-dasharray="3 3" stroke-linecap="round" stroke-opacity="0.3" />
 
   <!-- ═══ Bezier curve ═══ -->
-  <path class="curve" d="M 18 62 C 18 16, 62 58, 62 14" stroke="url(#curveGrad)" stroke-width="3.5"
-            stroke-linecap="round" fill="none" />
+  <path class="curve" d="M 18 62 C 18 16, 62 58, 62 14" stroke="url(#curveGrad)" stroke-width="5" stroke-linecap="round"
+            fill="none" />
 
   <!-- ═══ Control points ═══ -->
   <!-- CP1 (top-left) — halo + dot -->
-  <circle class="halo" cx="18" cy="16" r="7" fill="#A78BFA" opacity="0.18" />
-  <circle class="cp" cx="18" cy="16" r="4" fill="#A78BFA" />
+  <circle class="halo" cx="18" cy="16" r="9" fill="#A78BFA" opacity="0.18" />
+  <circle class="cp" cx="18" cy="16" r="5.5" fill="#A78BFA" />
 
   <!-- CP2 (bottom-right) — halo + dot -->
-  <circle class="halo" cx="62" cy="58" r="7" fill="#34D399" opacity="0.18" />
-  <circle class="cp" cx="62" cy="58" r="4" fill="#34D399" />
+  <circle class="halo" cx="62" cy="58" r="9" fill="#34D399" opacity="0.18" />
+  <circle class="cp" cx="62" cy="58" r="5.5" fill="#34D399" />
 
   <!-- ═══ Anchor points (curve start / end) ═══ -->
-  <circle cx="18" cy="62" r="3" fill="currentColor" opacity="0.7" />
-  <circle cx="62" cy="14" r="3" fill="currentColor" opacity="0.7" />
+  <circle cx="18" cy="62" r="4.5" fill="currentColor" opacity="0.7" />
+  <circle cx="62" cy="14" r="4.5" fill="currentColor" opacity="0.7" />
 
 </svg>
