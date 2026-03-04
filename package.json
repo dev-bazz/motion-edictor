@@ -3,7 +3,7 @@
   "displayName": "Motion — CSS Animation Editor: Easing, Spring Physics & Scroll-Driven",
   "description": "Visual CSS animation editor — design cubic-bezier easing curves, spring physics (linear() easing), scroll-driven animations (animation-timeline, animation-range), plus SVG path & scroll animation cheat sheets. Generate production-ready CSS with live previews directly in VS Code.",
   "icon": "media/brand-icon.png",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": "https://github.com/dev-bazz/motion-edictor",
   "engines": {
     "vscode": "^1.109.0"
