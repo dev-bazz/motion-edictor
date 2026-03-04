@@ -39,6 +39,32 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 		),
 	);
+
+	// Register command to open SVG Loaders Cheat Sheet
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openSVGLoadersCheatSheet",
+			() => {
+				SVGLoadersCheatSheetPanel.createOrShow(
+					context.extensionUri,
+					context.extensionPath,
+				);
+			},
+		),
+	);
+
+	// Register command to open the Cheat Sheet Hub
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openCheatSheetHub",
+			() => {
+				CheatSheetHubPanel.createOrShow(
+					context.extensionUri,
+					context.extensionPath,
+				);
+			},
+		),
+	);
 }
 
 class EaseEditorViewProvider implements vscode.WebviewViewProvider {
@@ -70,6 +96,11 @@ class EaseEditorViewProvider implements vscode.WebviewViewProvider {
 					vscode.env.clipboard.writeText(message.value);
 					vscode.window.showInformationMessage(
 						"CSS ease value copied to clipboard!",
+					);
+					return;
+				case "openCheatSheetHub":
+					vscode.commands.executeCommand(
+						"motion-graph-edictor.openCheatSheetHub",
 					);
 					return;
 			}
@@ -232,6 +263,171 @@ class ScrollAnimationCheatSheetPanel {
 			this._extensionPath,
 			"src",
 			"scroll-animation-cheatsheet.html",
+		);
+		return fs.readFileSync(htmlPath, "utf8");
+	}
+}
+
+// ─── SVG Loaders Cheat Sheet Panel ─────────────────────────────
+class SVGLoadersCheatSheetPanel {
+	public static currentPanel: SVGLoadersCheatSheetPanel | undefined;
+	private static readonly viewType = "svgLoadersCheatSheet";
+
+	private readonly _panel: vscode.WebviewPanel;
+	private readonly _extensionPath: string;
+	private _disposables: vscode.Disposable[] = [];
+
+	public static createOrShow(extensionUri: vscode.Uri, extensionPath: string) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (SVGLoadersCheatSheetPanel.currentPanel) {
+			SVGLoadersCheatSheetPanel.currentPanel._panel.reveal(column);
+			return;
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			SVGLoadersCheatSheetPanel.viewType,
+			"SVG Loaders Cheat Sheet",
+			column || vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				localResourceRoots: [extensionUri],
+			},
+		);
+
+		SVGLoadersCheatSheetPanel.currentPanel = new SVGLoadersCheatSheetPanel(
+			panel,
+			extensionPath,
+		);
+	}
+
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._panel = panel;
+		this._extensionPath = extensionPath;
+
+		this._panel.webview.html = this._getHtmlForWebview();
+
+		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+		this._panel.webview.onDidReceiveMessage(
+			(message) => {
+				if (message.command === "copyToClipboard") {
+					vscode.env.clipboard.writeText(message.value);
+					vscode.window.showInformationMessage("Copied to clipboard!");
+				}
+			},
+			null,
+			this._disposables,
+		);
+	}
+
+	public dispose() {
+		SVGLoadersCheatSheetPanel.currentPanel = undefined;
+		this._panel.dispose();
+		while (this._disposables.length) {
+			const d = this._disposables.pop();
+			if (d) {
+				d.dispose();
+			}
+		}
+	}
+
+	private _getHtmlForWebview(): string {
+		const htmlPath = path.join(
+			this._extensionPath,
+			"src",
+			"svg-loaders-cheatsheet.html",
+		);
+		return fs.readFileSync(htmlPath, "utf8");
+	}
+}
+
+// ─── Cheat Sheet Hub Panel ─────────────────────────────────────
+class CheatSheetHubPanel {
+	public static currentPanel: CheatSheetHubPanel | undefined;
+	private static readonly viewType = "cheatSheetHub";
+
+	private readonly _panel: vscode.WebviewPanel;
+	private readonly _extensionPath: string;
+	private _disposables: vscode.Disposable[] = [];
+
+	public static createOrShow(extensionUri: vscode.Uri, extensionPath: string) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (CheatSheetHubPanel.currentPanel) {
+			CheatSheetHubPanel.currentPanel._panel.reveal(column);
+			return;
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			CheatSheetHubPanel.viewType,
+			"Cheat Sheets",
+			column || vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				localResourceRoots: [extensionUri],
+			},
+		);
+
+		CheatSheetHubPanel.currentPanel = new CheatSheetHubPanel(
+			panel,
+			extensionPath,
+		);
+	}
+
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._panel = panel;
+		this._extensionPath = extensionPath;
+
+		this._panel.webview.html = this._getHtmlForWebview();
+
+		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+		this._panel.webview.onDidReceiveMessage(
+			(message) => {
+				switch (message.command) {
+					case "openSVGCheatSheet":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openSVGCheatSheet",
+						);
+						return;
+					case "openScrollAnimationCheatSheet":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openScrollAnimationCheatSheet",
+						);
+						return;
+					case "openSVGLoadersCheatSheet":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openSVGLoadersCheatSheet",
+						);
+						return;
+				}
+			},
+			null,
+			this._disposables,
+		);
+	}
+
+	public dispose() {
+		CheatSheetHubPanel.currentPanel = undefined;
+		this._panel.dispose();
+		while (this._disposables.length) {
+			const d = this._disposables.pop();
+			if (d) {
+				d.dispose();
+			}
+		}
+	}
+
+	private _getHtmlForWebview(): string {
+		const htmlPath = path.join(
+			this._extensionPath,
+			"src",
+			"cheatsheet-hub.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
 	}

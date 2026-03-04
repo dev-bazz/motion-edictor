@@ -1570,6 +1570,7 @@
       <div class="header">
         <h1>Motion By BaZz</h1>
         <div class="controls">
+          <button id="cheatSheetBtn" title="Browse all cheat sheets">Cheat Sheets</button>
         </div>
       </div>
 
@@ -2035,6 +2036,19 @@
         }
       };
       handleVscodeAssignment();
+
+      // Cheat Sheet Hub button
+      const cheatSheetBtn = document.getElementById( 'cheatSheetBtn' );
+      if ( cheatSheetBtn )
+      {
+        cheatSheetBtn.addEventListener( 'click', () =>
+        {
+          if ( vscode && vscode.postMessage )
+          {
+            vscode.postMessage( { command: 'openCheatSheetHub' } );
+          }
+        } );
+      }
 
       // Tab switching functionality
       const easingTab = document.getElementById( 'easingTab' );
