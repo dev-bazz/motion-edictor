@@ -26,6 +26,19 @@ export function activate(context: vscode.ExtensionContext) {
 			},
 		),
 	);
+
+	// Register command to open SVG Path Cheat Sheet
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openSVGCheatSheet",
+			() => {
+				SVGCheatSheetPanel.createOrShow(
+					context.extensionUri,
+					context.extensionPath,
+				);
+			},
+		),
+	);
 }
 
 class EaseEditorViewProvider implements vscode.WebviewViewProvider {
@@ -71,6 +84,82 @@ class EaseEditorViewProvider implements vscode.WebviewViewProvider {
 }
 
 export function deactivate() {}
+
+// ─── SVG Path Cheat Sheet Panel ────────────────────────────────
+class SVGCheatSheetPanel {
+	public static currentPanel: SVGCheatSheetPanel | undefined;
+	private static readonly viewType = "svgPathCheatSheet";
+
+	private readonly _panel: vscode.WebviewPanel;
+	private readonly _extensionPath: string;
+	private _disposables: vscode.Disposable[] = [];
+
+	public static createOrShow(extensionUri: vscode.Uri, extensionPath: string) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (SVGCheatSheetPanel.currentPanel) {
+			SVGCheatSheetPanel.currentPanel._panel.reveal(column);
+			return;
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			SVGCheatSheetPanel.viewType,
+			"SVG Path Cheat Sheet",
+			column || vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				localResourceRoots: [extensionUri],
+			},
+		);
+
+		SVGCheatSheetPanel.currentPanel = new SVGCheatSheetPanel(
+			panel,
+			extensionPath,
+		);
+	}
+
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._panel = panel;
+		this._extensionPath = extensionPath;
+
+		this._panel.webview.html = this._getHtmlForWebview();
+
+		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+		this._panel.webview.onDidReceiveMessage(
+			(message) => {
+				if (message.command === "copyToClipboard") {
+					vscode.env.clipboard.writeText(message.value);
+					vscode.window.showInformationMessage("Copied to clipboard!");
+				}
+			},
+			null,
+			this._disposables,
+		);
+	}
+
+	public dispose() {
+		SVGCheatSheetPanel.currentPanel = undefined;
+		this._panel.dispose();
+		while (this._disposables.length) {
+			const d = this._disposables.pop();
+			if (d) {
+				d.dispose();
+			}
+		}
+	}
+
+	private _getHtmlForWebview(): string {
+		const htmlPath = path.join(
+			this._extensionPath,
+			"src",
+			"svg-path-cheat-sheet.html",
+		);
+		return fs.readFileSync(htmlPath, "utf8");
+	}
+}
 
 // ─── Scroll Animation Cheat Sheet Panel ────────────────────────
 class ScrollAnimationCheatSheetPanel {

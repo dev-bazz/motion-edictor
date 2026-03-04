@@ -1,7 +1,7 @@
 {
   "name": "motion-graph-edictor",
   "displayName": "Motion — CSS Animation Editor: Easing, Spring Physics & Scroll-Driven",
-  "description": "Visual CSS animation editor for cubic-bezier easing curves, spring physics (linear() easing), and scroll-driven animation ranges (animation-timeline, animation-range). Generate production-ready CSS with live previews directly in VS Code.",
+  "description": "Visual CSS animation editor — design cubic-bezier easing curves, spring physics (linear() easing), scroll-driven animations (animation-timeline, animation-range), plus SVG path & scroll animation cheat sheets. Generate production-ready CSS with live previews directly in VS Code.",
   "icon": "media/brand-icon.png",
   "version": "0.0.6",
   "repository": "https://github.com/dev-bazz/motion-edictor",
@@ -12,7 +12,8 @@
   "categories": [
     "Visualization",
     "Snippets",
-    "Other"
+    "Other",
+    "Education"
   ],
   "keywords": [
     "css",
@@ -29,7 +30,17 @@
     "timing function",
     "ease editor",
     "motion editor",
-    "css generator"
+    "css generator",
+    "svg path",
+    "svg cheat sheet",
+    "scroll animation",
+    "bezier curve",
+    "animation preview",
+    "css tools",
+    "webview editor",
+    "transition timing",
+    "damped oscillator",
+    "react spring"
   ],
   "activationEvents": [
     "onView:easeGeneratorView"
@@ -41,6 +52,11 @@
         "command": "motion-graph-edictor.openScrollAnimationCheatSheet",
         "title": "Open CSS Scroll Animation Cheat Sheet",
         "category": "Motion"
+      },
+      {
+        "command": "motion-graph-edictor.openSVGCheatSheet",
+        "category": "Motion",
+        "title": "SVG Animation Cheat sheet"
       }
     ],
     "viewsContainers": {
