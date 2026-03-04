@@ -264,6 +264,9 @@
         border-radius: 12px;
         overflow: hidden;
         transition: border-color 0.2s, transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       .card:hover {
@@ -309,10 +312,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 24px;
-        min-height: 160px;
+        padding: 32px;
+        min-height: 240px;
         position: relative;
         overflow: hidden;
+        flex-grow: 1;
       }
 
       .preview::before {
@@ -812,6 +816,104 @@
         offset-path: path("M20,100 Q100,20 220,100");
         offset-rotate: auto;
         animation: bounce-path 2s cubic-bezier(.36, .07, .19, .97) infinite;
+      }
+
+      /* ─── CSS-IRL: Pen draw + motion path ─── */
+      .demo-pen-draw-path {
+        stroke-dasharray: 520;
+        stroke-dashoffset: 520;
+        animation: pen-draw 2s ease forwards;
+      }
+
+      @keyframes pen-draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      .demo-pen-ball {
+        offset-path: path("M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0");
+        offset-rotate: auto;
+        animation: pen-move 2s ease forwards;
+      }
+
+      @keyframes pen-move {
+        from {
+          offset-distance: 0%;
+        }
+
+        to {
+          offset-distance: 100%;
+        }
+      }
+
+      /* ─── CSS-IRL: Draw & Erase ─── */
+      .demo-draw-erase-path {
+        stroke-dasharray: 520;
+        stroke-dashoffset: 520;
+        animation: draw-erase 2s ease infinite;
+      }
+
+      @keyframes draw-erase {
+        0% {
+          stroke-dashoffset: 520;
+        }
+
+        50% {
+          stroke-dashoffset: 0;
+        }
+
+        100% {
+          stroke-dashoffset: -520;
+        }
+      }
+
+      .demo-draw-erase-ball {
+        offset-path: path("M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0");
+        offset-rotate: auto;
+        animation: draw-erase-move 1s ease infinite;
+      }
+
+      @keyframes draw-erase-move {
+        from {
+          offset-distance: 0%;
+        }
+
+        to {
+          offset-distance: 100%;
+        }
+      }
+
+      /* ─── CSS-IRL: Box-shadow motion blur ─── */
+      .demo-blur-ball {
+        offset-path: path("M10,80 C60,10 120,150 180,80 S260,10 320,80");
+        animation: blur-move 2s ease infinite;
+      }
+
+      @keyframes blur-move {
+        10% {
+          opacity: 1;
+          offset-distance: 0%;
+        }
+
+        30% {
+          box-shadow: -0.5rem 0 0.3rem salmon;
+        }
+
+        70% {
+          box-shadow: -0.5rem 0 0.3rem salmon;
+        }
+
+        90% {
+          opacity: 1;
+          offset-distance: 100%;
+          box-shadow: none;
+        }
+
+        100% {
+          opacity: 0;
+          offset-distance: 100%;
+        }
       }
     </style>
   </head>
@@ -1381,6 +1483,150 @@ path.style.<span class="fn">setProperty</span>(
             </div>
           </div>
 
+        </div>
+
+        <!-- ─── CSS-IRL Inspired Cards ─── -->
+        <div style="margin-top:28px;margin-bottom:10px">
+          <span
+                    style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent2);opacity:0.8">//
+            from css-irl.info — Fun with CSS Motion Path</span>
+        </div>
+        <div class="grid-2">
+
+          <!-- Card: Pen Drawing along Path -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Pen Drawing Along Path</span>
+              <span class="card-tag badge-pink">draw + move</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg viewBox="-10 20 530 140" style="width:100%;height:100%">
+                <path class="demo-pen-draw-path" d="M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0" fill="none"
+                          stroke="var(--accent2)" stroke-width="2.5" />
+                <circle r="6" fill="var(--accent2)" style="filter:drop-shadow(0 0 6px var(--accent2))">
+                  <animateMotion dur="2s" fill="freeze" repeatCount="indefinite"
+                            path="M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0" />
+                </circle>
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* Animate element along path AND draw</span>
+<span class="cmt">   the path simultaneously */</span>
+<span class="tag-c">.path</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">520</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">520</span>;
+  <span class="kw">animation</span>: <span class="fn">draw</span> <span class="num">2s</span> <span class="val">ease forwards</span>;
+}
+<span class="tag-c">.pen</span> {
+  <span class="kw">offset-path</span>: <span class="fn">path</span>(
+    <span class="str">"M.4 84.1s127.4 188 267.7 0
+     247.3 0 247.3 0"</span>
+  );
+  <span class="kw">animation</span>: <span class="fn">move</span>
+    <span class="num">2s</span> <span class="val">ease forwards</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">draw</span> {
+  <span class="val">to</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+}
+<span class="kw">@keyframes</span> <span class="fn">move</span> {
+  <span class="val">from</span> { <span class="kw">offset-distance</span>: <span class="num">0%</span>; }
+  <span class="val">to</span>   { <span class="kw">offset-distance</span>: <span class="num">100%</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Card: Draw & Erase -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Draw &amp; Erase Stroke</span>
+              <span class="card-tag badge-yellow">dashoffset loop</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg viewBox="-10 20 530 140" style="width:100%;height:100%">
+                <path class="demo-draw-erase-path" d="M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0" fill="none"
+                          stroke="var(--accent4)" stroke-width="2.5" />
+                <circle r="6" fill="var(--accent4)" style="filter:drop-shadow(0 0 6px var(--accent4))">
+                  <animateMotion dur="1s" repeatCount="indefinite" path="M.4 84.1s127.4 188 267.7 0 247.3 0 247.3 0" />
+                </circle>
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* Draw in then erase out using</span>
+<span class="cmt">   negative dashoffset trick */</span>
+<span class="tag-c">.path</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">520</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">520</span>;
+  <span class="kw">animation</span>: <span class="fn">draw-erase</span>
+    <span class="num">2s</span> <span class="val">ease infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">draw-erase</span> {
+  <span class="num">0%</span>   { <span class="kw">stroke-dashoffset</span>: <span class="num">520</span>; }
+  <span class="num">50%</span>  { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+  <span class="num">100%</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">-520</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Card: Box-Shadow Motion Blur -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Box-Shadow Motion Blur</span>
+              <span class="card-tag badge-green">smoother feel</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg width="340" height="100" viewBox="0 0 340 100"
+                        style="position:absolute;inset:0;width:100%;height:100%">
+                <path d="M10,80 C60,10 120,150 180,80 S260,10 320,80" fill="none" stroke="rgba(109,250,179,0.2)"
+                          stroke-width="1.5" stroke-dasharray="4 3" />
+              </svg>
+              <div style="position:relative;width:340px;height:100px">
+                <div class="demo-blur-ball"
+                          style="position:absolute;width:14px;height:14px;background:var(--accent3);border-radius:50%;">
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* Add box-shadow during fast travel</span>
+<span class="cmt">   for a natural motion-blur effect */</span>
+<span class="tag-c">.ball</span> {
+  <span class="kw">offset-path</span>: <span class="fn">path</span>(<span class="str">"..."</span>);
+  <span class="kw">animation</span>: <span class="fn">blur-move</span> <span class="num">2s</span> <span class="val">ease infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">blur-move</span> {
+  <span class="num">10%</span>  { <span class="kw">opacity</span>: <span class="num">1</span>;
+         <span class="kw">offset-distance</span>: <span class="num">0%</span>; }
+  <span class="num">30%</span>  { <span class="kw">box-shadow</span>:
+         <span class="num">-0.5rem</span> <span class="num">0</span> <span class="num">0.3rem</span> <span class="val">salmon</span>; }
+  <span class="num">70%</span>  { <span class="kw">box-shadow</span>:
+         <span class="num">-0.5rem</span> <span class="num">0</span> <span class="num">0.3rem</span> <span class="val">salmon</span>; }
+  <span class="num">90%</span>  { <span class="kw">opacity</span>: <span class="num">1</span>;
+         <span class="kw">offset-distance</span>: <span class="num">100%</span>;
+         <span class="kw">box-shadow</span>: <span class="val">none</span>; }
+  <span class="num">100%</span> { <span class="kw">opacity</span>: <span class="num">0</span>;
+         <span class="kw">offset-distance</span>: <span class="num">100%</span>; }
+}</pre>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="tip" style="margin-top:20px">
+          <span class="tip-icon">🔗</span>
+          <div class="tip-text">
+            <strong>Source</strong> — The three cards above are adapted from
+            <a href="https://css-irl.info/fun-with-css-motion-path/" target="_blank" style="color:var(--accent)">"Fun
+              with CSS Motion Path"</a>
+            by Michelle Barker at CSS { In Real Life }.
+          </div>
         </div>
 
         <div class="tip tip-warn">
