@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Modern Queries — Dev Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+              rel="stylesheet">
+    <style>
+      /* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+      :root {
+        --bg: #0c0c10;
+        --bg2: #111117;
+        --bg3: #16161e;
+        --bg4: #1c1c26;
+        --surface: #1e1e2a;
+        --surface2: #252535;
+        --border: #2a2a3a;
+        --border2: #333347;
+
+        --text: #e8e8f0;
+        --text2: #9090a8;
+        --text3: #5a5a70;
+
+        --cyan: #00d4ff;
+        --cyan-dim: rgba(0, 212, 255, 0.12);
+        --cyan-border: rgba(0, 212, 255, 0.25);
+        --pink: #ff4d9d;
+        --pink-dim: rgba(255, 77, 157, 0.12);
+        --pink-border: rgba(255, 77, 157, 0.25);
+        --lime: #7fff6e;
+        --lime-dim: rgba(127, 255, 110, 0.1);
+        --lime-border: rgba(127, 255, 110, 0.22);
+        --amber: #ffb347;
+        --amber-dim: rgba(255, 179, 71, 0.1);
+        --violet: #9d7fff;
+        --violet-dim: rgba(157, 127, 255, 0.12);
+
+        /* ── syntax palette (One Dark Pro-ish) ── */
+        --tok-at: #c678dd;
+        /* @rule           */
+        --tok-sel: #e06c75;
+        /* selector        */
+        --tok-prop: #61afef;
+        /* property        */
+        --tok-val: #98c379;
+        /* value keyword   */
+        --tok-str: #e5c07b;
+        /* string / name   */
+        --tok-num: #d19a66;
+        /* number + unit   */
+        --tok-kw: #ff4d9d;
+        /* and/or/not/from */
+        --tok-fn: #56b6c2;
+        /* function        */
+        --tok-cmt: #5c6370;
+        /* comment         */
+        --tok-punc: #abb2bf;
+        /* punctuation     */
+        --tok-var: #d19a66;
+        /* --custom-prop   */
+        --tok-pseudo: #c678dd;
+        /* :pseudo         */
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: repeating-linear-gradient(0deg, transparent, transparent 2px,
+            rgba(0, 0, 0, 0.025) 2px, rgba(0, 0, 0, 0.025) 4px);
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      /* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+      header {
+        position: relative;
+        padding: 3.5rem 2rem 3rem;
+        border-bottom: 1px solid var(--border);
+        overflow: hidden;
+        background: var(--bg2);
+      }
+
+      .header-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 48px 48px;
+        opacity: 0.35;
+        mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 40%, transparent 100%);
+      }
+
+      .header-glow {
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 260px;
+        background: radial-gradient(ellipse, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .header-inner {
+        position: relative;
+        max-width: 1140px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        align-items: end;
+      }
+
+      .header-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--cyan);
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .header-eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 18px;
+        height: 1px;
+        background: var(--cyan);
+      }
+
+      h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(3.5rem, 8vw, 7rem);
+        line-height: 0.9;
+        letter-spacing: 0.01em;
+        color: var(--text);
+        margin-bottom: 0.6rem;
+      }
+
+      h1 .ac {
+        color: var(--cyan);
+      }
+
+      h1 .ap {
+        color: var(--pink);
+      }
+
+      .header-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--text3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 1.75rem;
+        margin-top: 1rem;
+      }
+
+      .header-sub-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--text2);
+      }
+
+      .header-sub-item .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .header-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+      }
+
+      .spec-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        padding: 0.3em 0.8em;
+        border-radius: 3px;
+        white-space: nowrap;
+        letter-spacing: 0.08em;
+      }
+
+      .spec-badge.stable {
+        background: rgba(127, 255, 110, 0.1);
+        color: var(--lime);
+        border: 1px solid var(--lime-border);
+      }
+
+      .spec-badge.new {
+        background: rgba(0, 212, 255, 0.08);
+        color: var(--cyan);
+        border: 1px solid var(--cyan-border);
+      }
+
+      .spec-badge.exp {
+        background: rgba(255, 179, 71, 0.1);
+        color: var(--amber);
+        border: 1px solid rgba(255, 179, 71, 0.25);
+      }
+
+      /* ═══════════════════════════════════════
+   TOC NAV
+═══════════════════════════════════════ */
+      .toc-nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(12, 12, 16, 0.92);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 2rem;
+      }
+
+      .toc-inner {
+        max-width: 1140px;
+        margin: 0 auto;
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .toc-inner::-webkit-scrollbar {
+        display: none;
+      }
+
+      .toc-link {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text3);
+        text-decoration: none;
+        padding: 0.9rem 1.2rem;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .toc-link:hover {
+        color: var(--text);
+        border-bottom-color: var(--border2);
+      }
+
+      .toc-link.active {
+        color: var(--cyan);
+        border-bottom-color: var(--cyan);
+      }
+
+      /* ═══════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════ */
+      .search-wrap {
+        padding: 1.25rem 2rem 0;
+        max-width: 1140px;
+        margin: 0 auto;
+      }
+
+      .search-input {
+        width: 100%;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: 4px;
+        padding: 0.65rem 1rem 0.65rem 2.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.15s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235a5a70' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 0.75rem center;
+      }
+
+      .search-input::placeholder {
+        color: var(--text3);
+      }
+
+      .search-input:focus {
+        border-color: var(--cyan-border);
+      }
+
+      /* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+      main {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 3rem 2rem 5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+      }
+
+      /* ═══════════════════════════════════════
+   SECTION HEADERS
+═══════════════════════════════════════ */
+      .section-head {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        color: var(--text3);
+        letter-spacing: 0.1em;
+        flex-shrink: 0;
+      }
+
+      .section-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2rem;
+        letter-spacing: 0.04em;
+        color: var(--text);
+        line-height: 1;
+      }
+
+      .section-badge {
+        margin-left: auto;
+      }
+
+      /* ═══════════════════════════════════════
+   CARDS
+═══════════════════════════════════════ */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 1px;
+      }
+
+      .grid-wrap {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--border);
+      }
+
+      .card {
+        background: var(--bg2);
+        display: flex;
+        flex-direction: column;
+        transition: background 0.15s;
+      }
+
+      .card:hover {
+        background: var(--bg3);
+      }
+
+      .card-header {
+        padding: 0.6rem 1rem;
+        background: var(--bg3);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        color: var(--text2);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .card-header .chip {
+        width: 7px;
+        height: 7px;
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
+
+      .chip-cyan {
+        background: var(--cyan);
+        box-shadow: 0 0 8px var(--cyan);
+      }
+
+      .chip-pink {
+        background: var(--pink);
+        box-shadow: 0 0 8px var(--pink);
+      }
+
+      .chip-lime {
+        background: var(--lime);
+        box-shadow: 0 0 8px var(--lime);
+      }
+
+      .chip-amber {
+        background: var(--amber);
+        box-shadow: 0 0 8px var(--amber);
+      }
+
+      .copy-btn {
+        margin-left: auto;
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        color: var(--text3);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        padding: 0.2em 0.55em;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.08em;
+      }
+
+      .copy-btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+
+      .copy-btn.copied {
+        color: var(--lime);
+        border-color: var(--lime-border);
+      }
+
+      /* ═══════════════════════════════════════
+   CODE BLOCKS — auto-highlighted
+═══════════════════════════════════════ */
+      .code-wrap {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      pre.code-block {
+        margin: 0;
+        padding: 1.1rem 0 1.1rem 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        line-height: 1.85;
+        overflow-x: auto;
+        flex: 1;
+        tab-size: 2;
+        white-space: pre;
+        counter-reset: line;
+      }
+
+      pre.code-block::-webkit-scrollbar {
+        height: 3px;
+      }
+
+      pre.code-block::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      pre.code-block::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 2px;
+      }
+
+      /* Each line is a div for line numbers + highlighting */
+      pre.code-block .cl {
+        display: grid;
+        grid-template-columns: 3ch 1fr;
+        gap: 0 1rem;
+        padding: 0 1.25rem 0 0.75rem;
+        min-height: 1.85em;
+      }
+
+      pre.code-block .cl:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      pre.code-block .cl .ln {
+        color: var(--text3);
+        text-align: right;
+        user-select: none;
+        font-size: 0.6rem;
+        opacity: 0.5;
+        line-height: 1.85em;
+        flex-shrink: 0;
+      }
+
+      pre.code-block .cl .lc {
+        color: var(--text);
+        overflow-wrap: anywhere;
+      }
+
+      /* highlighted line */
+      pre.code-block .cl.hl {
+        background: rgba(0, 212, 255, 0.05);
+        border-left: 2px solid var(--cyan);
+        padding-left: calc(0.75rem - 2px);
+      }
+
+      pre.code-block .cl.hl .ln {
+        opacity: 1;
+        color: var(--cyan);
+      }
+
+      /* ── syntax token spans (injected by JS) ── */
+      .t-at {
+        color: var(--tok-at);
+      }
+
+      /* @rule: @container @keyframes @media */
+      .t-sel {
+        color: var(--tok-sel);
+      }
+
+      /* selector: .foo, #bar, :hover        */
+      .t-prop {
+        color: var(--tok-prop);
+      }
+
+      /* property: font-size, container-type */
+      .t-val {
+        color: var(--tok-val);
+      }
+
+      /* value: inline-size, block, normal   */
+      .t-str {
+        color: var(--tok-str);
+      }
+
+      /* string / ident after @container     */
+      .t-num {
+        color: var(--tok-num);
+      }
+
+      /* numbers: 400, 1.5                   */
+      .t-unit {
+        color: var(--tok-fn);
+      }
+
+      /* unit/fn: px rem cqi clamp scroll    */
+      .t-kw {
+        color: var(--tok-kw);
+      }
+
+      /* and or not from to                  */
+      .t-cmt {
+        color: var(--tok-cmt);
+        font-style: italic;
+      }
+
+      .t-punc {
+        color: var(--tok-punc);
+      }
+
+      /* { } : ; ( ) > < =                  */
+      .t-var {
+        color: var(--tok-var);
+      }
+
+      /* --custom-property                   */
+      .t-pseudo {
+        color: var(--tok-pseudo);
+      }
+
+      /* :root :hover [attr]                 */
+      .t-imp {
+        color: var(--lime);
+        font-weight: 600;
+      }
+
+      /* important highlight      */
+      .t-fn {
+        color: var(--tok-fn);
+      }
+
+      /* function: clamp() scroll() view() */
+
+      /* ═══════════════════════════════════════
+   PREVIEW AREA
+═══════════════════════════════════════ */
+      .preview-area {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        position: relative;
+      }
+
+      .preview-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        color: var(--text3);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .preview-label::before {
+        content: '▶';
+        font-size: 0.45rem;
+        color: var(--lime);
+      }
+
+      /* ── Buttons ── */
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .pbtn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        padding: 0.3em 0.75em;
+        border: 1px solid var(--border2);
+        border-radius: 3px;
+        background: var(--surface);
+        color: var(--text2);
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.06em;
+      }
+
+      .pbtn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+
+      .pbtn.active {
+        background: var(--cyan-dim);
+        color: var(--cyan);
+        border-color: var(--cyan-border);
+      }
+
+      .pbtn.active-pink {
+        background: var(--pink-dim);
+        color: var(--pink);
+        border-color: var(--pink-border);
+      }
+
+      .pbtn.active-lime {
+        background: var(--lime-dim);
+        color: var(--lime);
+        border-color: var(--lime-border);
+      }
+
+      /* ═══════════════════════════════════════
+   CONTAINER QUERY DEMOS
+═══════════════════════════════════════ */
+      .cq-shell {
+        container-type: inline-size;
+        container-name: devcard;
+        border: 1px dashed var(--border2);
+        border-radius: 4px;
+        padding: 0.75rem;
+        background: var(--bg3);
+        transition: width 0.35s cubic-bezier(.4, 0, .2, 1);
+      }
+
+      .cq-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      @container devcard (width > 200px) {
+        .cq-inner {
+          flex-direction: row;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .cq-avatar {
+          width: 34px;
+          height: 34px;
+        }
+
+        .cq-name {
+          font-size: 0.8rem;
+        }
+
+        .cq-meta {
+          display: block;
+        }
+      }
+
+      @container devcard (width > 320px) {
+        .cq-name {
+          font-size: 1rem;
+          font-weight: 500;
+        }
+
+        .cq-tag {
+          display: inline-flex;
+        }
+      }
+
+      .cq-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: linear-gradient(135deg, var(--cyan), var(--violet));
+        flex-shrink: 0;
+        transition: all 0.35s;
+      }
+
+      .cq-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text);
+        transition: all 0.35s;
+      }
+
+      .cq-meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        color: var(--text3);
+        display: none;
+        transition: all 0.35s;
+      }
+
+      .cq-tag {
+        display: none;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.5rem;
+        padding: 0.15em 0.5em;
+        border-radius: 3px;
+        background: var(--cyan-dim);
+        color: var(--cyan);
+        border: 1px solid var(--cyan-border);
+        margin-left: auto;
+        align-items: center;
+      }
+
+      .cq-units-shell {
+        container-type: inline-size;
+        border: 1px dashed var(--border2);
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+        background: var(--bg3);
+      }
+
+      .cq-fluid-h {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(0.9rem, 7cqi, 2.5rem);
+        color: var(--cyan);
+        line-height: 1;
+        margin-bottom: 0.3rem;
+      }
+
+      .cq-fluid-p {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: clamp(0.5rem, 2.8cqi, 0.85rem);
+        color: var(--text3);
+      }
+
+      .nc-layout {
+        display: flex;
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .nc-sidebar {
+        container-type: inline-size;
+        container-name: sidebar;
+        background: var(--bg3);
+        padding: 0.6rem;
+        transition: width 0.35s cubic-bezier(.4, 0, .2, 1);
+        flex-shrink: 0;
+      }
+
+      .nc-main-pane {
+        container-type: inline-size;
+        container-name: mainpane;
+        background: var(--bg2);
+        padding: 0.6rem;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .nc-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: var(--bg4);
+        margin-bottom: 5px;
+        transition: all 0.35s;
+      }
+
+      @container sidebar (width > 90px) {
+        .nc-bar {
+          background: var(--violet-dim);
+          border: 1px solid rgba(157, 127, 255, 0.2);
+        }
+      }
+
+      @container mainpane (width > 120px) {
+        .nc-main-bar {
+          background: var(--cyan-dim);
+          border: 1px solid var(--cyan-border);
+          height: 8px;
+        }
+      }
+
+      .aspect-shell {
+        container-type: size;
+        border: 1px dashed var(--border2);
+        border-radius: 4px;
+        background: var(--bg3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.35s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .aspect-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text2);
+        z-index: 1;
+        text-align: center;
+      }
+
+      @container (aspect-ratio > 1) {
+        .aspect-label {
+          color: var(--lime);
+        }
+
+        .aspect-shell {
+          background: var(--lime-dim);
+        }
+      }
+
+      @container (aspect-ratio <=1) {
+        .aspect-label {
+          color: var(--pink);
+        }
+
+        .aspect-shell {
+          background: var(--pink-dim);
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   STYLE QUERY DEMOS
+═══════════════════════════════════════ */
+      .theme-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        padding: 0.4em 0.85em;
+        border-radius: 3px;
+        border: 1px solid var(--border2);
+        background: var(--surface);
+        color: var(--text2);
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+      }
+
+      .theme-pill:hover {
+        background: var(--surface2);
+      }
+
+      .theme-pill[data-active="true"] {
+        background: var(--cyan-dim);
+        color: var(--cyan);
+        border-color: var(--cyan-border);
+      }
+
+      .theme-pill[data-theme="danger"][data-active="true"] {
+        background: var(--pink-dim);
+        color: var(--pink);
+        border-color: var(--pink-border);
+      }
+
+      .theme-pill[data-theme="success"][data-active="true"] {
+        background: var(--lime-dim);
+        color: var(--lime);
+        border-color: var(--lime-border);
+      }
+
+      .theme-pill[data-theme="warning"][data-active="true"] {
+        background: var(--amber-dim);
+        color: var(--amber);
+        border-color: rgba(255, 179, 71, 0.25);
+      }
+
+      .flag-result {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        padding: 0.7rem 1rem;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--bg3);
+        color: var(--text3);
+        transition: all 0.3s;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+      }
+
+      .surface-card {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        padding: 0.9rem 1.1rem;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--bg3);
+        color: var(--text);
+        transition: all 0.35s;
+      }
+
+      .surface-card.dark-mode {
+        background: var(--bg4);
+        border-color: var(--cyan-border);
+        color: var(--cyan);
+      }
+
+      .size-item {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: var(--bg3);
+        color: var(--text3);
+        cursor: pointer;
+        transition: all 0.25s;
+        user-select: none;
+        text-align: center;
+      }
+
+      .size-item.sz-md {
+        padding: 0.75rem 1.2rem;
+        font-size: 0.75rem;
+        border-color: var(--cyan-border);
+        color: var(--cyan);
+        background: var(--cyan-dim);
+      }
+
+      .size-item.sz-lg {
+        padding: 1rem 1.5rem;
+        font-size: 0.9rem;
+        border-color: var(--pink-border);
+        color: var(--pink);
+        background: var(--pink-dim);
+        font-weight: 500;
+      }
+
+      /* ═══════════════════════════════════════
+   SCROLL DEMOS
+═══════════════════════════════════════ */
+      .scroll-box {
+        height: 140px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border2) transparent;
+      }
+
+      .scroll-box::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .scroll-box::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 2px;
+      }
+
+      .scroll-inner {
+        padding: 0.65rem 0.85rem;
+      }
+
+      .s-row {
+        height: 28px;
+        border-radius: 3px;
+        background: var(--bg4);
+        margin-bottom: 5px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 0.6rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        color: var(--text3);
+        animation: s-row-in linear both;
+        animation-timeline: view(block);
+        animation-range: entry 0% entry 40%;
+      }
+
+      @keyframes s-row-in {
+        from {
+          opacity: 0;
+          transform: translateX(-6px)
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0)
+        }
+      }
+
+      .progress-wrap {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--bg3);
+        padding: 0.35rem 0.65rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .progress-track {
+        height: 3px;
+        background: var(--bg4);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--cyan), var(--pink));
+        border-radius: 99px;
+        animation: prog-fill linear both;
+        animation-timeline: scroll(nearest block);
+        width: 0;
+      }
+
+      @keyframes prog-fill {
+        from {
+          width: 0
+        }
+
+        to {
+          width: 100%
+        }
+      }
+
+      .sticky-demo-wrap {
+        height: 140px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border2) transparent;
+      }
+
+      .sticky-hdr {
+        position: sticky;
+        top: 0;
+        background: var(--bg3);
+        padding: 0.55rem 0.85rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        font-weight: 500;
+        color: var(--text2);
+        border-bottom: 1px solid transparent;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        letter-spacing: 0.08em;
+      }
+
+      .sticky-hdr::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--text3);
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .sticky-hdr.stuck {
+        background: var(--bg4);
+        border-bottom-color: var(--cyan-border);
+        color: var(--cyan);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .sticky-hdr.stuck::before {
+        background: var(--lime);
+        box-shadow: 0 0 6px var(--lime);
+      }
+
+      .sticky-body {
+        padding: 0.5rem 0.85rem;
+      }
+
+      .sticky-row {
+        height: 24px;
+        border-radius: 3px;
+        background: var(--bg4);
+        margin-bottom: 5px;
+        border: 1px solid var(--border);
+      }
+
+      .vt-box {
+        height: 140px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border2) transparent;
+      }
+
+      .vt-inner {
+        padding: 0.5rem 0.65rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .vt-item {
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        background: var(--bg4);
+        border: 1px solid var(--border);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6rem;
+        color: var(--text2);
+        animation: vt-in linear both;
+        animation-timeline: view(block);
+        animation-range: entry 0% entry 60%;
+      }
+
+      @keyframes vt-in {
+        from {
+          opacity: 0;
+          scale: 0.96;
+          filter: blur(3px)
+        }
+
+        to {
+          opacity: 1;
+          scale: 1;
+          filter: blur(0)
+        }
+      }
+
+      /* ═══════════════════════════════════════
+   REFERENCE TABLE
+═══════════════════════════════════════ */
+      .ref-table-wrap {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      table.ref-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+      }
+
+      table.ref-table thead th {
+        background: var(--bg3);
+        padding: 0.6rem 1rem;
+        text-align: left;
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text3);
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+      }
+
+      table.ref-table tbody td {
+        padding: 0.65rem 1rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        color: var(--text2);
+      }
+
+      table.ref-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.ref-table tbody tr:hover td {
+        background: var(--bg3);
+      }
+
+      .ref-table .tc {
+        color: var(--text);
+        font-weight: 500;
+        font-size: 0.65rem;
+      }
+
+      .ref-table .td {
+        color: var(--text3);
+        font-size: 0.63rem;
+      }
+
+      .ref-table .th {
+        color: var(--tok-prop);
+      }
+
+      .ref-table .row-hl td {
+        background: rgba(0, 212, 255, 0.02);
+      }
+
+      /* ═══════════════════════════════════════
+   CHEAT GRID
+═══════════════════════════════════════ */
+      .cheat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      .cheat-item {
+        background: var(--bg2);
+        padding: 0.9rem 1rem;
+        transition: background 0.15s;
+      }
+
+      .cheat-item:hover {
+        background: var(--bg3);
+      }
+
+      .cheat-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.55rem;
+        color: var(--text3);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+      }
+
+      .cheat-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--tok-val);
+        line-height: 1.5;
+      }
+
+      /* ═══════════════════════════════════════
+   GOTCHAS
+═══════════════════════════════════════ */
+      .gotcha-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      .gotcha-card {
+        background: var(--bg2);
+        padding: 1.1rem 1rem;
+      }
+
+      .gotcha-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--amber);
+        margin-bottom: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .gotcha-title::before {
+        content: '⚠';
+        font-size: 0.7rem;
+      }
+
+      .gotcha-body {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.63rem;
+        line-height: 1.8;
+        color: var(--text2);
+      }
+
+      .gotcha-body .ok {
+        color: var(--lime);
+      }
+
+      .gotcha-body .bad {
+        color: var(--pink);
+      }
+
+      .gotcha-body code {
+        background: var(--bg4);
+        padding: 0.1em 0.4em;
+        border-radius: 3px;
+        color: var(--tok-prop);
+        font-size: 0.9em;
+      }
+
+      /* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 2rem;
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        color: var(--text3);
+        background: var(--bg2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      footer a {
+        color: var(--cyan);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* ═══════════════════════════════════════
+   MISC / UTIL
+═══════════════════════════════════════ */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg2);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text3);
+      }
+
+      .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .flex-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .mt-sm {
+        margin-top: 0.5rem;
+      }
+
+      .mt-md {
+        margin-top: 0.75rem;
+      }
+
+      .w100 {
+        width: 100%;
+      }
+
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(12px)
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0)
+        }
+      }
+
+      section {
+        animation: fade-up 0.4s ease both;
+      }
+
+      section:nth-child(1) {
+        animation-delay: 0.05s
+      }
+
+      section:nth-child(2) {
+        animation-delay: 0.1s
+      }
+
+      section:nth-child(3) {
+        animation-delay: 0.15s
+      }
+
+      section:nth-child(4) {
+        animation-delay: 0.2s
+      }
+
+      section:nth-child(5) {
+        animation-delay: 0.25s
+      }
+
+      section:nth-child(6) {
+        animation-delay: 0.3s
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="header-grid-bg"></div>
+      <div class="header-glow"></div>
+      <div class="header-inner">
+        <div class="header-left">
+          <div class="header-eyebrow">CSS Reference — 2024/25</div>
+          <h1><span class="ac">Container</span><br>Style &amp; <span class="ap">Scroll</span><br>Queries</h1>
+          <div class="header-sub">
+            <div class="header-sub-item"><span class="dot" style="background:var(--cyan)"></span>Container Queries</div>
+            <div class="header-sub-item"><span class="dot" style="background:var(--pink)"></span>Style Queries</div>
+            <div class="header-sub-item"><span class="dot" style="background:var(--lime)"></span>Scroll-Driven
+              Animations</div>
+            <div class="header-sub-item"><span class="dot" style="background:var(--violet)"></span>Scroll State (Exp.)
+            </div>
+          </div>
+        </div>
+        <div class="header-badges">
+          <span class="spec-badge stable">CSS Containment L3</span>
+          <span class="spec-badge new">CSS Animations L2</span>
+          <span class="spec-badge exp">Scroll State Exp.</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="toc-nav">
+      <div class="toc-inner">
+        <a href="#s-container" class="toc-link active">01 — Container Queries</a>
+        <a href="#s-style" class="toc-link">02 — Style Queries</a>
+        <a href="#s-scroll" class="toc-link">03 — Scroll Animations</a>
+        <a href="#s-ref" class="toc-link">04 — Reference Table</a>
+        <a href="#s-patterns" class="toc-link">05 — Patterns</a>
+        <a href="#s-gotchas" class="toc-link">06 — Gotchas</a>
+      </div>
+    </nav>
+
+    <div class="search-wrap">
+      <input class="search-input" type="text"
+                placeholder="Filter by keyword: container, cqi, scroll, style, view, sticky…"
+                oninput="filterCards(this.value)">
+    </div>
+
+    <main>
+
+      <!-- ════════════════════════ S1: CONTAINER QUERIES ════════════════════════ -->
+      <section id="s-container">
+        <div class="section-head">
+          <span class="section-num">01 ——</span>
+          <h2 class="section-title">Container Queries</h2>
+          <span class="spec-badge stable section-badge">Baseline 2023</span>
+        </div>
+        <div class="grid-wrap grid-2">
+
+          <div class="card" data-tags="container container-type container-name basic syntax">
+            <div class="card-header">
+              <span class="chip chip-cyan"></span>Basic Syntax
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block" data-hl="3,4,10,11,12">/* 1. Establish a container */
+.parent {
+  container-type: inline-size;
+  container-name: card;
+  /* shorthand: */
+  container: card / inline-size;
+}
+
+/* 2. Query from a descendant */
+@container card (width > 400px) {
+  .child { font-size: 1.5rem; }
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">INTERACTIVE DEMO — resize container</div>
+              <div class="btn-row" id="cq-btns">
+                <button class="pbtn active" onclick="setCQ(140,'cq-btns')">sm: 140px</button>
+                <button class="pbtn" onclick="setCQ(240,'cq-btns')">md: 240px</button>
+                <button class="pbtn" onclick="setCQ(360,'cq-btns')">lg: 360px</button>
+              </div>
+              <div style="display:flex;justify-content:center">
+                <div class="cq-shell" id="cq-demo" style="width:140px">
+                  <div class="cq-inner">
+                    <div class="cq-avatar"></div>
+                    <div>
+                      <div class="cq-name">adaptive layout</div>
+                      <div class="cq-meta">responds to container width</div>
+                    </div>
+                    <span class="cq-tag">md+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="container-type inline-size size normal values">
+            <div class="card-header">
+              <span class="chip chip-cyan"></span>container-type Values
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Responds to inline axis (width) only */
+container-type: inline-size;
+
+/* Responds to BOTH width and height */
+container-type: size;
+
+/* No containment — default */
+container-type: normal;
+
+/* Named shorthand */
+container: hero / size;
+container: card / inline-size;
+
+/* ⚠ 'size' needs explicit height on container */</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">NAMED CONTAINERS — sidebar vs main</div>
+              <div class="btn-row" id="nc-btns">
+                <button class="pbtn active" onclick="setNC(70,'nc-btns')">sidebar: narrow</button>
+                <button class="pbtn" onclick="setNC(130,'nc-btns')">sidebar: wide</button>
+              </div>
+              <div class="nc-layout">
+                <div class="nc-sidebar" id="nc-sidebar" style="width:70px">
+                  <div class="nc-bar" style="width:100%"></div>
+                  <div class="nc-bar" style="width:70%"></div>
+                  <div class="nc-bar" style="width:85%"></div>
+                </div>
+                <div class="nc-main-pane">
+                  <div class="nc-bar nc-main-bar" style="width:80%;height:8px"></div>
+                  <div class="nc-bar nc-main-bar" style="width:100%;height:8px"></div>
+                  <div class="nc-bar nc-main-bar" style="width:55%;height:8px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="range syntax units cqw cqh cqi cqb cqmin cqmax clamp fluid">
+            <div class="card-header">
+              <span class="chip chip-cyan"></span>Range Syntax &amp; Container Units
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block" data-hl="2,3">/* Modern range syntax (preferred over min-/max-) */
+@container (200px < width < 600px) {}
+@container (width >= 400px) {}
+
+/* Container length units */
+cqw   /* 1% of container width  */
+cqh   /* 1% of container height */
+cqi   /* 1% of inline size      */
+cqb   /* 1% of block size       */
+cqmin /* min(cqi, cqb)          */
+cqmax /* max(cqi, cqb)          */
+
+/* Fluid type with clamp + cqi */
+.title {
+  font-size: clamp(1rem, 5cqi, 3rem);
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">LIVE — fluid type via cqi units</div>
+              <div class="btn-row" id="units-btns">
+                <button class="pbtn active" onclick="setUnits('100%','units-btns')">full</button>
+                <button class="pbtn" onclick="setUnits('60%','units-btns')">60%</button>
+                <button class="pbtn" onclick="setUnits('35%','units-btns')">35%</button>
+              </div>
+              <div id="units-shell" class="cq-units-shell" style="width:100%;transition:width 0.35s">
+                <div class="cq-fluid-h">5cqi fluid heading</div>
+                <div class="cq-fluid-p">2.8cqi — scales with container inline size</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="aspect-ratio logical inline-size block-size and or not boolean">
+            <div class="card-header">
+              <span class="chip chip-cyan"></span>Aspect-ratio &amp; Boolean Logic
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Query aspect-ratio (requires size type) */
+.box { container-type: size; }
+
+@container (aspect-ratio > 1) {
+  /* wider than tall */
+}
+
+/* Logical dimensions */
+@container (inline-size > 400px) {}
+@container (block-size > 300px) {}
+
+/* Boolean AND / OR / NOT */
+@container (width > 300px) and (height > 200px) {}
+@container (width > 300px) or (width < 100px) {}
+@container not (width > 600px) {}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">DEMO — toggle orientation</div>
+              <div class="btn-row" id="aspect-btns">
+                <button class="pbtn active" onclick="setAspect('landscape','aspect-btns')">landscape → ratio &gt;
+                  1</button>
+                <button class="pbtn" onclick="setAspect('portrait','aspect-btns')">portrait → ratio ≤ 1</button>
+              </div>
+              <div class="aspect-shell" id="aspect-demo" style="height:58px">
+                <div class="aspect-label" id="aspect-lbl">aspect-ratio &gt; 1 ✓ landscape</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════ S2: STYLE QUERIES ════════════════════════ -->
+      <section id="s-style">
+        <div class="section-head">
+          <span class="section-num">02 ——</span>
+          <h2 class="section-title">Style Queries</h2>
+          <span class="spec-badge new section-badge">Baseline 2024</span>
+        </div>
+        <div class="grid-wrap grid-2">
+
+          <div class="card" data-tags="style query custom property variable theme dark surface">
+            <div class="card-header">
+              <span class="chip chip-pink"></span>Custom Property Queries
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block" data-hl="4,5,6,7,8,9">/* No container-type required for style() */
+.wrapper { --theme: dark; }
+
+@container style(--theme: dark) {
+  .child {
+    background: #0a0a0f;
+    color: white;
+  }
+}
+
+/* Query multiple values */
+@container style(--size: large) {
+  .child { padding: 2rem; }
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">DEMO — toggle surface value</div>
+              <div class="flex-col">
+                <div class="surface-card" id="surface-card">
+                  <span id="surface-val">--surface: <strong>light</strong></span> — component adapts
+                </div>
+                <button class="pbtn w100" onclick="toggleSurface()">Toggle --surface: dark / light</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="style named container variant primary danger success warning">
+            <div class="card-header">
+              <span class="chip chip-pink"></span>Named Style Containers
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Combine name + style query */
+.wrapper {
+  container-name: theme-ctx;
+  --variant: primary;
+}
+
+@container theme-ctx style(--variant: primary) {
+  .btn { background: blue; }
+}
+
+@container theme-ctx style(--variant: danger) {
+  .btn { background: red; }
+}
+
+/* Works across any depth in subtree */</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">DEMO — click a variant</div>
+              <div class="flex-row" style="justify-content:center">
+                <div class="theme-pill" data-theme="default" data-active="true" onclick="setVariant(this)">default</div>
+                <div class="theme-pill" data-theme="primary" onclick="setVariant(this)">primary</div>
+                <div class="theme-pill" data-theme="danger" onclick="setVariant(this)">danger</div>
+                <div class="theme-pill" data-theme="success" onclick="setVariant(this)">success</div>
+                <div class="theme-pill" data-theme="warning" onclick="setVariant(this)">warning</div>
+              </div>
+              <div id="variant-display" class="mt-md"
+                        style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text3);text-align:center">
+                --variant: <span id="variant-val" style="color:var(--cyan)">default</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="style boolean and or not combined flags active">
+            <div class="card-header">
+              <span class="chip chip-pink"></span>Boolean &amp; Combined Checks
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Boolean: truthy if prop != initial value */
+@container style(--active) {}
+
+/* NOT */
+@container style(not (--dark-mode: true)) {}
+
+/* AND — both conditions must match */
+@container style(
+  (--theme: dark) and (--size: large)
+) {}
+
+/* OR — either condition matches */
+@container style(
+  (--type: a) or (--type: b)
+) {}
+
+/* Nesting logic */
+@container style((--a) and (not (--b))) {}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">DEMO — toggle flags</div>
+              <div class="btn-row">
+                <button class="pbtn" id="flag-dark" onclick="toggleFlag('dark')">--dark: off</button>
+                <button class="pbtn" id="flag-large" onclick="toggleFlag('large')">--large: off</button>
+              </div>
+              <div class="flag-result" id="flag-result">No flags active — waiting…</div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="style inherited font-style color direction only limitation">
+            <div class="card-header">
+              <span class="chip chip-pink"></span>Inherited Standard Properties
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Only INHERITED properties are queryable */
+
+/* ✓ These work: */
+@container style(font-style: italic) {
+  em { font-style: normal; }
+}
+/* ✓ Also: color, font-size, direction,
+         writing-mode, visibility        */
+
+/* ✗ These do NOT work: */
+/* width, display, position, flex, grid  */
+
+/* Best practice: use --custom-props */
+:root { --surface: light; }
+[data-theme="dark"] { --surface: dark; }
+
+@container style(--surface: dark) {
+  .card { color: white; }
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">DEMO — size prop variants</div>
+              <div class="flex-row" style="justify-content:center">
+                <div class="size-item" id="sz-sm" onclick="cycleSize('small')">--size: small</div>
+                <div class="size-item sz-md" id="sz-md" onclick="cycleSize('medium')">--size: medium</div>
+                <div class="size-item sz-lg" id="sz-lg" onclick="cycleSize('large')">--size: large</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════ S3: SCROLL ANIMATIONS ════════════════════════ -->
+      <section id="s-scroll">
+        <div class="section-head">
+          <span class="section-num">03 ——</span>
+          <h2 class="section-title">Scroll-Driven Animations</h2>
+          <span class="spec-badge stable section-badge">Baseline 2024</span>
+        </div>
+        <div class="grid-wrap grid-2">
+
+          <div class="card" data-tags="scroll animation timeline progress root nearest self block inline">
+            <div class="card-header">
+              <span class="chip chip-lime"></span>scroll() — Progress Timeline
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block" data-hl="3,4">/* Tie animation to scroll progress 0–100% */
+.bar {
+  animation-timeline: scroll(root block);
+  animation: grow linear both;
+}
+
+/* scroll( scroller  axis ) */
+/* scroller: root | nearest | self   */
+/* axis:     block | inline | x | y  */
+
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* animation-fill-mode: both is critical! */</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">SCROLL INSIDE BOX — watch progress bar</div>
+              <div class="scroll-box">
+                <div class="progress-wrap">
+                  <div class="progress-track">
+                    <div class="progress-fill"></div>
+                  </div>
+                </div>
+                <div class="scroll-inner">
+                  <div class="s-row">animation-timeline: scroll(nearest block)</div>
+                  <div class="s-row">bar fills as you scroll — no JS</div>
+                  <div class="s-row">GPU-accelerated via compositor</div>
+                  <div class="s-row">works with nested scrollers</div>
+                  <div class="s-row">scroll() tracks 0% → 100% progress</div>
+                  <div class="s-row">combine with animation-range to clip</div>
+                  <div class="s-row">keep scrolling ↓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="view animation timeline visibility entry exit contain range">
+            <div class="card-header">
+              <span class="chip chip-lime"></span>view() — Visibility Timeline
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block" data-hl="3,4">/* Animate as element enters the viewport */
+.card {
+  animation-timeline: view(block);
+  animation-range: entry 0% entry 60%;
+  animation: appear linear both;
+}
+
+/* animation-range keywords:
+   entry          exit
+   contain        entry-crossing
+   exit-crossing                  */
+
+@keyframes appear {
+  from { opacity: 0; scale: 0.95; }
+  to   { opacity: 1; scale: 1;    }
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">SCROLL TO REVEAL items</div>
+              <div class="vt-box">
+                <div class="vt-inner">
+                  <div class="vt-item">▸ entry 0% → element begins entering scroller</div>
+                  <div class="vt-item">▸ entry 60% → animation completes</div>
+                  <div class="vt-item">▸ fades in as element enters visible area</div>
+                  <div class="vt-item">▸ no IntersectionObserver needed</div>
+                  <div class="vt-item">▸ pure CSS, GPU composited</div>
+                  <div class="vt-item">▸ combine: scale + blur + opacity</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="named scroll-timeline view-timeline name axis decoupled">
+            <div class="card-header">
+              <span class="chip chip-lime"></span>Named Scroll &amp; View Timelines
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* Named scroll timeline on the scroller */
+.scroller {
+  scroll-timeline: --page-scroll block;
+  /* or split properties: */
+  scroll-timeline-name: --page-scroll;
+  scroll-timeline-axis: block;
+}
+
+/* Named view timeline on the subject */
+.hero {
+  view-timeline: --hero-tl block;
+}
+
+/* Reference by name from ANYWHERE in subtree */
+.parallax-el {
+  animation: drift linear;
+  animation-timeline: --hero-tl;
+}</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">SCROLL — view timeline items animate in</div>
+              <div class="scroll-box">
+                <div class="scroll-inner">
+                  <div class="s-row">timeline name: --named-tl</div>
+                  <div class="s-row">defined on the scroll container</div>
+                  <div class="s-row">referenced by name from any child</div>
+                  <div class="s-row">decoupled from DOM hierarchy</div>
+                  <div class="s-row">multiple named timelines per page</div>
+                  <div class="s-row">axis: block | inline | x | y</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" data-tags="sticky scroll state stuck snapped overflowing experimental future">
+            <div class="card-header">
+              <span class="chip chip-lime"></span>Sticky Detection &amp; Scroll State
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="code-wrap">
+              <pre class="code-block">/* ── Current workaround via JS ── */
+.sticky-hdr.stuck {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  border-bottom: 1px solid #eee;
+}
+
+/* ── Future CSS (Experimental) ── */
+@container scroll-state(stuck: top) {
+  .sticky-header {
+    box-shadow: 0 4px 20px black;
+  }
+}
+
+/* scroll-state pseudo-classes:
+   stuck:      top | right | bottom | left
+   snapped:    x | y | block | inline
+   overflowing: x | y | block | inline   */</pre>
+            </div>
+            <div class="preview-area">
+              <div class="preview-label">SCROLL DOWN — watch header change</div>
+              <div class="sticky-demo-wrap" id="sticky-wrap">
+                <div class="sticky-hdr" id="sticky-hdr">STICKY HEADER — scroll to stick</div>
+                <div class="sticky-body">
+                  <div class="sticky-row"></div>
+                  <div class="sticky-row"></div>
+                  <div class="sticky-row"></div>
+                  <div class="sticky-row"></div>
+                  <div class="sticky-row"></div>
+                  <div class="sticky-row"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════ S4: REFERENCE TABLE ════════════════════════ -->
+      <section id="s-ref">
+        <div class="section-head">
+          <span class="section-num">04 ——</span>
+          <h2 class="section-title">Quick Reference</h2>
+        </div>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th style="width:18%">Feature</th>
+                <th style="width:36%">Syntax</th>
+                <th style="width:30%">Notes</th>
+                <th style="width:16%">Support</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tc">Container (size)</td>
+                <td><span class="th">@container (width &gt; 400px) {}</span></td>
+                <td class="td">Requires container-type on parent</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">Container name</td>
+                <td><span class="th">@container card (min-width: 300px)</span></td>
+                <td class="td">Targets named container ancestor</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr>
+                <td class="tc">Container unit</td>
+                <td><span class="th">font-size: 5cqi</span></td>
+                <td class="td">cqw cqh cqi cqb cqmin cqmax</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">Range syntax</td>
+                <td><span class="th">@container (200px &lt; width &lt; 600px)</span></td>
+                <td class="td">Replaces min-/max-width syntax</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr>
+                <td class="tc">Style query</td>
+                <td><span class="th">@container style(--theme: dark) {}</span></td>
+                <td class="td">Custom props only for now</td>
+                <td><span class="spec-badge new">Chrome 111+</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">Style + name</td>
+                <td><span class="th">@container wrap style(--v: a) {}</span></td>
+                <td class="td">Named + style combined</td>
+                <td><span class="spec-badge new">Chrome 111+</span></td>
+              </tr>
+              <tr>
+                <td class="tc">scroll()</td>
+                <td><span class="th">animation-timeline: scroll(root)</span></td>
+                <td class="td">Linked to scroll pos 0→100%</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">view()</td>
+                <td><span class="th">animation-timeline: view(block)</span></td>
+                <td class="td">Linked to element visibility</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr>
+                <td class="tc">Named scroll</td>
+                <td><span class="th">scroll-timeline: --name block</span></td>
+                <td class="td">Reference by name from anywhere</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">Named view</td>
+                <td><span class="th">view-timeline: --name block</span></td>
+                <td class="td">Reference by name from anywhere</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr>
+                <td class="tc">animation-range</td>
+                <td><span class="th">animation-range: entry 0% exit 100%</span></td>
+                <td class="td">entry exit contain entry-crossing</td>
+                <td><span class="spec-badge stable">✓ All</span></td>
+              </tr>
+              <tr class="row-hl">
+                <td class="tc">Scroll state</td>
+                <td><span class="th">@container scroll-state(stuck: top)</span></td>
+                <td class="td">:stuck, :snapped, :overflowing</td>
+                <td><span class="spec-badge exp">Experimental</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════ S5: KEY PATTERNS ════════════════════════ -->
+      <section id="s-patterns">
+        <div class="section-head">
+          <span class="section-num">05 ——</span>
+          <h2 class="section-title">Key Patterns</h2>
+        </div>
+        <div class="cheat-grid">
+          <div class="cheat-item">
+            <div class="cheat-label">container-type</div>
+            <div class="cheat-val">inline-size · size · normal</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">query operators</div>
+            <div class="cheat-val">and · or · not</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">container units</div>
+            <div class="cheat-val">cqw · cqh · cqi · cqb · cqmin · cqmax</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">scroll() scroller</div>
+            <div class="cheat-val">root · nearest · self</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">scroll() axis</div>
+            <div class="cheat-val">block · inline · x · y</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">animation-range</div>
+            <div class="cheat-val">entry · exit · contain · entry-crossing · exit-crossing</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">scroll-state pseudo</div>
+            <div class="cheat-val">stuck · snapped · overflowing</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">style() scope</div>
+            <div class="cheat-val">custom props · inherited props (exp.)</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">fluid size pattern</div>
+            <div class="cheat-val">clamp(1rem, 5cqi, 3rem)</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">view timeline range</div>
+            <div class="cheat-val">entry 0% entry 60% (reveal)</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">container shorthand</div>
+            <div class="cheat-val">container: name / inline-size</div>
+          </div>
+          <div class="cheat-item">
+            <div class="cheat-label">a11y: reduced motion</div>
+            <div class="cheat-val">@media (prefers-reduced-motion: reduce)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════ S6: GOTCHAS ════════════════════════ -->
+      <section id="s-gotchas">
+        <div class="section-head">
+          <span class="section-num">06 ——</span>
+          <h2 class="section-title">Gotchas &amp; Footguns</h2>
+        </div>
+        <div class="gotcha-grid">
+          <div class="gotcha-card">
+            <div class="gotcha-title">Can't query own container</div>
+            <div class="gotcha-body">A container <span class="bad">cannot</span> query itself — only descendants
+              can.<br><br><span class="bad">✗</span> <code>@container (…) { .parent {} }</code><br><span
+                        class="ok">✓</span> <code>@container (…) { .child {} }</code></div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">size type needs explicit height</div>
+            <div class="gotcha-body"><code>container-type: size</code> requires a definite block size. Without an
+              explicit height on the container, block-axis queries never fire.<br><br><span class="ok">✓</span> Set
+              <code>height</code>, <code>block-size</code>, or constrain via grid/flex parent.
+            </div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">Style queries: custom props only</div>
+            <div class="gotcha-body">Only <code>--custom-props</code> work reliably in <code>style()</code> today.
+              Querying standard inherited props is experimental — don't ship in prod yet.<br><br><span
+                        class="ok">✓</span> Use custom props as an explicit theming API.</div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">cq units fall back to vw/vh</div>
+            <div class="gotcha-body">If no size container exists in the ancestor chain,
+              <code>cqw</code>/<code>cqi</code> fall back to the viewport — causing unexpected full-width
+              layouts.<br><br><span class="ok">✓</span> Always wrap cq-unit users in a size container.
+            </div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">scroll() needs overflow: auto/scroll</div>
+            <div class="gotcha-body"><code>scroll(nearest)</code> walks up the DOM for a scrolling ancestor. If it finds
+              none (e.g. <code>overflow: hidden</code>), it falls through to the viewport.<br><br><span
+                        class="ok">✓</span> Use <code>scroll(root)</code> for page-level progress bars.</div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">animation-fill-mode: both</div>
+            <div class="gotcha-body">Scroll animations default to <code>fill: none</code>. Without <code>both</code>,
+              elements snap back to their <code>from</code> state when the range exits.<br><br><span class="ok">✓</span>
+              Always add <code>animation-fill-mode: both</code> to scroll-driven animations.</div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">Reduced motion accessibility</div>
+            <div class="gotcha-body">Scroll-driven animations are motion. Always
+              guard:<br><br><code>@media (prefers-reduced-motion: reduce) {</code><br><code>  .animated { animation: none; }</code><br><code>}</code>
+            </div>
+          </div>
+          <div class="gotcha-card">
+            <div class="gotcha-title">Named timelines are scoped</div>
+            <div class="gotcha-body">Named scroll/view timelines are only reachable by <span
+                        class="ok">descendants</span> of the defining element — not siblings or parents. Plan your DOM
+              accordingly.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <span>CSS Containment L3 · CSS Animations L2</span>
+      <span>·</span>
+      <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries" target="_blank">MDN
+        Docs</a>
+      <span>·</span>
+      <a href="https://scroll-driven-animations.style/" target="_blank">scroll-driven-animations.style</a>
+      <span>·</span>
+      <span>2024 / 2025</span>
+    </footer>
+
+    <script>
+      /* ═══════════════════════════════════════════════════════════
+         CSS TOKENIZER
+         - Reads raw text from <pre class="code-block">
+         - data-hl="1,3" highlights those line numbers
+         - Injects line-number + token spans, never touches HTML
+      ═══════════════════════════════════════════════════════════ */
+      ( function ()
+      {
+
+        // ── token helpers ──────────────────────────────────────
+        function esc ( s )
+        {
+          return s.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' );
+        }
+
+        // Words that map to specific token classes
+        const TK = {
+          // CSS at-rule names
+          at: new Set( [ 'container', 'keyframes', 'media', 'supports', 'layer', 'import',
+            'charset', 'namespace', 'font-face', 'page', 'property' ] ),
+          // Logic operators inside queries
+          kw: new Set( [ 'and', 'or', 'not', 'from', 'to', 'only' ] ),
+          // Known value keywords → green
+          val: new Set( [
+            'inline-size', 'size', 'normal', 'auto', 'none', 'block', 'inline',
+            'flex', 'grid', 'absolute', 'relative', 'sticky', 'fixed',
+            'both', 'linear', 'forwards', 'backwards',
+            'left', 'right', 'top', 'bottom', 'center',
+            'bold', 'italic', 'underline', 'nowrap', 'wrap',
+            'contain', 'cover', 'white', 'black', 'transparent',
+            'start', 'end', 'stretch',
+            'space-between', 'space-around', 'space-evenly',
+            'row', 'column', 'row-reverse', 'column-reverse',
+            'min-content', 'max-content', 'fit-content',
+            'entry', 'exit', 'entry-crossing', 'exit-crossing',
+            'contain', 'cover',
+            'root', 'nearest', 'self', 'x', 'y',
+            'rotate', 'scale', 'translate',
+            'blur', 'brightness', 'contrast', 'saturate', 'invert',
+            'style', 'scroll-state', 'stuck', 'snapped', 'overflowing',
+            'serif', 'sans-serif', 'monospace', 'cursive', 'fantasy',
+            'ltr', 'rtl', 'inherit', 'initial', 'revert', 'unset',
+          ] ),
+          // CSS functions → teal
+          fn: new Set( [
+            'clamp', 'min', 'max', 'calc', 'var', 'env', 'url', 'format',
+            'scroll', 'view', 'linear-gradient', 'radial-gradient', 'conic-gradient',
+            'cubic-bezier', 'steps', 'repeat', 'minmax', 'fit-content',
+            'translate', 'translateX', 'translateY', 'translateZ',
+            'scaleX', 'scaleY', 'scaleZ', 'rotate', 'rotateX', 'rotateY',
+            'skewX', 'skewY', 'perspective', 'matrix',
+            'rgb', 'rgba', 'hsl', 'hsla', 'oklch', 'oklab', 'color',
+            'selector', 'is', 'where', 'not', 'has', 'nth-child', 'nth-of-type',
+          ] ),
+        };
+
+        // ── tokenizer rules, tried in order ──────────────────────
+        // Each rule: { re, cls } or { re, fn(match)→html }
+        const RULES = [
+          // Block comment  /* ... */
+          { re: /^\/\*[\s\S]*?\*\//, cls: 't-cmt' },
+          // Line comment   // ...
+          { re: /^\/\/.*/, cls: 't-cmt' },
+
+          // @rule   →  split into @ + name
+          {
+            re: /^@([-\w]+)/, fn: m =>
+              `<span class="t-at">@${ esc( m[ 1 ] ) }</span>`
+          },
+
+          // --custom-property
+          { re: /^--[-\w]+/, cls: 't-var' },
+
+          // url(...)
+          { re: /^url\([^)]*\)/, cls: 't-str' },
+
+          // Quoted strings
+          { re: /^"(?:[^"\\]|\\.)*"|^'(?:[^'\\]|\\.)*'/, cls: 't-str' },
+
+          // Hex colors  #abc  #aabbcc  #aabbccdd
+          { re: /^#[0-9a-fA-F]{3,8}(?=\b|[^0-9a-fA-F])/, cls: 't-num' },
+
+          // Number + optional unit
+          {
+            re: /^-?\d*\.?\d+(px|rem|em|%|vw|vh|cqw|cqh|cqi|cqb|cqmin|cqmax|fr|s|ms|deg|turn|rad|ch|ex|lh|rlh|dvh|dvw|svh|svw|vmax|vmin|n)?\b/, fn: m =>
+            {
+              const num = esc( m[ 0 ].slice( 0, m[ 0 ].length - ( m[ 1 ] || '' ).length ) );
+              const unit = esc( m[ 1 ] || '' );
+              return `<span class="t-num">${ num }</span>` + ( unit ? `<span class="t-unit">${ unit }</span>` : '' );
+            }
+          },
+
+          // Known CSS functions (word immediately before open paren)
+          {
+            re: /^([-\w]+)(?=\s*\()/, fn: m =>
+            {
+              const name = m[ 1 ];
+              return TK.fn.has( name )
+                ? `<span class="t-fn">${ esc( name ) }</span>`
+                : `<span class="t-fn">${ esc( name ) }</span>`;   // all fns get teal
+            }
+          },
+
+          // Selectors: .class  #id  :pseudo  ::pseudo  [attr]  &
+          { re: /^(?:&|\.[-\w]+(?::[-\w]+(?:\([^)]*\))?)*|#[-\w]+|\[(?:[^\]\\]|\\.)*\]|:{1,2}[-\w]+(?:\([^)]*\))?)/, cls: 't-sel' },
+
+          // CSS property: word followed by colon (but not :: pseudo)
+          {
+            re: /^([-a-zA-Z]+)(?=\s*:(?!:))/, fn: m =>
+            {
+              const name = m[ 1 ];
+              return `<span class="t-prop">${ esc( name ) }</span>`;
+            }
+          },
+
+          // Bare word identifiers
+          {
+            re: /^[-\w]+/, fn: m =>
+            {
+              const w = m[ 0 ];
+              if ( TK.kw.has( w ) ) return `<span class="t-kw">${ esc( w ) }</span>`;
+              if ( TK.val.has( w ) ) return `<span class="t-val">${ esc( w ) }</span>`;
+              // Named container identifiers (after @container / container-name)
+              return `<span class="t-str">${ esc( w ) }</span>`;
+            }
+          },
+
+          // Punctuation / operators
+          { re: /^[{}();:,><=!+\-*/|^~]/, cls: 't-punc' },
+          { re: /^[\[\]]/, cls: 't-punc' },
+        ];
+
+        function tokenizeLine ( line )
+        {
+          let src = line, out = '';
+          while ( src.length )
+          {
+            // Pass through leading whitespace directly
+            const ws = /^[ \t]+/.exec( src );
+            if ( ws ) { out += ws[ 0 ]; src = src.slice( ws[ 0 ].length ); continue; }
+
+            let matched = false;
+            for ( const rule of RULES )
+            {
+              const m = rule.re.exec( src );
+              if ( !m ) continue;
+              if ( rule.fn )
+              {
+                out += rule.fn( m );
+              } else
+              {
+                out += `<span class="${ rule.cls }">${ esc( m[ 0 ] ) }</span>`;
+              }
+              src = src.slice( m[ 0 ].length );
+              matched = true;
+              break;
+            }
+            if ( !matched )
+            {
+              out += esc( src[ 0 ] );
+              src = src.slice( 1 );
+            }
+          }
+          return out;
+        }
+
+        function renderBlock ( pre )
+        {
+          // Read raw text — decode HTML entities the browser may have in textContent
+          const raw = pre.textContent;
+
+          // Which lines to highlight
+          const hlSet = new Set(
+            ( pre.getAttribute( 'data-hl' ) || '' ).split( ',' )
+              .map( s => parseInt( s.trim() ) ).filter( n => !isNaN( n ) )
+          );
+
+          const lines = raw.split( '\n' );
+          // Trim blank leading/trailing lines
+          while ( lines.length && !lines[ 0 ].trim() ) lines.shift();
+          while ( lines.length && !lines[ lines.length - 1 ].trim() ) lines.pop();
+
+          let html = '';
+          lines.forEach( ( line, i ) =>
+          {
+            const num = i + 1;
+            const hl = hlSet.has( num ) ? ' hl' : '';
+            const code = tokenizeLine( line ) || '\u00A0';
+            html += `<div class="cl${ hl }">`;
+            html += `<span class="ln">${ num }</span>`;
+            html += `<span class="lc">${ code }</span>`;
+            html += `</div>`;
+          } );
+
+          pre.innerHTML = html;
+        }
+
+        // Run when DOM is ready
+        if ( document.readyState === 'loading' )
+        {
+          document.addEventListener( 'DOMContentLoaded', run );
+        } else
+        {
+          run();
+        }
+        function run ()
+        {
+          document.querySelectorAll( 'pre.code-block' ).forEach( renderBlock );
+        }
+      } )();
+
+      /* ═══════════════════════════════════════════════════════════
+         INTERACTIVE DEMOS
+      ═══════════════════════════════════════════════════════════ */
+
+      function setCQ ( w, groupId )
+      {
+        document.getElementById( 'cq-demo' ).style.width = w + 'px';
+        document.querySelectorAll( '#' + groupId + ' .pbtn' ).forEach( b => b.classList.remove( 'active' ) );
+        event.target.classList.add( 'active' );
+      }
+      function setNC ( w, groupId )
+      {
+        document.getElementById( 'nc-sidebar' ).style.width = w + 'px';
+        document.querySelectorAll( '#' + groupId + ' .pbtn' ).forEach( b => b.classList.remove( 'active' ) );
+        event.target.classList.add( 'active' );
+      }
+      function setUnits ( w, groupId )
+      {
+        document.getElementById( 'units-shell' ).style.width = w;
+        document.querySelectorAll( '#' + groupId + ' .pbtn' ).forEach( b => b.classList.remove( 'active' ) );
+        event.target.classList.add( 'active' );
+      }
+      function setAspect ( mode, groupId )
+      {
+        const el = document.getElementById( 'aspect-demo' );
+        const lbl = document.getElementById( 'aspect-lbl' );
+        if ( mode === 'portrait' )
+        {
+          el.style.height = '110px'; el.style.width = '70px'; el.style.margin = '0 auto';
+          lbl.textContent = 'aspect-ratio \u2264 1 \u2014 portrait';
+        } else
+        {
+          el.style.height = '58px'; el.style.width = '100%'; el.style.margin = '';
+          lbl.textContent = 'aspect-ratio > 1 \u2713 landscape';
+        }
+        document.querySelectorAll( '#' + groupId + ' .pbtn' ).forEach( b => b.classList.remove( 'active' ) );
+        event.target.classList.add( 'active' );
+      }
+
+      let surfaceDark = false;
+      function toggleSurface ()
+      {
+        surfaceDark = !surfaceDark;
+        document.getElementById( 'surface-card' ).classList.toggle( 'dark-mode', surfaceDark );
+        document.getElementById( 'surface-val' ).innerHTML = surfaceDark
+          ? '--surface: <strong style="color:var(--cyan)">dark</strong>'
+          : '--surface: <strong>light</strong>';
+      }
+
+      function setVariant ( el )
+      {
+        document.querySelectorAll( '.theme-pill' ).forEach( p => p.removeAttribute( 'data-active' ) );
+        el.setAttribute( 'data-active', 'true' );
+        const t = el.dataset.theme;
+        const val = document.getElementById( 'variant-val' );
+        val.textContent = t;
+        val.style.color = t === 'danger' ? 'var(--pink)' : t === 'success' ? 'var(--lime)' : t === 'warning' ? 'var(--amber)' : 'var(--cyan)';
+      }
+
+      const flags = { dark: false, large: false };
+      function toggleFlag ( flag )
+      {
+        flags[ flag ] = !flags[ flag ];
+        const btn = document.getElementById( 'flag-' + flag );
+        btn.textContent = '--' + flag + ': ' + ( flags[ flag ] ? 'on' : 'off' );
+        btn.classList.toggle( 'active', flags[ flag ] );
+        const res = document.getElementById( 'flag-result' );
+        if ( flags.dark && flags.large )
+        {
+          Object.assign( res.style, { background: 'var(--bg4)', borderColor: 'var(--cyan-border)', color: 'var(--cyan)' } );
+          res.textContent = '\u2713 AND match: --dark AND --large both active';
+        } else if ( flags.dark )
+        {
+          Object.assign( res.style, { background: 'rgba(30,30,40,0.8)', borderColor: 'rgba(157,127,255,0.2)', color: 'var(--violet)' } );
+          res.textContent = '\u2713 --dark: true \u2192 dark styles applied';
+        } else if ( flags.large )
+        {
+          Object.assign( res.style, { background: 'var(--cyan-dim)', borderColor: 'var(--cyan-border)', color: 'var(--cyan)' } );
+          res.textContent = '\u2713 --large: true \u2192 bigger padding / text';
+        } else
+        {
+          Object.assign( res.style, { background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text3)' } );
+          res.textContent = 'No flags active \u2014 waiting\u2026';
+        }
+      }
+
+      function cycleSize ( size )
+      {
+        document.querySelectorAll( '.size-item' ).forEach( el => el.classList.remove( 'sz-md', 'sz-lg' ) );
+        if ( size === 'medium' ) document.getElementById( 'sz-md' ).classList.add( 'sz-md' );
+        if ( size === 'large' ) document.getElementById( 'sz-lg' ).classList.add( 'sz-lg' );
+      }
+
+      // Sticky header detection
+      const stickyWrap = document.getElementById( 'sticky-wrap' );
+      const stickyHdr = document.getElementById( 'sticky-hdr' );
+      stickyWrap.addEventListener( 'scroll', () =>
+      {
+        stickyHdr.classList.toggle( 'stuck', stickyWrap.scrollTop > 0 );
+      } );
+
+      // TOC active section tracking
+      const tocLinks = document.querySelectorAll( '.toc-link' );
+      const sections = document.querySelectorAll( 'main section' );
+      const tocObs = new IntersectionObserver( entries =>
+      {
+        entries.forEach( e =>
+        {
+          if ( e.isIntersecting )
+          {
+            const id = e.target.id;
+            tocLinks.forEach( l => l.classList.toggle( 'active', l.getAttribute( 'href' ) === '#' + id ) );
+          }
+        } );
+      }, { rootMargin: '-40% 0px -55%', threshold: 0 } );
+      sections.forEach( s => tocObs.observe( s ) );
+
+      // Copy code — strips line numbers from copied text
+      function copyCode ( btn )
+      {
+        const pre = btn.closest( '.card' ).querySelector( 'pre.code-block' );
+        // Get text content of .lc spans only (not line numbers)
+        const text = Array.from( pre.querySelectorAll( '.lc' ) )
+          .map( el => el.textContent ).join( '\n' ).trim();
+        navigator.clipboard.writeText( text ).then( () =>
+        {
+          btn.textContent = 'copied!';
+          btn.classList.add( 'copied' );
+          setTimeout( () => { btn.textContent = 'copy'; btn.classList.remove( 'copied' ); }, 1500 );
+        } );
+      }
+
+      // Search / filter cards
+      function filterCards ( q )
+      {
+        const term = q.toLowerCase().trim();
+        document.querySelectorAll( '.card[data-tags]' ).forEach( card =>
+        {
+          const match = !term
+            || card.dataset.tags.toLowerCase().includes( term )
+            || card.innerText.toLowerCase().includes( term );
+          card.style.display = match ? '' : 'none';
+        } );
+      }
+    </script>
+  </body>
+
+</html>

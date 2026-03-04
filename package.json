@@ -67,6 +67,11 @@
         "command": "motion-graph-edictor.openCheatSheetHub",
         "category": "Motion",
         "title": "Open Cheat Sheets"
+      },
+      {
+        "command": "motion-graph-edictor.openContainerQueryCheatSheet",
+        "category": "Motion",
+        "title": "CSS Modern Queries Cheat Sheet"
       }
     ],
     "viewsContainers": {

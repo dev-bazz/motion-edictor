@@ -53,6 +53,19 @@ export function activate(context: vscode.ExtensionContext) {
 		),
 	);
 
+	// Register command to open CSS Modern Queries Cheat Sheet
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openContainerQueryCheatSheet",
+			() => {
+				ContainerQueryCheatSheetPanel.createOrShow(
+					context.extensionUri,
+					context.extensionPath,
+				);
+			},
+		),
+	);
+
 	// Register command to open the Cheat Sheet Hub
 	context.subscriptions.push(
 		vscode.commands.registerCommand(
@@ -405,6 +418,11 @@ class CheatSheetHubPanel {
 							"motion-graph-edictor.openSVGLoadersCheatSheet",
 						);
 						return;
+					case "openContainerQueryCheatSheet":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openContainerQueryCheatSheet",
+						);
+						return;
 				}
 			},
 			null,
@@ -428,6 +446,80 @@ class CheatSheetHubPanel {
 			this._extensionPath,
 			"src",
 			"cheatsheet-hub.html",
+		);
+		return fs.readFileSync(htmlPath, "utf8");
+	}
+}
+
+// ─── Container Query Cheat Sheet Panel ─────────────────────────
+class ContainerQueryCheatSheetPanel {
+	public static currentPanel: ContainerQueryCheatSheetPanel | undefined;
+	private static readonly viewType = "containerQueryCheatSheet";
+
+	private readonly _panel: vscode.WebviewPanel;
+	private readonly _extensionPath: string;
+	private _disposables: vscode.Disposable[] = [];
+
+	public static createOrShow(extensionUri: vscode.Uri, extensionPath: string) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (ContainerQueryCheatSheetPanel.currentPanel) {
+			ContainerQueryCheatSheetPanel.currentPanel._panel.reveal(column);
+			return;
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			ContainerQueryCheatSheetPanel.viewType,
+			"CSS Modern Queries Cheat Sheet",
+			column || vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				localResourceRoots: [extensionUri],
+			},
+		);
+
+		ContainerQueryCheatSheetPanel.currentPanel =
+			new ContainerQueryCheatSheetPanel(panel, extensionPath);
+	}
+
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._panel = panel;
+		this._extensionPath = extensionPath;
+
+		this._panel.webview.html = this._getHtmlForWebview();
+
+		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+		this._panel.webview.onDidReceiveMessage(
+			(message) => {
+				if (message.command === "copyToClipboard") {
+					vscode.env.clipboard.writeText(message.value);
+					vscode.window.showInformationMessage("Copied to clipboard!");
+				}
+			},
+			null,
+			this._disposables,
+		);
+	}
+
+	public dispose() {
+		ContainerQueryCheatSheetPanel.currentPanel = undefined;
+		this._panel.dispose();
+		while (this._disposables.length) {
+			const d = this._disposables.pop();
+			if (d) {
+				d.dispose();
+			}
+		}
+	}
+
+	private _getHtmlForWebview(): string {
+		const htmlPath = path.join(
+			this._extensionPath,
+			"src",
+			"container-query.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
 	}
