@@ -104,7 +104,7 @@
     .cp {
       transition: all 0.3s ease;
     }
-  </style>
+  </style>`
 
   <defs>
     <!-- Gradient for the bezier curve — purple → teal -->
