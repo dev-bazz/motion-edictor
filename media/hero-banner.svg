@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="180" viewBox="0 0 680 180" fill="none">
+  <rect x="0" y="0" rx="24" ry="24" width="680" height="180" fill="#18181B"/>
+  <path d="M 40 140 C 40 40, 160 40, 200 80 S 320 160, 400 80 S 520 0, 640 80" stroke="url(#heroGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="40" cy="140" r="5" fill="#A78BFA"/>
+  <circle cx="200" cy="80" r="5" fill="#34D399"/>
+  <circle cx="400" cy="80" r="5" fill="#60A5FA"/>
+  <circle cx="640" cy="80" r="5" fill="#FBBF24"/>
+  <line x1="40" y1="140" x2="160" y2="40" stroke="#A78BFA" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+  <line x1="200" y1="80" x2="320" y2="160" stroke="#34D399" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+  <line x1="400" y1="80" x2="520" y2="0" stroke="#60A5FA" stroke-width="1" stroke-dasharray="4 4" opacity="0.4"/>
+  <text x="340" y="60" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-weight="800" font-size="38" fill="white" letter-spacing="-1">Motion</text>
+  <text x="340" y="88" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-weight="400" font-size="14" fill="#A1A1AA" letter-spacing="4">CSS ANIMATION EDITOR</text>
+  <rect x="264" y="108" rx="12" ry="12" width="152" height="26" fill="#27272A"/>
+  <text x="340" y="126" text-anchor="middle" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-weight="600" font-size="12" fill="#A78BFA">&#9670;  Built for VS Code</text>
+  <defs>
+    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="33%" stop-color="#34D399"/>
+      <stop offset="66%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+</svg>

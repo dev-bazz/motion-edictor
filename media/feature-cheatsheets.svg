@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="130" viewBox="0 0 460 130" fill="none">
+  <rect width="460" height="130" rx="16" fill="#18181B"/>
+  <rect x="30" y="20" rx="10" ry="10" width="190" height="90" fill="#27272A" stroke="#FBBF24" stroke-width="1.5" opacity="0.7"/>
+  <text x="62" y="44" font-family="sans-serif" font-size="12" fill="#FBBF24" font-weight="700">SVG Path Commands</text>
+  <text x="50" y="64" font-family="monospace" font-size="10" fill="#A1A1AA">M 10 80 L 50 10</text>
+  <text x="50" y="78" font-family="monospace" font-size="10" fill="#A1A1AA">C 20 10 40 10 50 80</text>
+  <text x="50" y="92" font-family="monospace" font-size="10" fill="#A1A1AA">A 25 25 0 0 1 50 50</text>
+  <rect x="240" y="20" rx="10" ry="10" width="190" height="90" fill="#27272A" stroke="#60A5FA" stroke-width="1.5" opacity="0.7"/>
+  <text x="264" y="44" font-family="sans-serif" font-size="12" fill="#60A5FA" font-weight="700">Scroll Animation</text>
+  <text x="260" y="64" font-family="monospace" font-size="10" fill="#A1A1AA">animation-timeline</text>
+  <text x="260" y="78" font-family="monospace" font-size="10" fill="#A1A1AA">animation-range</text>
+  <text x="260" y="92" font-family="monospace" font-size="10" fill="#A1A1AA">view() | scroll()</text>
+</svg>
