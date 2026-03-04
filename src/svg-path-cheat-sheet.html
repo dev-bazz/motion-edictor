@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Path Animation — Dev Cheat Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;700;800&display=swap"
+              rel="stylesheet">
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #111118;
+        --surface2: #1a1a24;
+        --border: #2a2a3a;
+        --accent: #7c6dfa;
+        --accent2: #fa6d8f;
+        --accent3: #6dfab3;
+        --accent4: #fad96d;
+        --text: #e8e8f0;
+        --muted: #6b6b80;
+        --code-bg: #0d0d14;
+        --tag: #2d1e4f;
+        --tag-text: #b09ef8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Syne', sans-serif;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* ─── NOISE OVERLAY ─── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.4;
+      }
+
+      /* ─── HEADER ─── */
+      .hero {
+        position: relative;
+        padding: 80px 40px 60px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: '';
+        position: absolute;
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 700px;
+        height: 400px;
+        background: radial-gradient(ellipse, rgba(124, 109, 250, 0.18) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .hero-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+        opacity: 0.8;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.2rem, 5vw, 4rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 16px;
+      }
+
+      .hero-sub {
+        color: var(--muted);
+        font-size: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        max-width: 560px;
+        margin: 0 auto 32px;
+      }
+
+      .badge-row {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .badge-purple {
+        background: #2d1e4f;
+        color: #b09ef8;
+        border: 1px solid #4a3680;
+      }
+
+      .badge-pink {
+        background: #3a1a28;
+        color: #f87ea7;
+        border: 1px solid #5a2840;
+      }
+
+      .badge-green {
+        background: #1a3a2a;
+        color: #6dfab3;
+        border: 1px solid #2a5a3a;
+      }
+
+      .badge-yellow {
+        background: #3a300e;
+        color: #fad96d;
+        border: 1px solid #5a4a20;
+      }
+
+      /* ─── NAV ─── */
+      .sticky-nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(10, 10, 15, 0.9);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 40px;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .sticky-nav ul {
+        display: flex;
+        list-style: none;
+        gap: 0;
+      }
+
+      .sticky-nav a {
+        display: inline-block;
+        padding: 14px 18px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-decoration: none;
+        color: var(--muted);
+        border-bottom: 2px solid transparent;
+        transition: color 0.2s, border-color 0.2s;
+      }
+
+      .sticky-nav a:hover {
+        color: var(--text);
+        border-color: var(--accent);
+      }
+
+      /* ─── LAYOUT ─── */
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 40px 80px;
+      }
+
+      .section {
+        margin-top: 64px;
+        scroll-margin-top: 60px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section-number {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--accent);
+        background: var(--tag);
+        padding: 3px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.1em;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      /* ─── CARDS GRID ─── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      .grid-1 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 900px) {
+
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+
+        .container {
+          padding: 0 20px 60px;
+        }
+
+        .hero {
+          padding: 60px 20px 40px;
+        }
+
+        .sticky-nav {
+          padding: 0 20px;
+        }
+      }
+
+      /* ─── CARD ─── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+      }
+
+      .card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        padding: 16px 20px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .card-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .card-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        color: var(--text);
+      }
+
+      .card-tag {
+        margin-left: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        padding: 2px 7px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      /* ─── PREVIEW BOX ─── */
+      .preview {
+        background: var(--code-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        min-height: 160px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .preview::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+
+      /* ─── CODE BLOCK ─── */
+      .code-block {
+        background: var(--code-bg);
+        border-top: 1px solid var(--border);
+        padding: 16px 20px;
+        position: relative;
+      }
+
+      .code-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .code-lang {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .copy-btn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        padding: 3px 8px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.05em;
+      }
+
+      .copy-btn:hover {
+        color: var(--text);
+        border-color: var(--accent);
+      }
+
+      .copy-btn.copied {
+        color: var(--accent3);
+        border-color: var(--accent3);
+      }
+
+      pre {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11.5px;
+        line-height: 1.7;
+        overflow-x: auto;
+        color: #c8c8e0;
+        tab-size: 2;
+      }
+
+      /* ─── SYNTAX HIGHLIGHT ─── */
+      .kw {
+        color: #b09ef8;
+      }
+
+      /* keyword / property */
+      .val {
+        color: #6dfab3;
+      }
+
+      /* value */
+      .str {
+        color: #fad96d;
+      }
+
+      /* string */
+      .num {
+        color: #fa9d6d;
+      }
+
+      /* number */
+      .cmt {
+        color: #4a4a60;
+        font-style: italic;
+      }
+
+      /* comment */
+      .tag-c {
+        color: #f87ea7;
+      }
+
+      /* tag */
+      .attr {
+        color: #7ec8f8;
+      }
+
+      /* attribute */
+      .fn {
+        color: #fad96d;
+      }
+
+      /* function */
+
+      /* ─── TIPS ─── */
+      .tip {
+        display: flex;
+        gap: 12px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .tip-warn {
+        background: #2a1a0a;
+        border: 1px solid #5a350a;
+      }
+
+      .tip-info {
+        background: #0e1a30;
+        border: 1px solid #1a3a60;
+      }
+
+      .tip-success {
+        background: #0a1f18;
+        border: 1px solid #1a4030;
+      }
+
+      .tip-purple {
+        background: var(--tag);
+        border: 1px solid #4a3680;
+      }
+
+      .tip-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .tip-text {
+        color: var(--text);
+      }
+
+      .tip-text strong {
+        display: block;
+        margin-bottom: 3px;
+        font-weight: 700;
+      }
+
+      /* ─── PROPERTIES TABLE ─── */
+      .prop-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11.5px;
+      }
+
+      .prop-table th {
+        text-align: left;
+        padding: 10px 16px;
+        background: var(--surface2);
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .prop-table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: top;
+      }
+
+      .prop-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .prop-name {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .prop-val {
+        color: var(--accent3);
+      }
+
+      .prop-desc {
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      /* ─── FULL WIDTH CARD ─── */
+      .card-full {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 20px;
+      }
+
+      /* ─── EASING VISUAL ─── */
+      .easing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+        padding: 20px;
+      }
+
+      .easing-item {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .easing-item:hover {
+        border-color: var(--accent);
+      }
+
+      .easing-item svg {
+        display: block;
+        margin: 0 auto 8px;
+      }
+
+      .easing-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      /* ─── INLINE CODE ─── */
+      code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11.5px;
+        background: var(--tag);
+        color: var(--tag-text);
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+
+      /* ─── DIVIDER ─── */
+      .divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin: 20px 0;
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        text-align: center;
+        padding: 40px;
+        border-top: 1px solid var(--border);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* ─── ANIMATIONS ─── */
+      @keyframes dash {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes draw {
+        from {
+          stroke-dashoffset: var(--len, 300);
+        }
+
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse-stroke {
+
+        0%,
+        100% {
+          stroke-width: 2;
+          opacity: 1;
+        }
+
+        50% {
+          stroke-width: 5;
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes march {
+        to {
+          stroke-dashoffset: -20;
+        }
+      }
+
+      @keyframes morph-path {
+        0% {
+          d: path("M 40,80 C 40,40 80,40 80,80 S 120,120 120,80");
+        }
+
+        50% {
+          d: path("M 40,80 C 80,20 80,140 120,80 S 160,40 160,80");
+        }
+
+        100% {
+          d: path("M 40,80 C 40,40 80,40 80,80 S 120,120 120,80");
+        }
+      }
+
+      @keyframes travel {
+        0% {
+          offset-distance: 0%;
+        }
+
+        100% {
+          offset-distance: 100%;
+        }
+      }
+
+      @keyframes fade-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card {
+        animation: fade-in-up 0.4s ease both;
+      }
+
+      /* Preview SVG base */
+      .preview svg {
+        overflow: visible;
+      }
+
+      /* stroke-dasharray demos */
+      .demo-draw {
+        stroke-dasharray: 300;
+        stroke-dashoffset: 300;
+        animation: draw 2.5s cubic-bezier(.4, 0, .2, 1) infinite alternate;
+      }
+
+      .demo-march {
+        stroke-dasharray: 10 6;
+        animation: march 0.6s linear infinite;
+      }
+
+      .demo-pulse {
+        animation: pulse-stroke 1.5s ease-in-out infinite;
+      }
+
+      .demo-spin {
+        transform-origin: 80px 80px;
+        animation: spin 3s linear infinite;
+      }
+
+      /* motion path */
+      .demo-travel {
+        offset-path: path("M10,80 C40,10 80,150 120,80 S180,10 220,80");
+        offset-rotate: auto;
+        animation: travel 3s linear infinite;
+        offset-anchor: center;
+      }
+
+      /* morph (CSS d property) */
+      .demo-morph {
+        animation: morph-path 3s ease-in-out infinite;
+      }
+
+      /* trim-path via dashoffset trick */
+      @keyframes trim {
+        0% {
+          stroke-dashoffset: 283;
+        }
+
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      .demo-trim {
+        stroke-dasharray: 283;
+        animation: trim 2s ease-out infinite alternate;
+      }
+
+      /* wave */
+      @keyframes wave-offset {
+        0% {
+          stroke-dashoffset: 0;
+        }
+
+        100% {
+          stroke-dashoffset: 120;
+        }
+      }
+
+      .demo-wave {
+        stroke-dasharray: 20 8;
+        animation: wave-offset 1.2s linear infinite;
+      }
+
+      /* stagger */
+      .demo-stagger path {
+        stroke-dasharray: 200;
+        stroke-dashoffset: 200;
+        animation: draw 1.5s cubic-bezier(.4, 0, .2, 1) infinite alternate;
+      }
+
+      .demo-stagger path:nth-child(1) {
+        animation-delay: 0s;
+        stroke: var(--accent);
+      }
+
+      .demo-stagger path:nth-child(2) {
+        animation-delay: 0.2s;
+        stroke: var(--accent2);
+      }
+
+      .demo-stagger path:nth-child(3) {
+        animation-delay: 0.4s;
+        stroke: var(--accent3);
+      }
+
+      .demo-stagger path:nth-child(4) {
+        animation-delay: 0.6s;
+        stroke: var(--accent4);
+      }
+
+      /* rotate around path */
+      @keyframes orbit {
+        from {
+          offset-distance: 0%;
+        }
+
+        to {
+          offset-distance: 100%;
+        }
+      }
+
+      .demo-orbit {
+        offset-path: path("M80,20 a60,60 0 1,1 0,120 a60,60 0 1,1 0,-120");
+        offset-rotate: 0deg;
+        animation: orbit 2s linear infinite;
+      }
+
+      /* reveal mask */
+      @keyframes mask-reveal {
+        from {
+          stroke-dashoffset: 500;
+        }
+
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      .demo-mask-line {
+        stroke-dasharray: 500;
+        animation: mask-reveal 3s ease-in-out infinite alternate;
+      }
+
+      /* bounce on path */
+      @keyframes bounce-path {
+
+        0%,
+        100% {
+          offset-distance: 0%;
+        }
+
+        50% {
+          offset-distance: 100%;
+        }
+      }
+
+      .demo-bounce {
+        offset-path: path("M20,100 Q100,20 220,100");
+        offset-rotate: auto;
+        animation: bounce-path 2s cubic-bezier(.36, .07, .19, .97) infinite;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- ─── HERO ─── -->
+    <header class="hero">
+      <p class="hero-eyebrow">// CSS + SVG Reference</p>
+      <h1>SVG Path Animation<br>Cheat Sheet</h1>
+      <p class="hero-sub">stroke-dasharray · offset-path · path morphing · masks · tricks &amp; gotchas</p>
+      <div class="badge-row">
+        <span class="badge badge-purple">CSS Animations</span>
+        <span class="badge badge-pink">SVG Paths</span>
+        <span class="badge badge-green">Motion Path</span>
+        <span class="badge badge-yellow">Tricks &amp; Gotchas</span>
+      </div>
+    </header>
+
+    <!-- ─── NAV ─── -->
+    <nav class="sticky-nav">
+      <ul>
+        <li><a href="#s1">① Draw</a></li>
+        <li><a href="#s2">② Dash Tricks</a></li>
+        <li><a href="#s3">③ Motion Path</a></li>
+        <li><a href="#s4">④ Morph</a></li>
+        <li><a href="#s5">⑤ Stagger</a></li>
+        <li><a href="#s6">⑥ Masks</a></li>
+        <li><a href="#s7">⑦ Properties</a></li>
+        <li><a href="#s8">⑧ Easings</a></li>
+        <li><a href="#s9">⑨ JS APIs</a></li>
+        <li><a href="#s10">⑩ Gotchas</a></li>
+      </ul>
+    </nav>
+
+    <!-- ─── CONTENT ─── -->
+    <main class="container">
+
+      <!-- ════════════════════════════════════════════
+       SECTION 1 — DRAW ON ANIMATION
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s1">
+        <div class="section-header">
+          <span class="section-number">01</span>
+          <h2 class="section-title">Path Draw-On (stroke-dashoffset)</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Card: Basic Draw -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">Basic Draw-On</span>
+              <span class="card-tag badge-purple">Core Technique</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <path class="demo-draw" d="M10,80 C40,10 80,150 120,80 S180,10 220,80" fill="none"
+                          stroke="var(--accent)" stroke-width="2.5" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar">
+                <span class="code-lang">CSS</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+              <pre><span class="cmt">/* 1. Measure path length in JS or DevTools */</span>
+<span class="cmt">/* path.getTotalLength() → e.g. 300 */</span>
+
+<span class="tag-c">.path</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">300</span>;   <span class="cmt">/* total length */</span>
+  <span class="kw">stroke-dashoffset</span>: <span class="num">300</span>; <span class="cmt">/* start hidden */</span>
+  <span class="kw">animation</span>: <span class="fn">draw</span> <span class="num">2s</span> <span class="val">ease</span> <span class="val">forwards</span>;
+}
+
+<span class="kw">@keyframes</span> <span class="fn">draw</span> {
+  <span class="val">to</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Card: CSS Variable Length -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Dynamic Length via CSS Var</span>
+              <span class="card-tag badge-green">Pro Tip</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <path style="--len:300;stroke-dasharray:300;stroke-dashoffset:300;animation:draw 2.5s ease-in-out infinite alternate;fill:none;stroke:var(--accent3);stroke-width:2.5"
+                          d="M10,80 C60,10 100,150 150,80 S200,20 220,60" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar">
+                <span class="code-lang">CSS + JS</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+              <pre><span class="cmt">/* Set length dynamically from JS */</span>
+<span class="tag-c">const</span> path = document.<span class="fn">querySelector</span>(<span class="str">'path'</span>);
+path.style.<span class="fn">setProperty</span>(
+  <span class="str">'--len'</span>, path.<span class="fn">getTotalLength</span>()
+);
+
+<span class="tag-c">.path</span> {
+  <span class="kw">stroke-dasharray</span>:  <span class="fn">var</span>(<span class="val">--len</span>);
+  <span class="kw">stroke-dashoffset</span>: <span class="fn">var</span>(<span class="val">--len</span>);
+  <span class="kw">animation</span>: <span class="fn">draw</span> <span class="num">2s</span> <span class="val">ease forwards</span>;
+}
+
+<span class="kw">@keyframes</span> <span class="fn">draw</span> {
+  <span class="val">to</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Card: Reverse (Erase) -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Erase Animation (Reverse)</span>
+              <span class="card-tag badge-pink">Technique</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <path style="stroke-dasharray:300;stroke-dashoffset:0;animation:draw 2s ease-in-out infinite alternate-reverse;fill:none;stroke:var(--accent2);stroke-width:2.5"
+                          d="M10,50 C60,10 100,90 150,50 S200,10 230,50" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar">
+                <span class="code-lang">CSS</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+              <pre><span class="cmt">/* Animate from 0 → length to erase */</span>
+<span class="tag-c">.path-erase</span> {
+  <span class="kw">stroke-dasharray</span>:  <span class="num">300</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; <span class="cmt">/* start visible */</span>
+  <span class="kw">animation</span>: <span class="fn">erase</span> <span class="num">2s</span> <span class="val">ease forwards</span>;
+}
+
+<span class="kw">@keyframes</span> <span class="fn">erase</span> {
+  <span class="val">to</span> {
+    <span class="cmt">/* negative = erase from end */</span>
+    <span class="kw">stroke-dashoffset</span>: <span class="num">-300</span>;
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Card: Scroll-driven -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Scroll-Driven Draw</span>
+              <span class="card-tag badge-yellow">Modern CSS</span>
+            </div>
+            <div class="preview" style="flex-direction:column;gap:8px;align-items:flex-start">
+              <svg width="220" height="80" viewBox="0 0 220 80" style="display:block">
+                <path style="stroke-dasharray:400;stroke-dashoffset:400;animation:draw 4s ease-in-out infinite alternate;fill:none;stroke:var(--accent4);stroke-width:2"
+                          d="M5,40 C30,5 60,75 90,40 S150,5 185,40 S220,75 220,40" />
+              </svg>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);padding:0 4px">↓
+                scroll to animate in real usage</span>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar">
+                <span class="code-lang">CSS (Chrome 115+)</span>
+                <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              </div>
+              <pre><span class="tag-c">.path</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">400</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">400</span>;
+  <span class="kw">animation</span>: <span class="fn">draw</span> <span class="val">linear</span>;
+  <span class="kw">animation-timeline</span>: <span class="fn">scroll</span>();
+  <span class="kw">animation-range</span>: <span class="val">entry 0%</span> <span class="val">cover 60%</span>;
+}
+
+<span class="kw">@keyframes</span> <span class="fn">draw</span> {
+  <span class="val">to</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+}</pre>
+            </div>
+          </div>
+
+        </div><!-- /grid-2 -->
+
+        <div class="tip tip-info">
+          <span class="tip-icon">ℹ️</span>
+          <div class="tip-text">
+            <strong>How it works</strong>
+            <code>stroke-dasharray</code> creates a dashed pattern. Setting it to the path length creates one "dash" the
+            full length of the path. <code>stroke-dashoffset</code> shifts it — starting at <code>length</code> hides it
+            completely, animating to <code>0</code> draws it. Negative offset erases from the end.
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 2 — DASH TRICKS
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s2">
+        <div class="section-header">
+          <span class="section-number">02</span>
+          <h2 class="section-title">Dash Pattern Tricks</h2>
+        </div>
+
+        <div class="grid-3">
+
+          <!-- Marching Ants -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Marching Ants</span>
+            </div>
+            <div class="preview">
+              <svg width="180" height="80" viewBox="0 0 180 80">
+                <rect class="demo-march" x="15" y="15" width="150" height="50" rx="6" fill="none"
+                          stroke="var(--accent3)" stroke-width="2" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.march</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">10 6</span>;
+  <span class="kw">animation</span>: <span class="fn">march</span> <span class="num">0.6s</span>
+    <span class="val">linear infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">march</span> {
+  <span class="val">to</span> {
+    <span class="kw">stroke-dashoffset</span>: <span class="num">-16</span>;
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Pulse Stroke -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Pulse Stroke</span>
+            </div>
+            <div class="preview">
+              <svg width="180" height="80" viewBox="0 0 180 80">
+                <path class="demo-pulse" d="M20,40 L50,40 L60,10 L75,70 L90,25 L105,55 L120,40 L160,40" fill="none"
+                          stroke="var(--accent2)" stroke-width="2.5" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.pulse</span> {
+  <span class="kw">animation</span>: <span class="fn">pulse-stroke</span>
+    <span class="num">1.5s</span> <span class="val">ease-in-out infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">pulse-stroke</span> {
+  <span class="num">0%</span>,<span class="num">100%</span> {
+    <span class="kw">stroke-width</span>: <span class="num">2</span>;
+    <span class="kw">opacity</span>: <span class="num">1</span>;
+  }
+  <span class="num">50%</span> {
+    <span class="kw">stroke-width</span>: <span class="num">6</span>;
+    <span class="kw">opacity</span>: <span class="num">0.4</span>;
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Wave Fill -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Animated Wave Pattern</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="80" viewBox="0 0 200 80">
+                <path class="demo-wave" d="M0,40 C20,20 40,60 60,40 S100,20 120,40 S160,60 180,40 S210,20 220,40"
+                          fill="none" stroke="var(--accent4)" stroke-width="2" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.wave</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">20 8</span>;
+  <span class="kw">animation</span>: <span class="fn">wave</span>
+    <span class="num">1.2s</span> <span class="val">linear infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">wave</span> {
+  <span class="val">to</span> {
+    <span class="cmt">/* offset = sum of dash+gap */</span>
+    <span class="kw">stroke-dashoffset</span>: <span class="num">-28</span>;
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Trim Path (circle) -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">Progress Ring (trim)</span>
+            </div>
+            <div class="preview">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(124,109,250,0.15)" stroke-width="8" />
+                <circle class="demo-trim" cx="60" cy="60" r="45" fill="none" stroke="var(--accent)" stroke-width="8"
+                          stroke-linecap="round" transform="rotate(-90 60 60)" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS + SVG</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* r=45 → circumference = 2π×45 ≈ 283 */</span>
+<span class="tag-c">.ring</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">283</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">283</span>;
+  <span class="kw">transform</span>: <span class="fn">rotate</span>(<span class="num">-90deg</span>);
+  <span class="kw">transform-origin</span>: <span class="val">center</span>;
+  <span class="kw">animation</span>: <span class="fn">trim</span> <span class="num">2s</span>
+    <span class="val">ease-out forwards</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">trim</span> {
+  <span class="val">to</span> { <span class="kw">stroke-dashoffset</span>: <span class="num">0</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Indeterminate Spinner</span>
+            </div>
+            <div class="preview">
+              <svg width="100" height="100" viewBox="0 0 100 100" class="demo-spin">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(248,126,167,0.2)" stroke-width="6" />
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent2)" stroke-width="6"
+                          stroke-dasharray="80 160" stroke-linecap="round" transform="rotate(-90 50 50)" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS + SVG</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* dasharray: visible gap */</span>
+<span class="tag-c">.arc</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">80 160</span>;
+  <span class="kw">stroke-linecap</span>: <span class="val">round</span>;
+}
+<span class="tag-c">.spinner-group</span> {
+  <span class="kw">transform-origin</span>: <span class="val">50px 50px</span>;
+  <span class="kw">animation</span>: <span class="fn">spin</span> <span class="num">1s</span>
+    <span class="val">linear infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">spin</span> {
+  <span class="val">to</span> { <span class="kw">transform</span>: <span class="fn">rotate</span>(<span class="num">360deg</span>); }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Custom dasharray pattern -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Multi-value Dash Pattern</span>
+            </div>
+            <div class="preview" style="flex-direction:column;gap:12px">
+              <svg width="200" height="16" viewBox="0 0 200 16">
+                <line x1="5" y1="8" x2="195" y2="8" stroke="var(--accent)" stroke-width="3" stroke-dasharray="20 5" />
+              </svg>
+              <svg width="200" height="16" viewBox="0 0 200 16">
+                <line x1="5" y1="8" x2="195" y2="8" stroke="var(--accent2)" stroke-width="3"
+                          stroke-dasharray="4 4 16 4" />
+              </svg>
+              <svg width="200" height="16" viewBox="0 0 200 16">
+                <line x1="5" y1="8" x2="195" y2="8" stroke="var(--accent3)" stroke-width="3" stroke-dasharray="1 6" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG attr</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* dash gap dash gap ... */</span>
+<span class="cmt">/* values repeat to fill */</span>
+<span class="attr">stroke-dasharray</span>=<span class="str">"20 5"</span>
+<span class="attr">stroke-dasharray</span>=<span class="str">"4 4 16 4"</span>
+<span class="attr">stroke-dasharray</span>=<span class="str">"1 6"</span>
+
+<span class="cmt">/* Animate between patterns */</span>
+<span class="kw">@keyframes</span> <span class="fn">pattern</span> {
+  <span class="num">0%</span>   { <span class="kw">stroke-dasharray</span>: <span class="str">"20 5"</span>; }
+  <span class="num">100%</span> { <span class="kw">stroke-dasharray</span>: <span class="str">"5 20"</span>; }
+}</pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 3 — MOTION PATH
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s3">
+        <div class="section-header">
+          <span class="section-number">03</span>
+          <h2 class="section-title">Motion Path (offset-path)</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Basic motion path -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">Translate Along a Path</span>
+              <span class="card-tag badge-purple">CSS Motion Path</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg width="240" height="100" viewBox="0 0 240 100"
+                        style="position:absolute;inset:0;width:100%;height:100%">
+                <path d="M10,80 C40,10 80,150 120,80 S180,10 220,80" fill="none" stroke="rgba(124,109,250,0.2)"
+                          stroke-width="1.5" stroke-dasharray="4 3" />
+              </svg>
+              <div style="position:relative;width:240px;height:100px">
+                <div class="demo-travel"
+                          style="position:absolute;width:12px;height:12px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent)">
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.ball</span> {
+  <span class="kw">offset-path</span>:
+    <span class="fn">path</span>(<span class="str">"M10,80 C40,10 80,150
+       120,80 S180,10 220,80"</span>);
+  <span class="kw">offset-rotate</span>: <span class="val">auto</span>; <span class="cmt">/* face dir */</span>
+  <span class="kw">offset-anchor</span>: <span class="val">center</span>;
+  <span class="kw">animation</span>: <span class="fn">travel</span>
+    <span class="num">3s</span> <span class="val">linear infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">travel</span> {
+  <span class="val">from</span> { <span class="kw">offset-distance</span>: <span class="num">0%</span>; }
+  <span class="val">to</span>   { <span class="kw">offset-distance</span>: <span class="num">100%</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Orbit -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Orbit (circular path)</span>
+              <span class="card-tag badge-pink">offset-rotate: 0deg</span>
+            </div>
+            <div class="preview" style="min-height:160px">
+              <svg width="160" height="160" viewBox="0 0 160 160" style="position:absolute">
+                <circle cx="80" cy="80" r="55" fill="none" stroke="rgba(248,126,167,0.15)" stroke-width="1.5" />
+                <circle cx="80" cy="80" r="8" fill="rgba(248,126,167,0.1)" stroke="var(--accent2)" stroke-width="1.5" />
+              </svg>
+              <div style="position:relative;width:160px;height:160px">
+                <div class="demo-orbit"
+                          style="position:absolute;width:14px;height:14px;background:var(--accent2);border-radius:50%;box-shadow:0 0 12px var(--accent2);top:-7px;left:-7px">
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* SVG arc path for circle */</span>
+<span class="cmt">/* M cx,top a r,r 0 1 1 0,2r ... */</span>
+<span class="tag-c">.planet</span> {
+  <span class="kw">offset-path</span>: <span class="fn">path</span>(
+    <span class="str">"M80,20 a60,60 0 1,1
+     0,120 a60,60 0 1,1 0,-120"</span>
+  );
+  <span class="kw">offset-rotate</span>: <span class="num">0deg</span>; <span class="cmt">/* no flip */</span>
+  <span class="kw">animation</span>: <span class="fn">orbit</span>
+    <span class="num">3s</span> <span class="val">linear infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">orbit</span> {
+  <span class="val">to</span> { <span class="kw">offset-distance</span>: <span class="num">100%</span>; }
+}</pre>
+            </div>
+          </div>
+
+          <!-- Bounce on path -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Bounce Along Curve</span>
+              <span class="card-tag badge-yellow">easing magic</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg width="240" height="110" viewBox="0 0 240 110"
+                        style="position:absolute;inset:0;width:100%;height:100%">
+                <path d="M20,100 Q100,20 220,100" fill="none" stroke="rgba(250,217,109,0.2)" stroke-width="1.5"
+                          stroke-dasharray="4 3" />
+              </svg>
+              <div style="position:relative;width:240px;height:110px">
+                <div class="demo-bounce"
+                          style="position:absolute;width:14px;height:14px;background:var(--accent4);border-radius:50%;box-shadow:0 0 12px var(--accent4);top:-7px;left:-7px">
+                </div>
+              </div>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.ball</span> {
+  <span class="kw">offset-path</span>:
+    <span class="fn">path</span>(<span class="str">"M20,100 Q100,20 220,100"</span>);
+  <span class="kw">offset-rotate</span>: <span class="val">auto</span>;
+  <span class="kw">animation</span>: <span class="fn">bounce</span>
+    <span class="num">2s</span> <span class="fn">cubic-bezier</span>(.36,.07,.19,.97)
+    <span class="val">infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">bounce</span> {
+  <span class="num">0%</span>,<span class="num">100%</span>{<span class="kw">offset-distance</span>:<span class="num">0%</span>}
+  <span class="num">50%</span>    {<span class="kw">offset-distance</span>:<span class="num">100%</span>}
+}</pre>
+            </div>
+          </div>
+
+          <!-- offset-rotate values -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">offset-rotate Reference</span>
+              <span class="card-tag badge-green">All Values</span>
+            </div>
+            <div class="preview" style="flex-direction:column;align-items:flex-start;padding:16px">
+              <table style="width:100%;font-family:'JetBrains Mono',monospace;font-size:11px;border-collapse:collapse">
+                <tr>
+                  <td style="padding:6px 10px;color:var(--accent)">auto</td>
+                  <td style="padding:6px 10px;color:var(--muted)">Rotate to face travel direction</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;color:var(--accent)">auto 90deg</td>
+                  <td style="padding:6px 10px;color:var(--muted)">auto + 90° offset</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;color:var(--accent)">0deg</td>
+                  <td style="padding:6px 10px;color:var(--muted)">Keep original orientation</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;color:var(--accent)">reverse</td>
+                  <td style="padding:6px 10px;color:var(--muted)">Face backwards</td>
+                </tr>
+              </table>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS Reference</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* Face direction of travel */</span>
+<span class="kw">offset-rotate</span>: <span class="val">auto</span>;
+
+<span class="cmt">/* Perpendicular to path */</span>
+<span class="kw">offset-rotate</span>: <span class="val">auto 90deg</span>;
+
+<span class="cmt">/* Fixed — ignore path angle */</span>
+<span class="kw">offset-rotate</span>: <span class="num">45deg</span>;
+
+<span class="cmt">/* offset-anchor positions element */</span>
+<span class="kw">offset-anchor</span>: <span class="val">50% 50%</span>; <span class="cmt">/* center */</span>
+<span class="kw">offset-anchor</span>: <span class="val">bottom center</span>;</pre>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="tip tip-warn">
+          <span class="tip-icon">⚠️</span>
+          <div class="tip-text">
+            <strong>Browser Support (2025)</strong>
+            <code>offset-path: path()</code> is widely supported. <code>offset-path: url(#svgPath)</code> referencing an
+            inline SVG <code>&lt;path&gt;</code> element has limited support — prefer inline <code>path()</code> strings
+            for max compatibility. Always prefix with <code>-webkit-</code> for older Safari.
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 4 — PATH MORPHING
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s4">
+        <div class="section-header">
+          <span class="section-number">04</span>
+          <h2 class="section-title">Path Morphing</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- CSS d property -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">CSS d property morph</span>
+              <span class="card-tag badge-purple">Modern CSS</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="120" viewBox="0 0 200 120">
+                <path
+                          style="animation:morph-path 3s ease-in-out infinite;fill:none;stroke:var(--accent);stroke-width:2.5;d:path('M 40,80 C 40,40 80,40 80,80 S 120,120 120,80')" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS (Chrome 93+)</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* CRITICAL: same # of points! */</span>
+<span class="tag-c">.shape</span> {
+  <span class="kw">d</span>: <span class="fn">path</span>(<span class="str">"M40,80 C40,40
+     80,40 80,80 S120,120 120,80"</span>);
+  <span class="kw">animation</span>: <span class="fn">morph</span>
+    <span class="num">3s</span> <span class="val">ease-in-out infinite</span>;
+}
+<span class="kw">@keyframes</span> <span class="fn">morph</span> {
+  <span class="num">50%</span> {
+    <span class="kw">d</span>: <span class="fn">path</span>(<span class="str">"M40,80 C80,20
+       80,140 120,80 S160,40 160,80"</span>);
+  }
+}</pre>
+            </div>
+          </div>
+
+          <!-- SMIL animate -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">SMIL &lt;animate&gt; Morph</span>
+              <span class="card-tag badge-green">All browsers</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="120" viewBox="0 0 200 120">
+                <path fill="none" stroke="var(--accent3)" stroke-width="2.5">
+                  <animate attributeName="d" values="M30,60 C30,30 70,30 70,60 S110,90 110,60;
+                        M30,60 C60,10 80,110 110,60 S150,20 150,60;
+                        M30,60 C30,30 70,30 70,60 S110,90 110,60" dur="3s" repeatCount="indefinite" />
+                </path>
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG/SMIL</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">&lt;!-- Works in all modern browsers --&gt;</span>
+<span class="tag-c">&lt;path</span> <span class="attr">fill</span>=<span class="str">"none"</span><span class="tag-c">&gt;</span>
+  <span class="tag-c">&lt;animate</span>
+    <span class="attr">attributeName</span>=<span class="str">"d"</span>
+    <span class="attr">values</span>=<span class="str">"M30,60 C...;
+            M30,60 C...;"</span>
+    <span class="attr">dur</span>=<span class="str">"3s"</span>
+    <span class="attr">repeatCount</span>=<span class="str">"indefinite"</span>
+  <span class="tag-c">/&gt;</span>
+<span class="tag-c">&lt;/path&gt;</span></pre>
+            </div>
+          </div>
+
+          <!-- Morph rules -->
+          <div class="card" style="grid-column:1/-1">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Morph Requirements & Tricks</span>
+            </div>
+            <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div>
+                <p
+                          style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">
+                  ✓ Requirements</p>
+                <ul
+                          style="list-style:none;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px">
+                  <li>🔢 Same number of path commands</li>
+                  <li>🔤 Same command types (M, C, L...)</li>
+                  <li>📍 Same command order</li>
+                  <li>🔗 Same start/end point type</li>
+                </ul>
+              </div>
+              <div>
+                <p
+                          style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">
+                  ✦ Tricks</p>
+                <ul
+                          style="list-style:none;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px">
+                  <li>🔄 Convert all to cubic bezier (C)</li>
+                  <li>📐 Add dummy points to match count</li>
+                  <li>🛠 Use tools: Flubber.js, GSAP MorphSVG</li>
+                  <li>🔁 Interpolate via Web Animations API</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 5 — STAGGER
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s5">
+        <div class="section-header">
+          <span class="section-number">05</span>
+          <h2 class="section-title">Staggered Path Animation</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- CSS stagger -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">CSS animation-delay Stagger</span>
+              <span class="card-tag badge-purple">nth-child</span>
+            </div>
+            <div class="preview" style="min-height:130px">
+              <svg class="demo-stagger" width="200" height="120" viewBox="0 0 200 120">
+                <path d="M10,30 C50,10 100,50 180,30" fill="none" stroke-width="2.5" />
+                <path d="M10,55 C50,35 100,75 180,55" fill="none" stroke-width="2.5" />
+                <path d="M10,80 C50,60 100,100 180,80" fill="none" stroke-width="2.5" />
+                <path d="M10,105 C50,85 100,125 180,105" fill="none" stroke-width="2.5" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">.group path</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">200</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">200</span>;
+  <span class="kw">animation</span>: <span class="fn">draw</span>
+    <span class="num">1.5s</span> <span class="val">ease forwards</span>;
+}
+
+<span class="tag-c">.group path:nth-child(1)</span> {
+  <span class="kw">animation-delay</span>: <span class="num">0s</span>;
+}
+<span class="tag-c">.group path:nth-child(2)</span> {
+  <span class="kw">animation-delay</span>: <span class="num">0.2s</span>;
+}
+<span class="cmt">/* Or generate with JS/SCSS loop */</span></pre>
+            </div>
+          </div>
+
+          <!-- JS stagger loop -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">JS Dynamic Stagger Loop</span>
+              <span class="card-tag badge-pink">JS</span>
+            </div>
+            <div class="preview" style="flex-direction:column;align-items:flex-start;padding:16px 20px">
+              <svg width="200" height="120" viewBox="0 0 200 120" id="js-stagger">
+                <path d="M10,20 L190,20" fill="none" stroke="var(--accent)" stroke-width="2.5"
+                          style="stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1s ease forwards;animation-delay:0s" />
+                <path d="M10,45 L190,45" fill="none" stroke="var(--accent2)" stroke-width="2.5"
+                          style="stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1s ease forwards;animation-delay:0.15s" />
+                <path d="M10,70 L190,70" fill="none" stroke="var(--accent3)" stroke-width="2.5"
+                          style="stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1s ease forwards;animation-delay:0.3s" />
+                <path d="M10,95 L190,95" fill="none" stroke="var(--accent4)" stroke-width="2.5"
+                          style="stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1s ease forwards;animation-delay:0.45s" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">JavaScript</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">const</span> paths =
+  document.<span class="fn">querySelectorAll</span>(<span class="str">'path'</span>);
+
+paths.<span class="fn">forEach</span>((path, i) => {
+  <span class="tag-c">const</span> len = path.<span class="fn">getTotalLength</span>();
+  path.style.<span class="fn">setProperty</span>(
+    <span class="str">'--len'</span>, len
+  );
+  path.style.animationDelay =
+    <span class="str">`${i * 0.15}s`</span>;
+});</pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 6 — MASKS & CLIP PATHS
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s6">
+        <div class="section-header">
+          <span class="section-number">06</span>
+          <h2 class="section-title">Masks, Clip Paths &amp; Reveals</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Text reveal via stroke -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">Handwriting / Text Reveal</span>
+            </div>
+            <div class="preview" style="min-height:120px">
+              <svg width="220" height="80" viewBox="0 0 220 80">
+                <text x="10" y="60" font-family="Georgia,serif" font-size="52" fill="none" stroke="var(--accent)"
+                          stroke-width="1.5"
+                          style="stroke-dasharray:800;stroke-dashoffset:800;animation:mask-reveal 4s ease-in-out infinite alternate">
+                  hello
+                </text>
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG + CSS</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">&lt;!-- Stroke text like a path --&gt;</span>
+<span class="tag-c">&lt;text</span>
+  <span class="attr">fill</span>=<span class="str">"none"</span>
+  <span class="attr">stroke</span>=<span class="str">"#7c6dfa"</span>
+  <span class="attr">stroke-width</span>=<span class="str">"1.5"</span><span class="tag-c">&gt;</span>hello<span class="tag-c">&lt;/text&gt;</span>
+
+<span class="tag-c">text</span> {
+  <span class="kw">stroke-dasharray</span>: <span class="num">800</span>;
+  <span class="kw">stroke-dashoffset</span>: <span class="num">800</span>;
+  <span class="kw">animation</span>: <span class="fn">draw</span>
+    <span class="num">3s</span> <span class="val">ease forwards</span>;
+}</pre>
+            </div>
+          </div>
+
+          <!-- Clip path reveal -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">clipPath Wipe Reveal</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <defs>
+                  <clipPath id="wipe">
+                    <rect x="0" y="0" height="100" width="0">
+                      <animate attributeName="width" from="0" to="200" dur="2s" repeatCount="indefinite" />
+                    </rect>
+                  </clipPath>
+                </defs>
+                <text x="10" y="65" font-family="'Syne',sans-serif" font-size="36" font-weight="800"
+                          fill="var(--accent2)" clip-path="url(#wipe)">MOTION</text>
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG/SMIL</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">&lt;defs&gt;</span>
+  <span class="tag-c">&lt;clipPath</span> <span class="attr">id</span>=<span class="str">"wipe"</span><span class="tag-c">&gt;</span>
+    <span class="tag-c">&lt;rect</span> <span class="attr">x</span>=<span class="str">"0"</span> <span class="attr">y</span>=<span class="str">"0"</span>
+          <span class="attr">height</span>=<span class="str">"100"</span> <span class="attr">width</span>=<span class="str">"0"</span><span class="tag-c">&gt;</span>
+      <span class="tag-c">&lt;animate</span>
+        <span class="attr">attributeName</span>=<span class="str">"width"</span>
+        <span class="attr">from</span>=<span class="str">"0"</span> <span class="attr">to</span>=<span class="str">"200"</span>
+        <span class="attr">dur</span>=<span class="str">"2s"</span>
+        <span class="attr">fill</span>=<span class="str">"freeze"</span>
+      <span class="tag-c">/&gt;</span>
+    <span class="tag-c">&lt;/rect&gt;</span>
+  <span class="tag-c">&lt;/clipPath&gt;</span>
+<span class="tag-c">&lt;/defs&gt;</span>
+<span class="tag-c">&lt;text</span> <span class="attr">clip-path</span>=<span class="str">"url(#wipe)"</span><span class="tag-c">&gt;</span>...<span class="tag-c">&lt;/text&gt;</span></pre>
+            </div>
+          </div>
+
+          <!-- mask reveal -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Path-shaped Mask</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <defs>
+                  <mask id="stroke-mask">
+                    <path class="demo-mask-line" d="M10,50 C50,10 80,90 130,50 S180,10 200,50" fill="none"
+                              stroke="white" stroke-width="30" />
+                  </mask>
+                </defs>
+                <image href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100'%3E%3Crect width='200' height='100' fill='%237c6dfa'/%3E%3Ccircle cx='60' cy='50' r='20' fill='%23fa6d8f'/%3E%3Ccircle cx='130' cy='50' r='20' fill='%236dfab3'/%3E%3C/svg%3E"
+                          width="200" height="100" mask="url(#stroke-mask)" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">&lt;defs&gt;</span>
+  <span class="tag-c">&lt;mask</span> <span class="attr">id</span>=<span class="str">"m"</span><span class="tag-c">&gt;</span>
+    <span class="tag-c">&lt;path</span>
+      <span class="attr">stroke</span>=<span class="str">"white"</span>
+      <span class="attr">stroke-width</span>=<span class="str">"30"</span>
+      <span class="attr">fill</span>=<span class="str">"none"</span>
+      <span class="attr">class</span>=<span class="str">"animated-path"</span>
+    <span class="tag-c">/&gt;</span>
+  <span class="tag-c">&lt;/mask&gt;</span>
+<span class="tag-c">&lt;/defs&gt;</span>
+<span class="cmt">&lt;!-- Anything using mask= gets </span>
+<span class="cmt">     revealed as stroke draws --&gt;</span>
+<span class="tag-c">&lt;image</span> <span class="attr">mask</span>=<span class="str">"url(#m)"</span><span class="tag-c">/&gt;</span></pre>
+            </div>
+          </div>
+
+          <!-- filter glow -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">Glow Filter on Stroke</span>
+            </div>
+            <div class="preview">
+              <svg width="200" height="100" viewBox="0 0 200 100">
+                <defs>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <path style="stroke-dasharray:300;stroke-dashoffset:300;animation:draw 3s ease-in-out infinite alternate"
+                          d="M10,80 C50,10 100,90 150,50 S200,10 210,50" fill="none" stroke="var(--accent4)"
+                          stroke-width="2.5" filter="url(#glow)" />
+              </svg>
+            </div>
+            <div class="code-block">
+              <div class="code-toolbar"><span class="code-lang">SVG Filter</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">&lt;defs&gt;</span>
+  <span class="tag-c">&lt;filter</span> <span class="attr">id</span>=<span class="str">"glow"</span><span class="tag-c">&gt;</span>
+    <span class="tag-c">&lt;feGaussianBlur</span>
+      <span class="attr">stdDeviation</span>=<span class="str">"3"</span>
+      <span class="attr">result</span>=<span class="str">"blur"</span><span class="tag-c">/&gt;</span>
+    <span class="tag-c">&lt;feMerge&gt;</span>
+      <span class="tag-c">&lt;feMergeNode</span> <span class="attr">in</span>=<span class="str">"blur"</span><span class="tag-c">/&gt;</span>
+      <span class="tag-c">&lt;feMergeNode</span> <span class="attr">in</span>=<span class="str">"blur"</span><span class="tag-c">/&gt;</span>
+      <span class="tag-c">&lt;feMergeNode</span> <span class="attr">in</span>=<span class="str">"SourceGraphic"</span><span class="tag-c">/&gt;</span>
+    <span class="tag-c">&lt;/feMerge&gt;</span>
+  <span class="tag-c">&lt;/filter&gt;</span>
+<span class="tag-c">&lt;/defs&gt;</span>
+<span class="tag-c">&lt;path</span> <span class="attr">filter</span>=<span class="str">"url(#glow)"</span><span class="tag-c">/&gt;</span></pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 7 — PROPERTIES REFERENCE
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s7">
+        <div class="section-header">
+          <span class="section-number">07</span>
+          <h2 class="section-title">Complete Properties Reference</h2>
+        </div>
+
+        <div class="card-full">
+          <div class="card-header" style="padding:16px 20px;border-bottom:1px solid var(--border)">
+            <span class="card-dot" style="background:var(--accent)"></span>
+            <span class="card-title">Stroke &amp; Path CSS Properties</span>
+          </div>
+          <table class="prop-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Values</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="prop-name">stroke-dasharray</td>
+                <td class="prop-val">none | &lt;length&gt;+</td>
+                <td class="prop-desc">Defines dash and gap pattern. Single value = equal dash/gap. Multiple values
+                  cycle.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">stroke-dashoffset</td>
+                <td class="prop-val">&lt;length&gt; | &lt;percentage&gt;</td>
+                <td class="prop-desc">Shifts dash pattern along path. Negative shifts backwards. Animatable.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">stroke-linecap</td>
+                <td class="prop-val">butt | round | square</td>
+                <td class="prop-desc">End cap shape. <code>round</code> for smooth animated lines.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">stroke-linejoin</td>
+                <td class="prop-val">miter | round | bevel</td>
+                <td class="prop-desc">Corner join style at path segments.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">stroke-width</td>
+                <td class="prop-val">&lt;length&gt;</td>
+                <td class="prop-desc">Animatable. Use for pulse effects.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">stroke-opacity</td>
+                <td class="prop-val">0 – 1</td>
+                <td class="prop-desc">Separate from <code>opacity</code>. Composited differently with fill.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">fill-opacity</td>
+                <td class="prop-val">0 – 1</td>
+                <td class="prop-desc">Animate for fade-in effects on filled shapes.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">vector-effect</td>
+                <td class="prop-val">non-scaling-stroke</td>
+                <td class="prop-desc">Keeps stroke width constant regardless of scale transform.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">d</td>
+                <td class="prop-val">path("...")</td>
+                <td class="prop-desc">CSS property for path shape. Animatable for morph (Chrome 93+).</td>
+              </tr>
+              <tr>
+                <td class="prop-name">offset-path</td>
+                <td class="prop-val">path() | url() | ray() | basic-shape</td>
+                <td class="prop-desc">Defines the motion path for the element.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">offset-distance</td>
+                <td class="prop-val">0% – 100%</td>
+                <td class="prop-desc">Position along the offset-path. Animate this for motion.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">offset-rotate</td>
+                <td class="prop-val">auto | auto &lt;angle&gt; | &lt;angle&gt;</td>
+                <td class="prop-desc">Orientation of element along path. <code>auto</code> = faces travel direction.
+                </td>
+              </tr>
+              <tr>
+                <td class="prop-name">offset-anchor</td>
+                <td class="prop-val">&lt;position&gt;</td>
+                <td class="prop-desc">The element's anchor point on the path. Default center.</td>
+              </tr>
+              <tr>
+                <td class="prop-name">pathLength</td>
+                <td class="prop-val">&lt;number&gt;</td>
+                <td class="prop-desc">SVG attribute! Normalizes path length. Set to <code>1</code> then use 0–1 for
+                  dasharray.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tip tip-success" style="margin-top:16px">
+          <span class="tip-icon">✨</span>
+          <div class="tip-text">
+            <strong>pathLength="1" trick</strong>
+            Set <code>pathLength="1"</code> on any SVG path, then use <code>stroke-dasharray: 1</code> and
+            <code>stroke-dashoffset: 1</code>. No need to call <code>getTotalLength()</code> — it normalizes the length
+            to 1. Works everywhere.
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 8 — EASINGS
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s8">
+        <div class="section-header">
+          <span class="section-number">08</span>
+          <h2 class="section-title">Easing Reference</h2>
+        </div>
+
+        <div class="card-full">
+          <div class="easing-grid">
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 L80,5" fill="none" stroke="var(--accent)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">linear</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C20,45 60,5 80,5" fill="none" stroke="var(--accent)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">ease</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C40,45 80,5 80,5" fill="none" stroke="var(--accent2)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">ease-in</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C0,5 40,5 80,5" fill="none" stroke="var(--accent2)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">ease-out</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C40,45 40,5 80,5" fill="none" stroke="var(--accent3)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">ease-in-out</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C20,45 30,-10 50,-10 C65,-10 65,15 80,5" fill="none" stroke="var(--accent3)"
+                          stroke-width="2" />
+              </svg>
+              <div class="easing-label">back-in-out</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 L20,5 L25,20 L40,5 L44,13 L55,5 L80,5" fill="none" stroke="var(--accent4)"
+                          stroke-width="2" />
+              </svg>
+              <div class="easing-label">bounce-out</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C10,45 10,5 40,25 C60,10 70,5 80,5" fill="none" stroke="var(--accent4)"
+                          stroke-width="2" />
+              </svg>
+              <div class="easing-label">elastic</div>
+            </div>
+            <div class="easing-item">
+              <svg width="80" height="50" viewBox="0 0 80 50">
+                <path d="M0,45 C80,45 0,5 80,5" fill="none" stroke="var(--muted)" stroke-width="2" />
+              </svg>
+              <div class="easing-label">custom</div>
+            </div>
+          </div>
+
+          <div class="code-block" style="border-top:1px solid var(--border)">
+            <div class="code-toolbar">
+              <span class="code-lang">CSS Easings</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <pre><span class="cmt">/* Built-ins */</span>
+<span class="kw">animation-timing-function</span>: <span class="val">linear</span> | <span class="val">ease</span> | <span class="val">ease-in</span> |
+                             <span class="val">ease-out</span> | <span class="val">ease-in-out</span>;
+
+<span class="cmt">/* Custom cubic-bezier — use cubic-bezier.com */</span>
+<span class="kw">animation-timing-function</span>: <span class="fn">cubic-bezier</span>(<span class="num">0.34</span>, <span class="num">1.56</span>, <span class="num">0.64</span>, <span class="num">1</span>); <span class="cmt">/* spring */</span>
+<span class="kw">animation-timing-function</span>: <span class="fn">cubic-bezier</span>(<span class="num">0.68</span>,<span class="num">-0.55</span>, <span class="num">0.27</span>, <span class="num">1.55</span>); <span class="cmt">/* back */</span>
+
+<span class="cmt">/* Steps — for frame-by-frame */</span>
+<span class="kw">animation-timing-function</span>: <span class="fn">steps</span>(<span class="num">8</span>, <span class="val">end</span>);
+
+<span class="cmt">/* CSS linear() — multi-point custom curve (Chrome 113+) */</span>
+<span class="kw">animation-timing-function</span>: <span class="fn">linear</span>(<span class="num">0</span>, <span class="num">0.5</span> <span class="num">25%</span>, <span class="num">1.2</span> <span class="num">75%</span>, <span class="num">1</span>);</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 9 — JS APIS
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s9">
+        <div class="section-header">
+          <span class="section-number">09</span>
+          <h2 class="section-title">JavaScript APIs</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- getTotalLength / getPointAtLength -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">SVG Path DOM Methods</span>
+            </div>
+            <div class="code-block" style="border-top:none">
+              <div class="code-toolbar"><span class="code-lang">JavaScript</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">const</span> path = <span class="fn">document</span>.<span class="fn">querySelector</span>(<span class="str">'path'</span>);
+
+<span class="cmt">// Total path length in px</span>
+<span class="tag-c">const</span> len = path.<span class="fn">getTotalLength</span>();
+
+<span class="cmt">// Point at position (0–len)</span>
+<span class="tag-c">const</span> pt = path.<span class="fn">getPointAtLength</span>(len * <span class="num">0.5</span>);
+<span class="cmt">// → { x: 120.3, y: 45.8 }</span>
+
+<span class="cmt">// Use for placing elements along path</span>
+dot.style.transform =
+  <span class="str">`translate(${pt.x}px, ${pt.y}px)`</span>;
+
+<span class="cmt">// Manual progress animation</span>
+<span class="tag-c">let</span> progress = <span class="num">0</span>;
+<span class="tag-c">function</span> <span class="fn">tick</span>() {
+  progress = (progress + <span class="num">1</span>) % len;
+  <span class="tag-c">const</span> p = path.<span class="fn">getPointAtLength</span>(progress);
+  dot.style.transform =
+    <span class="str">`translate(${p.x}px, ${p.y}px)`</span>;
+  <span class="fn">requestAnimationFrame</span>(tick);
+}
+<span class="fn">tick</span>();</pre>
+            </div>
+          </div>
+
+          <!-- Web Animations API -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Web Animations API</span>
+            </div>
+            <div class="code-block" style="border-top:none">
+              <div class="code-toolbar"><span class="code-lang">JavaScript</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">const</span> path = <span class="fn">document</span>.<span class="fn">querySelector</span>(<span class="str">'path'</span>);
+<span class="tag-c">const</span> len  = path.<span class="fn">getTotalLength</span>();
+
+<span class="cmt">// WAAPI — programmatic control</span>
+<span class="tag-c">const</span> anim = path.<span class="fn">animate</span>(
+  [
+    { strokeDashoffset: len },
+    { strokeDashoffset: <span class="num">0</span>   }
+  ],
+  {
+    duration: <span class="num">2000</span>,
+    easing: <span class="str">'cubic-bezier(0.4,0,0.2,1)'</span>,
+    fill: <span class="str">'forwards'</span>
+  }
+);
+
+<span class="cmt">// Control playback</span>
+anim.<span class="fn">pause</span>();
+anim.<span class="fn">play</span>();
+anim.<span class="fn">reverse</span>();
+anim.currentTime = <span class="num">500</span>; <span class="cmt">// seek</span>
+anim.playbackRate = <span class="num">2</span>;  <span class="cmt">// 2× speed</span>
+
+<span class="cmt">// Promises</span>
+<span class="val">await</span> anim.<span class="fn">finished</span>;</pre>
+            </div>
+          </div>
+
+          <!-- IntersectionObserver trigger -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Trigger on Scroll (IntersectionObserver)</span>
+            </div>
+            <div class="code-block" style="border-top:none">
+              <div class="code-toolbar"><span class="code-lang">JavaScript</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="tag-c">const</span> paths = <span class="fn">document</span>.<span class="fn">querySelectorAll</span>(<span class="str">'.animate-path'</span>);
+
+<span class="tag-c">const</span> io = <span class="tag-c">new</span> <span class="fn">IntersectionObserver</span>(
+  (entries) => {
+    entries.<span class="fn">forEach</span>(entry => {
+      <span class="tag-c">if</span> (entry.isIntersecting) {
+        entry.target.classList.<span class="fn">add</span>(<span class="str">'play'</span>);
+        io.<span class="fn">unobserve</span>(entry.target);
+      }
+    });
+  },
+  { threshold: <span class="num">0.2</span> } <span class="cmt">// 20% visible</span>
+);
+
+paths.<span class="fn">forEach</span>(p => io.<span class="fn">observe</span>(p));
+
+<span class="cmt">/* CSS: .animate-path { animation-play-state: paused; }
+        .animate-path.play { animation-play-state: running; } */</span></pre>
+            </div>
+          </div>
+
+          <!-- GSAP snippet -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent4)"></span>
+              <span class="card-title">GSAP DrawSVG + MotionPath</span>
+              <span class="card-tag badge-yellow">library</span>
+            </div>
+            <div class="code-block" style="border-top:none">
+              <div class="code-toolbar"><span class="code-lang">GSAP</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">// GSAP DrawSVGPlugin (club / free for some)</span>
+<span class="fn">gsap</span>.<span class="fn">from</span>(<span class="str">'.path'</span>, {
+  drawSVG: <span class="num">0</span>,
+  duration: <span class="num">2</span>,
+  ease: <span class="str">'power2.inOut'</span>
+});
+
+<span class="cmt">// GSAP MotionPathPlugin</span>
+<span class="fn">gsap</span>.<span class="fn">to</span>(<span class="str">'.ball'</span>, {
+  motionPath: {
+    path: <span class="str">'#myPath'</span>,
+    align: <span class="str">'#myPath'</span>,
+    autoRotate: <span class="val">true</span>,
+    alignOrigin: [<span class="num">0.5</span>, <span class="num">0.5</span>]
+  },
+  duration: <span class="num">3</span>,
+  ease: <span class="str">'none'</span>,
+  repeat: <span class="num">-1</span>
+});
+
+<span class="cmt">// MorphSVG</span>
+<span class="fn">gsap</span>.<span class="fn">to</span>(<span class="str">'#shape'</span>, {
+  morphSVG: <span class="str">'#targetShape'</span>,
+  duration: <span class="num">1.5</span>
+});</pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════
+       SECTION 10 — GOTCHAS
+  ═══════════════════════════════════════════════ -->
+      <section class="section" id="s10">
+        <div class="section-header">
+          <span class="section-number">10</span>
+          <h2 class="section-title">Gotchas, Fixes &amp; Performance</h2>
+        </div>
+
+        <div class="grid-2">
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent2)"></span>
+              <span class="card-title">Common Bugs</span>
+            </div>
+            <div style="padding:0">
+              <div class="tip tip-warn" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">🐛</span>
+                <div class="tip-text">
+                  <strong>Stroke not animating</strong>
+                  Forgot to set both <code>stroke-dasharray</code> AND <code>stroke-dashoffset</code> to the same value.
+                  Both are required to hide the path initially.
+                </div>
+              </div>
+              <div class="tip tip-warn" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">🐛</span>
+                <div class="tip-text">
+                  <strong>transform-origin broken on SVG</strong>
+                  SVG transforms use the SVG coordinate system, not the element center. Use
+                  <code>transform-box: fill-box</code> + <code>transform-origin: center</code> to fix.
+                </div>
+              </div>
+              <div class="tip tip-warn" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">🐛</span>
+                <div class="tip-text">
+                  <strong>offset-path jumps on loop</strong>
+                  Object teleports back to start. Use <code>animation-direction: alternate</code> or set start keyframe
+                  explicitly in your <code>@keyframes</code>.
+                </div>
+              </div>
+              <div class="tip tip-warn" style="border-radius:0;border:none">
+                <span class="tip-icon">🐛</span>
+                <div class="tip-text">
+                  <strong>Path morph fails silently</strong>
+                  Source and target paths must have the same number and type of commands. Use absolute commands
+                  (uppercase letters) only.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent3)"></span>
+              <span class="card-title">Performance Tips</span>
+            </div>
+            <div style="padding:0">
+              <div class="tip tip-success" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">⚡</span>
+                <div class="tip-text">
+                  <strong>Use will-change</strong>
+                  <code>will-change: stroke-dashoffset</code> promotes the element to its own compositor layer —
+                  eliminates jank on complex paths.
+                </div>
+              </div>
+              <div class="tip tip-success" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">⚡</span>
+                <div class="tip-text">
+                  <strong>Animate only composited properties</strong>
+                  <code>stroke-dashoffset</code>, <code>opacity</code>, and <code>transform</code> are GPU-composited.
+                  Avoid animating <code>stroke-width</code> or <code>fill</code> in tight loops.
+                </div>
+              </div>
+              <div class="tip tip-success" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+                <span class="tip-icon">⚡</span>
+                <div class="tip-text">
+                  <strong>Reduce path complexity</strong>
+                  Simplify paths with tools like SVGOMG. Fewer control points = faster rendering.
+                </div>
+              </div>
+              <div class="tip tip-success" style="border-radius:0;border:none">
+                <span class="tip-icon">⚡</span>
+                <div class="tip-text">
+                  <strong>prefers-reduced-motion</strong>
+                  Always wrap in <code>@media (prefers-reduced-motion: reduce)</code> to disable or minimize for
+                  accessibility.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick wins -->
+          <div class="card" style="grid-column:1/-1">
+            <div class="card-header">
+              <span class="card-dot" style="background:var(--accent)"></span>
+              <span class="card-title">Quick-win Snippets</span>
+            </div>
+            <div class="code-block" style="border-top:none">
+              <div class="code-toolbar"><span class="code-lang">CSS Utilities</span><button class="copy-btn"
+                          onclick="copyCode(this)">copy</button></div>
+              <pre><span class="cmt">/* ① Fix transform-origin in SVG */</span>
+<span class="tag-c">.svg-element</span> {
+  <span class="kw">transform-box</span>: <span class="val">fill-box</span>;
+  <span class="kw">transform-origin</span>: <span class="val">center</span>;
+}
+
+<span class="cmt">/* ② pathLength normalization trick */</span>
+<span class="tag-c">&lt;path</span> <span class="attr">pathLength</span>=<span class="str">"1"</span> <span class="tag-c">/&gt;</span>  <span class="cmt">/* SVG attr */</span>
+<span class="tag-c">.path</span> { <span class="kw">stroke-dasharray</span>: <span class="num">1</span>; <span class="kw">stroke-dashoffset</span>: <span class="num">1</span>; }
+
+<span class="cmt">/* ③ Accessibility */</span>
+<span class="kw">@media</span> (prefers-reduced-motion: reduce) {
+  <span class="tag-c">*</span> { <span class="kw">animation-duration</span>: <span class="num">0.01ms</span> <span class="val">!important</span>; }
+}
+
+<span class="cmt">/* ④ GPU layer promotion */</span>
+<span class="tag-c">.animated-path</span> {
+  <span class="kw">will-change</span>: <span class="val">stroke-dashoffset</span>;
+}
+
+<span class="cmt">/* ⑤ Pause/play with class */</span>
+<span class="tag-c">.path</span>            { <span class="kw">animation-play-state</span>: <span class="val">paused</span>; }
+<span class="tag-c">.path.is-playing</span> { <span class="kw">animation-play-state</span>: <span class="val">running</span>; }
+
+<span class="cmt">/* ⑥ Consistent direction — always use absolute path commands */</span>
+<span class="cmt">/* M (absolute) vs m (relative) — stick to UPPERCASE */</span>
+
+<span class="cmt">/* ⑦ non-scaling-stroke for zoom-safe SVGs */</span>
+<span class="tag-c">path</span> { <span class="kw">vector-effect</span>: <span class="val">non-scaling-stroke</span>; }</pre>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="tip tip-purple" style="margin-top:20px">
+          <span class="tip-icon">🛠</span>
+          <div class="tip-text">
+            <strong>Recommended Tools</strong>
+            <strong>DevTools:</strong> Chrome DevTools → Animation panel to inspect/scrub live SVG animations.
+            <strong>Path length:</strong> Use DevTools console:
+            <code>document.querySelector('path').getTotalLength()</code>. <strong>Optimise SVGs:</strong> <a
+                      href="https://jakearchibald.github.io/svgomg/" style="color:var(--accent)">SVGOMG</a>.
+            <strong>Easing:</strong> <a href="https://cubic-bezier.com"
+                      style="color:var(--accent)">cubic-bezier.com</a>. <strong>Path editing:</strong> Inkscape, Figma.
+            <strong>Morph helper:</strong> Flubber.js.
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ─── FOOTER ─── -->
+    <footer>
+      <p style="margin-bottom:6px">SVG Path Animation Cheat Sheet</p>
+      <p style="color:rgba(107,107,128,0.5);font-size:10px">stroke-dasharray · offset-path · path() morph · WAAPI · SMIL
+      </p>
+    </footer>
+
+    <script>
+      // ── Copy button ──
+      function copyCode ( btn )
+      {
+        const pre = btn.closest( '.code-block' ).querySelector( 'pre' );
+        const text = pre.innerText;
+        navigator.clipboard.writeText( text ).then( () =>
+        {
+          btn.textContent = 'copied!';
+          btn.classList.add( 'copied' );
+          setTimeout( () =>
+          {
+            btn.textContent = 'copy';
+            btn.classList.remove( 'copied' );
+          }, 1800 );
+        } );
+      }
+
+      // ── Set CSS var for path lengths ──
+      document.querySelectorAll( 'path[data-animate]' ).forEach( p =>
+      {
+        try
+        {
+          const len = p.getTotalLength();
+          p.style.setProperty( '--len', len );
+        } catch ( e ) { }
+      } );
+
+      // ── Active nav highlight on scroll ──
+      const sections = document.querySelectorAll( '.section' );
+      const navLinks = document.querySelectorAll( '.sticky-nav a' );
+
+      const io = new IntersectionObserver( ( entries ) =>
+      {
+        entries.forEach( entry =>
+        {
+          if ( entry.isIntersecting )
+          {
+            const id = entry.target.id;
+            navLinks.forEach( a =>
+            {
+              a.style.color = a.getAttribute( 'href' ) === `#${ id }`
+                ? 'var(--text)' : '';
+              a.style.borderColor = a.getAttribute( 'href' ) === `#${ id }`
+                ? 'var(--accent)' : 'transparent';
+            } );
+          }
+        } );
+      }, { rootMargin: '-30% 0px -60% 0px' } );
+
+      sections.forEach( s => io.observe( s ) );
+
+      // ── Stagger animation replay on hover ──
+      document.querySelectorAll( '.card' ).forEach( ( card, i ) =>
+      {
+        card.style.animationDelay = `${ i * 0.04 }s`;
+      } );
+    </script>
+
+  </body>
+
+</html>
