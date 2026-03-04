@@ -1333,16 +1333,13 @@ path.style.<span class="fn">setProperty</span>(
               <span class="card-tag badge-purple">CSS Motion Path</span>
             </div>
             <div class="preview" style="min-height:120px">
-              <svg width="240" height="100" viewBox="0 0 240 100"
-                        style="position:absolute;inset:0;width:100%;height:100%">
+              <svg viewBox="0 0 240 100" style="width:100%;height:100%">
                 <path d="M10,80 C40,10 80,150 120,80 S180,10 220,80" fill="none" stroke="rgba(124,109,250,0.2)"
                           stroke-width="1.5" stroke-dasharray="4 3" />
+                <circle r="6" fill="var(--accent)" style="filter:drop-shadow(0 0 8px var(--accent))">
+                  <animateMotion dur="3s" repeatCount="indefinite" path="M10,80 C40,10 80,150 120,80 S180,10 220,80" />
+                </circle>
               </svg>
-              <div style="position:relative;width:240px;height:100px">
-                <div class="demo-travel"
-                          style="position:absolute;width:12px;height:12px;background:var(--accent);border-radius:50%;box-shadow:0 0 10px var(--accent)">
-                </div>
-              </div>
             </div>
             <div class="code-block">
               <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
@@ -1371,15 +1368,14 @@ path.style.<span class="fn">setProperty</span>(
               <span class="card-tag badge-pink">offset-rotate: 0deg</span>
             </div>
             <div class="preview" style="min-height:160px">
-              <svg width="160" height="160" viewBox="0 0 160 160" style="position:absolute">
+              <svg viewBox="0 0 160 160" style="width:100%;height:100%;max-width:240px">
                 <circle cx="80" cy="80" r="55" fill="none" stroke="rgba(248,126,167,0.15)" stroke-width="1.5" />
                 <circle cx="80" cy="80" r="8" fill="rgba(248,126,167,0.1)" stroke="var(--accent2)" stroke-width="1.5" />
+                <circle r="7" fill="var(--accent2)" style="filter:drop-shadow(0 0 10px var(--accent2))">
+                  <animateMotion dur="2s" repeatCount="indefinite"
+                            path="M80,20 a60,60 0 1,1 0,120 a60,60 0 1,1 0,-120" />
+                </circle>
               </svg>
-              <div style="position:relative;width:160px;height:160px">
-                <div class="demo-orbit"
-                          style="position:absolute;width:14px;height:14px;background:var(--accent2);border-radius:50%;box-shadow:0 0 12px var(--accent2);top:-7px;left:-7px">
-                </div>
-              </div>
             </div>
             <div class="code-block">
               <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
@@ -1409,16 +1405,15 @@ path.style.<span class="fn">setProperty</span>(
               <span class="card-tag badge-yellow">easing magic</span>
             </div>
             <div class="preview" style="min-height:120px">
-              <svg width="240" height="110" viewBox="0 0 240 110"
-                        style="position:absolute;inset:0;width:100%;height:100%">
+              <svg viewBox="0 0 240 110" style="width:100%;height:100%">
                 <path d="M20,100 Q100,20 220,100" fill="none" stroke="rgba(250,217,109,0.2)" stroke-width="1.5"
                           stroke-dasharray="4 3" />
+                <circle r="7" fill="var(--accent4)" style="filter:drop-shadow(0 0 10px var(--accent4))">
+                  <animateMotion dur="2s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;0.5;1"
+                            calcMode="spline" keySplines="0.36 0.07 0.19 0.97;0.36 0.07 0.19 0.97"
+                            path="M20,100 Q100,20 220,100" />
+                </circle>
               </svg>
-              <div style="position:relative;width:240px;height:110px">
-                <div class="demo-bounce"
-                          style="position:absolute;width:14px;height:14px;background:var(--accent4);border-radius:50%;box-shadow:0 0 12px var(--accent4);top:-7px;left:-7px">
-                </div>
-              </div>
             </div>
             <div class="code-block">
               <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
@@ -1581,16 +1576,18 @@ path.style.<span class="fn">setProperty</span>(
               <span class="card-tag badge-green">smoother feel</span>
             </div>
             <div class="preview" style="min-height:120px">
-              <svg width="340" height="100" viewBox="0 0 340 100"
-                        style="position:absolute;inset:0;width:100%;height:100%">
+              <svg viewBox="0 0 340 100" style="width:100%;height:100%">
                 <path d="M10,80 C60,10 120,150 180,80 S260,10 320,80" fill="none" stroke="rgba(109,250,179,0.2)"
                           stroke-width="1.5" stroke-dasharray="4 3" />
+                <circle r="7" fill="var(--accent3)" opacity="0">
+                  <animateMotion dur="2s" repeatCount="indefinite" path="M10,80 C60,10 120,150 180,80 S260,10 320,80" />
+                  <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0;1;1;1;0"
+                            keyTimes="0;0.1;0.7;0.9;1" />
+                  <animate attributeName="filter" dur="2s" repeatCount="indefinite"
+                            values="none;drop-shadow(-4px 0 3px salmon);drop-shadow(-4px 0 3px salmon);none;none"
+                            keyTimes="0;0.3;0.7;0.9;1" />
+                </circle>
               </svg>
-              <div style="position:relative;width:340px;height:100px">
-                <div class="demo-blur-ball"
-                          style="position:absolute;width:14px;height:14px;background:var(--accent3);border-radius:50%;">
-                </div>
-              </div>
             </div>
             <div class="code-block">
               <div class="code-toolbar"><span class="code-lang">CSS</span><button class="copy-btn"
