@@ -1,6 +1,145 @@
-<svg width="80" height="79" viewBox="0 0 80 79" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M16.8015 15.8854C16.8015 18.8309 19.1894 21.2188 22.1349 21.2188C25.0804 21.2188 27.4682 18.8309 27.4682 15.8854C27.4682 12.9399 25.0804 10.5521 22.1349 10.5521C19.1894 10.5521 16.8015 12.9399 16.8015 15.8854ZM22.1349 15.8854H21.1349V17.4442H22.1349H23.1349V15.8854H22.1349ZM22.1349 20.5617H21.1349V23.6793H22.1349H23.1349V20.5617H22.1349ZM22.1349 26.7968H21.1349V29.9144H22.1349H23.1349V26.7968H22.1349ZM22.1349 33.0319H21.1349V36.1495H22.1349H23.1349V33.0319H22.1349ZM22.1349 39.267H21.1349V42.3846H22.1349H23.1349V39.267H22.1349ZM22.1349 45.5021H21.1349V48.6196H22.1349H23.1349V45.5021H22.1349ZM22.1349 51.7372H21.1349V54.8547H22.1349H23.1349V51.7372H22.1349ZM22.1349 57.9723H21.1349V61.0898H22.1349H23.1349V57.9723H22.1349ZM22.1349 64.2074H21.1349V65.7661H22.1349H23.1349V64.2074H22.1349ZM16.8015 15.8854C16.8015 18.8309 19.1894 21.2188 22.1349 21.2188C25.0804 21.2188 27.4682 18.8309 27.4682 15.8854C27.4682 12.9399 25.0804 10.5521 22.1349 10.5521C19.1894 10.5521 16.8015 12.9399 16.8015 15.8854ZM22.1349 15.8854H21.1349V17.4442H22.1349H23.1349V15.8854H22.1349ZM22.1349 20.5617H21.1349V23.6793H22.1349H23.1349V20.5617H22.1349ZM22.1349 26.7968H21.1349V29.9144H22.1349H23.1349V26.7968H22.1349ZM22.1349 33.0319H21.1349V36.1495H22.1349H23.1349V33.0319H22.1349ZM22.1349 39.267H21.1349V42.3846H22.1349H23.1349V39.267H22.1349ZM22.1349 45.5021H21.1349V48.6196H22.1349H23.1349V45.5021H22.1349ZM22.1349 51.7372H21.1349V54.8547H22.1349H23.1349V51.7372H22.1349ZM22.1349 57.9723H21.1349V61.0898H22.1349H23.1349V57.9723H22.1349ZM22.1349 64.2074H21.1349V65.7661H22.1349H23.1349V64.2074H22.1349Z" fill="black"/>
-<path d="M68.5422 61.9066C68.644 58.9628 66.3402 56.4939 63.3964 56.3921C60.4527 56.2903 57.9837 58.5942 57.882 61.5379C57.7802 64.4817 60.084 66.9506 63.0278 67.0524C65.9715 67.1542 68.4405 64.8503 68.5422 61.9066ZM63.2121 61.7223L64.2115 61.7568L64.261 60.3244L63.2616 60.2899L62.2622 60.2553L62.2127 61.6877L63.2121 61.7223ZM63.3607 57.4251L64.3601 57.4596L64.4592 54.5948L63.4598 54.5603L62.4604 54.5257L62.3613 57.3905L63.3607 57.4251ZM63.5588 51.6955L64.5582 51.73L64.6573 48.8652L63.6579 48.8307L62.6585 48.7961L62.5594 51.6609L63.5588 51.6955ZM63.7569 45.9658L64.7563 46.0004L64.8554 43.1356L63.856 43.101L62.8566 43.0665L62.7575 45.9313L63.7569 45.9658ZM63.9551 40.2362L64.9545 40.2708L65.0535 37.406L64.0541 37.3714L63.0547 37.3369L62.9557 40.2017L63.9551 40.2362ZM64.1532 34.5066L65.1526 34.5412L65.2517 31.6764L64.2522 31.6418L63.2528 31.6073L63.1538 34.4721L64.1532 34.5066ZM64.3513 28.777L65.3507 28.8116L65.4498 25.9468L64.4504 25.9122L63.451 25.8777L63.3519 28.7425L64.3513 28.777ZM64.5494 23.0474L65.5488 23.082L65.6479 20.2172L64.6485 20.1826L63.6491 20.1481L63.55 23.0129L64.5494 23.0474ZM64.7476 17.3178L65.747 17.3524L65.7965 15.92L64.7971 15.8854L63.7977 15.8509L63.7482 17.2833L64.7476 17.3178ZM68.5422 61.9066C68.644 58.9628 66.3402 56.4939 63.3964 56.3921C60.4527 56.2903 57.9837 58.5942 57.882 61.5379C57.7802 64.4817 60.084 66.9506 63.0278 67.0524C65.9715 67.1542 68.4405 64.8503 68.5422 61.9066ZM63.2121 61.7223L64.2115 61.7568L64.261 60.3244L63.2616 60.2899L62.2622 60.2553L62.2127 61.6877L63.2121 61.7223ZM63.3607 57.4251L64.3601 57.4596L64.4592 54.5948L63.4598 54.5603L62.4604 54.5257L62.3613 57.3905L63.3607 57.4251ZM63.5588 51.6955L64.5582 51.73L64.6573 48.8652L63.6579 48.8307L62.6585 48.7961L62.5594 51.6609L63.5588 51.6955ZM63.7569 45.9658L64.7563 46.0004L64.8554 43.1356L63.856 43.101L62.8566 43.0665L62.7575 45.9313L63.7569 45.9658ZM63.9551 40.2362L64.9545 40.2708L65.0535 37.406L64.0541 37.3714L63.0547 37.3369L62.9557 40.2017L63.9551 40.2362ZM64.1532 34.5066L65.1526 34.5412L65.2517 31.6764L64.2522 31.6418L63.2528 31.6073L63.1538 34.4721L64.1532 34.5066ZM64.3513 28.777L65.3507 28.8116L65.4498 25.9468L64.4504 25.9122L63.451 25.8777L63.3519 28.7425L64.3513 28.777ZM64.5494 23.0474L65.5488 23.082L65.6479 20.2172L64.6485 20.1826L63.6491 20.1481L63.55 23.0129L64.5494 23.0474ZM64.7476 17.3178L65.747 17.3524L65.7965 15.92L64.7971 15.8854L63.7977 15.8509L63.7482 17.2833L64.7476 17.3178Z" fill="black"/>
-<path d="M7.504 8.504V73.496H72.496" stroke="black" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M22.1349 64.4891C22.1349 22.2443 66.0006 53.3766 64.7742 17.1095" stroke="black" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <style>
+    /* ── Draw-in / hold / draw-out loop — 4s total ── */
+    @keyframes drawCurve {
+      0%   { stroke-dashoffset: 120; }   /* hidden */
+      35%  { stroke-dashoffset: 0; }     /* fully drawn */
+      65%  { stroke-dashoffset: 0; }     /* hold */
+      100% { stroke-dashoffset: -120; }  /* draw out the other end */
+    }
+
+    /* ── Gentle pulse on control-point halos ── */
+    @keyframes pulse {
+      0%, 100% { r: 7; opacity: 0.18; }
+      50%      { r: 10; opacity: 0.08; }
+    }
+
+    /* ── Control points fade in sync with curve ── */
+    @keyframes cpFade {
+      0%   { opacity: 0; }
+      35%  { opacity: 1; }
+      65%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ── Axis stays visible ── */
+
+    /* ── Looping draw-in ── */
+    .curve {
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      animation: drawCurve 4s cubic-bezier(.4,0,.2,1) infinite;
+    }
+
+    .halo {
+      animation: pulse 2.8s ease-in-out infinite;
+    }
+
+    .cp, .handle-line {
+      animation: cpFade 4s cubic-bezier(.4,0,.2,1) infinite;
+    }
+
+    /* ── Hover state — glow + curve shift ── */
+    svg:hover .curve {
+      filter: drop-shadow(0 0 4px rgba(167,139,250,0.6));
+      stroke: url(#curveGradHover);
+      transition: filter 0.3s ease, stroke 0.3s ease;
+    }
+
+    svg:hover .handle-line {
+      stroke-opacity: 0.55;
+      transition: stroke-opacity 0.3s ease;
+    }
+
+    svg:hover .cp {
+      r: 5;
+      transition: r 0.2s ease;
+    }
+
+    svg:hover .halo {
+      animation-duration: 1.6s;
+    }
+
+    /* ── Default transitions for smooth out ── */
+    .curve, .handle-line, .cp {
+      transition: all 0.3s ease;
+    }
+  </style>
+
+  <defs>
+    <!-- Gradient for the bezier curve — purple → teal -->
+    <linearGradient id="curveGrad" x1="18" y1="62" x2="62" y2="14">
+      <stop offset="0%"   stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+
+    <!-- Brighter gradient on hover -->
+    <linearGradient id="curveGradHover" x1="18" y1="62" x2="62" y2="14">
+      <stop offset="0%"   stop-color="#C4B5FD"/>
+      <stop offset="100%" stop-color="#6EE7B7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══ Axes ═══ -->
+  <path
+    class="axis"
+    d="M 10 10 V 70 H 70"
+    stroke="currentColor"
+    stroke-width="3.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.55"
+  />
+
+  <!-- Subtle grid ticks -->
+  <line x1="10" y1="40" x2="13" y2="40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+  <line x1="40" y1="70" x2="40" y2="67" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+
+  <!-- ═══ Control-point handles (dashed lines) ═══ -->
+  <!-- P0 → CP1 -->
+  <line
+    class="handle-line"
+    x1="18" y1="62" x2="18" y2="16"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-dasharray="3 3"
+    stroke-linecap="round"
+    stroke-opacity="0.3"
+  />
+
+  <!-- P3 → CP2 -->
+  <line
+    class="handle-line"
+    x1="62" y1="14" x2="62" y2="58"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-dasharray="3 3"
+    stroke-linecap="round"
+    stroke-opacity="0.3"
+  />
+
+  <!-- ═══ Bezier curve ═══ -->
+  <path
+    class="curve"
+    d="M 18 62 C 18 16, 62 58, 62 14"
+    stroke="url(#curveGrad)"
+    stroke-width="3.5"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- ═══ Control points ═══ -->
+  <!-- CP1 (top-left) — halo + dot -->
+  <circle class="halo" cx="18" cy="16" r="7" fill="#A78BFA" opacity="0.18"/>
+  <circle class="cp" cx="18" cy="16" r="4" fill="#A78BFA"/>
+
+  <!-- CP2 (bottom-right) — halo + dot -->
+  <circle class="halo" cx="62" cy="58" r="7" fill="#34D399" opacity="0.18"/>
+  <circle class="cp" cx="62" cy="58" r="4" fill="#34D399"/>
+
+  <!-- ═══ Anchor points (curve start / end) ═══ -->
+  <circle cx="18" cy="62" r="3" fill="currentColor" opacity="0.7"/>
+  <circle cx="62" cy="14" r="3" fill="currentColor" opacity="0.7"/>
+
 </svg>
