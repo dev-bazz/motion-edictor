@@ -13,7 +13,7 @@
 <!-- Tagline -->
 <p>
   <strong>Visually design CSS animations and generate production-ready code — right inside your editor.</strong><br/>
-  <sub>Cubic-bezier curves · Spring physics · Scroll-driven ranges · SVG path references</sub>
+  <sub>Cubic-bezier curves · Spring physics · Scroll-driven ranges · SVG paths · CSS gradients</sub>
 </p>
 
 <!-- Badges -->
@@ -90,7 +90,7 @@
 <br/>
 
 **Cheat Sheets**<br/>
-<sub>SVG path &amp; scroll animation<br/>quick-reference panels</sub>
+<sub>SVG paths · scroll · loaders<br/>CSS queries · gradient builder</sub>
 
 <br/><br/>
 
@@ -230,8 +230,11 @@ animation-range: entry 0% exit 100%;
 |:---|:---|
 | **SVG Path Cheat Sheet** | Interactive reference for SVG `<path>` commands (`M`, `L`, `C`, `A`, etc.) |
 | **CSS Scroll Animation** | Visual guide to `animation-timeline`, `animation-range`, and scroll-driven properties |
+| **SVG Loaders** | Animated SVG loading spinners & indicators — copy-paste ready with SMIL and CSS keyframes |
+| **CSS Modern Queries** | Container queries, style queries, `@layer`, `@property`, `supports`, media & more |
+| **Gradient Forge Pro** | Build and fine-tune CSS gradients — linear, radial, conic — with live preview and copy-ready code |
 
-Open either from the **Command Palette** (<kbd>⌘ Shift P</kbd>).
+Open any from the **Command Palette** (<kbd>⌘ Shift P</kbd>) or the **Cheat Sheets Hub**.
 
 </details>
 
@@ -249,8 +252,12 @@ Open the Command Palette (<kbd>⌘ Shift P</kbd> / <kbd>Ctrl Shift P</kbd>):
 
 | Command | Description |
 |:---|:---|
+| `Motion: Open Cheat Sheets` | Open the Cheat Sheet Hub |
 | `Motion: SVG Animation Cheat sheet` | Open the SVG path commands reference |
 | `Motion: Open CSS Scroll Animation Cheat Sheet` | Open the scroll-driven animation reference |
+| `Motion: SVG Loaders Cheat Sheet` | Open the SVG loaders reference |
+| `Motion: CSS Modern Queries Cheat Sheet` | Open the CSS modern queries reference |
+| `Motion: Gradient Forge Pro` | Open the gradient builder cheat sheet |
 
 > The main **Ease Generator** panel is always available via the Activity Bar sidebar icon.
 
