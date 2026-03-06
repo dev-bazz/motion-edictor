@@ -72,6 +72,11 @@
         "command": "motion-graph-edictor.openContainerQueryCheatSheet",
         "category": "Motion",
         "title": "CSS Modern Queries Cheat Sheet"
+      },
+      {
+        "command": "motion-graph-edictor.openGradientForgePro",
+        "category": "Motion",
+        "title": "Gradient Forge Pro"
       }
     ],
     "viewsContainers": {
