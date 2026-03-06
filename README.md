@@ -90,7 +90,7 @@
 <br/>
 
 **Cheat Sheets**<br/>
-<sub>SVG paths · scroll · loaders<br/>CSS queries · gradient builder</sub>
+<sub>Ease generator · SVG paths<br/>scroll · loaders · CSS queries<br/>gradient builder</sub>
 
 <br/><br/>
 
@@ -228,11 +228,13 @@ animation-range: entry 0% exit 100%;
 
 | Cheat Sheet | Description |
 |:---|:---|
+| **CSS Ease Generator** | Visual cubic-bezier editor, spring physics simulator, and scroll-driven animation ranges |
 | **SVG Path Cheat Sheet** | Interactive reference for SVG `<path>` commands (`M`, `L`, `C`, `A`, etc.) |
 | **CSS Scroll Animation** | Visual guide to `animation-timeline`, `animation-range`, and scroll-driven properties |
 | **SVG Loaders** | Animated SVG loading spinners & indicators — copy-paste ready with SMIL and CSS keyframes |
 | **CSS Modern Queries** | Container queries, style queries, `@layer`, `@property`, `supports`, media & more |
 | **Gradient Forge Pro** | Build and fine-tune CSS gradients — linear, radial, conic — with live preview and copy-ready code |
+| **List Style Playground** | Interactive list styling tool with ::marker, ::before, and image icons — export CSS, HTML, and React |
 
 Open any from the **Command Palette** (<kbd>⌘ Shift P</kbd>) or the **Cheat Sheets Hub**.
 
@@ -253,11 +255,13 @@ Open the Command Palette (<kbd>⌘ Shift P</kbd> / <kbd>Ctrl Shift P</kbd>):
 | Command | Description |
 |:---|:---|
 | `Motion: Open Cheat Sheets` | Open the Cheat Sheet Hub |
+| `Motion: Open CSS Ease Generator` | Open the CSS ease generator in the sidebar |
 | `Motion: SVG Animation Cheat sheet` | Open the SVG path commands reference |
 | `Motion: Open CSS Scroll Animation Cheat Sheet` | Open the scroll-driven animation reference |
 | `Motion: SVG Loaders Cheat Sheet` | Open the SVG loaders reference |
 | `Motion: CSS Modern Queries Cheat Sheet` | Open the CSS modern queries reference |
 | `Motion: Gradient Forge Pro` | Open the gradient builder cheat sheet |
+| `Motion: List Style Playground` | Open the interactive list styling playground |
 
 > The main **Ease Generator** panel is always available via the Activity Bar sidebar icon.
 

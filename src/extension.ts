@@ -79,6 +79,19 @@ export function activate(context: vscode.ExtensionContext) {
 		),
 	);
 
+	// Register command to open List Style Playground
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openListPlayground",
+			() => {
+				ListPlaygroundPanel.createOrShow(
+					context.extensionUri,
+					context.extensionPath,
+				);
+			},
+		),
+	);
+
 	// Register command to open the Cheat Sheet Hub
 	context.subscriptions.push(
 		vscode.commands.registerCommand(
@@ -88,6 +101,16 @@ export function activate(context: vscode.ExtensionContext) {
 					context.extensionUri,
 					context.extensionPath,
 				);
+			},
+		),
+	);
+
+	// Register command to open the Ease Generator view
+	context.subscriptions.push(
+		vscode.commands.registerCommand(
+			"motion-graph-edictor.openEaseGenerator",
+			() => {
+				vscode.commands.executeCommand("easeGeneratorView.focus");
 			},
 		),
 	);
@@ -212,6 +235,7 @@ class SVGCheatSheetPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"svg-path-cheat-sheet.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
@@ -288,6 +312,7 @@ class ScrollAnimationCheatSheetPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"scroll-animation-cheatsheet.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
@@ -364,6 +389,7 @@ class SVGLoadersCheatSheetPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"svg-loaders-cheatsheet.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
@@ -416,6 +442,11 @@ class CheatSheetHubPanel {
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				switch (message.command) {
+					case "openEaseGenerator":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openEaseGenerator",
+						);
+						return;
 					case "openSVGCheatSheet":
 						vscode.commands.executeCommand(
 							"motion-graph-edictor.openSVGCheatSheet",
@@ -441,6 +472,11 @@ class CheatSheetHubPanel {
 							"motion-graph-edictor.openGradientForgePro",
 						);
 						return;
+					case "openListPlayground":
+						vscode.commands.executeCommand(
+							"motion-graph-edictor.openListPlayground",
+						);
+						return;
 				}
 			},
 			null,
@@ -463,6 +499,7 @@ class CheatSheetHubPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"cheatsheet-hub.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
@@ -537,6 +574,7 @@ class ContainerQueryCheatSheetPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"container-query.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
@@ -613,7 +651,85 @@ class GradientForgeProPanel {
 		const htmlPath = path.join(
 			this._extensionPath,
 			"src",
+			"tools",
 			"gradient-forge-pro.html",
+		);
+		return fs.readFileSync(htmlPath, "utf8");
+	}
+}
+
+// ─── List Style Playground Panel ───────────────────────────────
+class ListPlaygroundPanel {
+	public static currentPanel: ListPlaygroundPanel | undefined;
+	private static readonly viewType = "listPlayground";
+
+	private readonly _panel: vscode.WebviewPanel;
+	private readonly _extensionPath: string;
+	private _disposables: vscode.Disposable[] = [];
+
+	public static createOrShow(extensionUri: vscode.Uri, extensionPath: string) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+
+		if (ListPlaygroundPanel.currentPanel) {
+			ListPlaygroundPanel.currentPanel._panel.reveal(column);
+			return;
+		}
+
+		const panel = vscode.window.createWebviewPanel(
+			ListPlaygroundPanel.viewType,
+			"List Style Playground",
+			column || vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				localResourceRoots: [extensionUri],
+			},
+		);
+
+		ListPlaygroundPanel.currentPanel = new ListPlaygroundPanel(
+			panel,
+			extensionPath,
+		);
+	}
+
+	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+		this._panel = panel;
+		this._extensionPath = extensionPath;
+
+		this._panel.webview.html = this._getHtmlForWebview();
+
+		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+		this._panel.webview.onDidReceiveMessage(
+			(message) => {
+				if (message.command === "copyToClipboard") {
+					vscode.env.clipboard.writeText(message.value);
+					vscode.window.showInformationMessage("Copied to clipboard!");
+				}
+			},
+			null,
+			this._disposables,
+		);
+	}
+
+	public dispose() {
+		ListPlaygroundPanel.currentPanel = undefined;
+		this._panel.dispose();
+		while (this._disposables.length) {
+			const d = this._disposables.pop();
+			if (d) {
+				d.dispose();
+			}
+		}
+	}
+
+	private _getHtmlForWebview(): string {
+		const htmlPath = path.join(
+			this._extensionPath,
+			"src",
+			"tools",
+			"list-playground.html",
 		);
 		return fs.readFileSync(htmlPath, "utf8");
 	}

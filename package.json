@@ -49,6 +49,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "motion-graph-edictor.openEaseGenerator",
+        "title": "Open CSS Ease Generator",
+        "category": "Motion"
+      },
+      {
         "command": "motion-graph-edictor.openScrollAnimationCheatSheet",
         "title": "Open CSS Scroll Animation Cheat Sheet",
         "category": "Motion"
@@ -77,6 +82,11 @@
         "command": "motion-graph-edictor.openGradientForgePro",
         "category": "Motion",
         "title": "Gradient Forge Pro"
+      },
+      {
+        "command": "motion-graph-edictor.openListPlayground",
+        "category": "Motion",
+        "title": "List Style Playground"
       }
     ],
     "viewsContainers": {

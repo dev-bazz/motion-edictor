@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List Style Playground</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Instrument+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0f;--surface:#13131a;--panel:#15151e;--border:#222230;--border2:#2c2c3e;
+  --text:#ddddf0;--muted:#52526e;--muted2:#35354a;
+  --accent:#7c6cff;--accent2:#a090ff;
+  --green:#3ddc97;--amber:#ffb547;--red:#ff5f7e;--cyan:#38d9f5;--pink:#ff6eb4;
+  --mono:'Fragment Mono',monospace;--sans:'Instrument Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;display:flex;flex-direction:column;}
+
+.topbar{height:44px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:10;}
+.brand{font-family:var(--mono);font-size:12px;color:var(--accent2);display:flex;align-items:center;gap:7px;flex-shrink:0;letter-spacing:-.2px;}
+.sep{width:1px;height:18px;background:var(--border2);}
+.presets{display:flex;gap:5px;overflow-x:auto;flex:1;scrollbar-width:none;}
+.presets::-webkit-scrollbar{display:none;}
+.preset-btn{font-family:var(--mono);font-size:10.5px;padding:3px 11px;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.preset-btn:hover{color:var(--text);border-color:var(--muted2);}
+.preset-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.tech-toggle{display:flex;border:1px solid var(--border2);border-radius:4px;overflow:hidden;flex-shrink:0;}
+.tech-btn{font-family:var(--mono);font-size:10px;padding:5px 11px;background:transparent;color:var(--muted);border:none;cursor:pointer;letter-spacing:.5px;transition:all .15s;white-space:nowrap;}
+.tech-btn+.tech-btn{border-left:1px solid var(--border2);}
+.tech-btn.active{background:var(--border2);color:var(--text);}
+.tech-btn.img-active{background:rgba(255,181,71,.15);color:var(--amber);}
+.copy-btn-top{font-family:var(--mono);font-size:10.5px;padding:5px 13px;background:var(--green);color:#000;border:none;border-radius:3px;cursor:pointer;letter-spacing:.4px;font-weight:600;flex-shrink:0;transition:all .15s;}
+.copy-btn-top:hover{opacity:.85;}
+.copy-btn-top.copied{background:var(--border2);color:var(--green);}
+
+.workspace{display:grid;grid-template-columns:268px 1fr 390px;flex:1;overflow:hidden;}
+
+.controls{background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.ctrl-sec{border-bottom:1px solid var(--border);padding:13px 15px;}
+.ctrl-sec-title{font-family:var(--mono);font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;}
+.badge{font-size:8.5px;padding:2px 6px;border-radius:2px;letter-spacing:.5px;}
+.badge-ok{background:rgba(61,220,151,.1);color:var(--green);border:1px solid rgba(61,220,151,.2);}
+.badge-warn{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.2);}
+.ctrl-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ctrl-row:last-child{margin-bottom:0;}
+.lbl{font-family:var(--mono);font-size:10.5px;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lbl .p{color:var(--cyan);}
+select,input[type=text],input[type=url],input[type=number]{font-family:var(--mono);font-size:10.5px;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:5px 8px;border-radius:3px;outline:none;width:100%;transition:border-color .15s;}
+select:focus,input:focus{border-color:var(--accent);}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;height:3px;margin:3px 0;}
+.rv{font-family:var(--mono);font-size:10.5px;color:var(--accent2);min-width:34px;text-align:right;flex-shrink:0;}
+.rrow{display:flex;align-items:center;gap:7px;margin-bottom:9px;}
+.rrow:last-child{margin-bottom:0;}
+.clr-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.clr-wrap{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:3px 8px;flex:1;cursor:pointer;transition:border-color .15s;}
+.clr-wrap:hover{border-color:var(--accent);}
+input[type=color]{width:17px;height:17px;border:none;border-radius:2px;padding:0;background:none;cursor:pointer;flex-shrink:0;}
+.hex{font-family:var(--mono);font-size:10.5px;color:var(--text);flex:1;background:none;border:none;outline:none;padding:0;width:58px;}
+.tog-wrap{display:flex;align-items:center;gap:7px;}
+.tog{width:28px;height:15px;background:var(--border2);border-radius:8px;cursor:pointer;position:relative;border:none;transition:background .2s;flex-shrink:0;}
+.tog.on{background:var(--accent);}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;background:#fff;border-radius:50%;transition:transform .2s;}
+.tog.on::after{transform:translateX(13px);}
+.alert-box{background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.18);border-radius:3px;padding:8px 10px;font-size:10.5px;color:var(--amber);line-height:1.55;margin-bottom:10px;display:none;}
+.alert-box.show{display:block;}
+.alert-box code{font-family:var(--mono);font-size:9.5px;}
+.img-tabs{display:flex;gap:0;border:1px solid var(--border2);border-radius:3px;overflow:hidden;margin-bottom:11px;}
+.img-tab{font-family:var(--mono);font-size:9.5px;flex:1;padding:5px 0;text-align:center;background:transparent;color:var(--muted);border:none;cursor:pointer;letter-spacing:.4px;transition:all .15s;}
+.img-tab+.img-tab{border-left:1px solid var(--border2);}
+.img-tab.active{background:rgba(255,181,71,.12);color:var(--amber);}
+.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;}
+.icon-opt{width:100%;aspect-ratio:1;background:var(--bg);border:1px solid var(--border2);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.icon-opt:hover{border-color:var(--muted2);}
+.icon-opt.active{border-color:var(--amber);background:rgba(255,181,71,.08);}
+
+.preview-panel{background:var(--bg);overflow:hidden;display:flex;flex-direction:column;}
+.preview-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.preview-bar-left{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:1px;}
+.dot-live{width:6px;height:6px;border-radius:50%;background:#3ddc97;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bg-swatches{display:flex;gap:4px;align-items:center;}
+.bg-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-right:2px;}
+.bgs{width:15px;height:15px;border-radius:2px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;flex-shrink:0;}
+.bgs.active{border-color:#7c6cff;}
+.preview-body{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:40px 48px;}
+.preview-canvas{width:100%;max-width:500px;}
+.edit-hint{font-family:var(--mono);font-size:9px;color:#ccc;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:5px;}
+.edit-hint::before{content:'';width:4px;height:4px;border-radius:50%;background:#ccc;}
+#plist{font-family:'Instrument Sans',sans-serif;font-size:15px;line-height:1.7;color:#111;}
+#plist li{outline:none;cursor:text;}
+#plist li:focus{background:rgba(124,108,255,.05);border-radius:2px;}
+#plist li:empty::before{content:attr(data-ph);color:#ccc;pointer-events:none;}
+
+.code-panel{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.code-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ctabs{display:flex;gap:2px;}
+.ctab{font-family:var(--mono);font-size:9.5px;padding:4px 10px;border-radius:3px;border:none;background:transparent;color:var(--muted);cursor:pointer;letter-spacing:.5px;transition:all .15s;}
+.ctab.active{background:var(--border2);color:var(--text);}
+.ctab:hover:not(.active){color:var(--muted2);}
+.copy-snippet{font-family:var(--mono);font-size:9.5px;padding:4px 10px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:3px;cursor:pointer;transition:all .15s;}
+.copy-snippet:hover{color:var(--text);border-color:var(--muted2);}
+.copy-snippet.copied{color:var(--green);border-color:var(--green);}
+.code-out{flex:1;overflow-y:auto;padding:18px;font-family:var(--mono);font-size:11.5px;line-height:1.8;white-space:pre;}
+.s{color:#7c9fff;}.p_{color:var(--pink);}.v{color:var(--green);}.st{color:var(--amber);}.cm{color:var(--muted);font-style:italic;}.pu{color:var(--muted2);}.nu{color:var(--cyan);}.kw{color:var(--accent2);}
+@keyframes codepop{0%{background:rgba(124,108,255,.1)}100%{background:transparent}}
+.popped{animation:codepop .35s ease;border-radius:2px;}
+.insights{border-top:1px solid var(--border);padding:13px 15px;flex-shrink:0;max-height:160px;overflow-y:auto;}
+.ins-title{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.ins-row{display:flex;gap:9px;margin-bottom:6px;font-size:11px;line-height:1.5;color:var(--muted);align-items:flex-start;}
+.ins-row:last-child{margin-bottom:0;}
+.ins-row strong{color:var(--text);font-weight:500;}
+.ins-row code{font-family:var(--mono);font-size:10px;color:var(--cyan);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="4" width="4" height="4" rx="1" fill="#a090ff"/><rect x="7" y="1.5" width="5" height="2" rx="1" fill="#a090ff" opacity=".45"/><rect x="7" y="5.5" width="5" height="2" rx="1" fill="#a090ff" opacity=".45"/><rect x="7" y="9.5" width="5" height="2" rx="1" fill="#a090ff" opacity=".45"/></svg>
+    list-style playground
+  </div>
+  <div class="sep"></div>
+  <div class="presets">
+    <button class="preset-btn" onclick="applyPreset(this,'minimal')">minimal</button>
+    <button class="preset-btn" id="preset-pill" onclick="applyPreset(this,'pill')">pill</button>
+    <button class="preset-btn" onclick="applyPreset(this,'outlined')">outlined</button>
+    <button class="preset-btn" onclick="applyPreset(this,'numbox')">num-box</button>
+    <button class="preset-btn" onclick="applyPreset(this,'dotring')">dot-ring</button>
+    <button class="preset-btn" onclick="applyPreset(this,'ghost')">ghost</button>
+    <button class="preset-btn" onclick="applyPreset(this,'step')">step</button>
+    <button class="preset-btn" onclick="applyPreset(this,'img-svg')">img-svg</button>
+    <button class="preset-btn" onclick="applyPreset(this,'img-emoji')">img-emoji</button>
+  </div>
+  <div class="sep"></div>
+  <div class="tech-toggle">
+    <button class="tech-btn active" id="btn-marker" onclick="setTech('marker')">::marker</button>
+    <button class="tech-btn" id="btn-before" onclick="setTech('before')">::before</button>
+    <button class="tech-btn" id="btn-img" onclick="setTech('img')">img icon</button>
+  </div>
+  <button class="copy-btn-top" id="copy-top" onclick="copyTop()">copy CSS</button>
+</div>
+
+<div class="workspace">
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="ctrl-sec">
+    <div class="ctrl-sec-title">List</div>
+    <div class="ctrl-row">
+      <span class="lbl"><span class="p">element</span></span>
+      <select id="c-el" style="width:120px" onchange="update()"><option value="ul">ul</option><option value="ol">ol</option></select>
+    </div>
+    <div id="row-type">
+      <div class="ctrl-row"><span class="lbl"><span class="p">list-style-type</span></span></div>
+      <select id="c-type" onchange="update()" style="margin-bottom:8px">
+        <optgroup label="── Unordered ──" class="og-ul">
+          <option value="disc">disc •</option>
+          <option value="circle">circle ◦</option>
+          <option value="square">square ▪</option>
+          <option value="disclosure-open">disclosure-open ▾</option>
+          <option value="disclosure-closed">disclosure-closed ‣</option>
+        </optgroup>
+        <optgroup label="── Ordered: Numeric ──" class="og-ol">
+          <option value="decimal">decimal  1, 2, 3</option>
+          <option value="decimal-leading-zero">decimal-leading-zero  01, 02</option>
+          <option value="lower-roman">lower-roman  i, ii, iii</option>
+          <option value="upper-roman">upper-roman  I, II, III</option>
+          <option value="lower-alpha">lower-alpha  a, b, c</option>
+          <option value="upper-alpha">upper-alpha  A, B, C</option>
+          <option value="lower-latin">lower-latin  a, b, c</option>
+          <option value="upper-latin">upper-latin  A, B, C</option>
+          <option value="lower-greek">lower-greek  α, β, γ</option>
+        </optgroup>
+        <optgroup label="── Ordered: East Asian ──" class="og-ol">
+          <option value="cjk-decimal">cjk-decimal  〇, 一, 二</option>
+          <option value="japanese-formal">japanese-formal  壱, 弐</option>
+          <option value="japanese-informal">japanese-informal  一, 二</option>
+          <option value="simp-chinese-formal">simp-chinese-formal 壹</option>
+          <option value="simp-chinese-informal">simp-chinese-informal 一</option>
+          <option value="trad-chinese-formal">trad-chinese-formal 壹</option>
+          <option value="trad-chinese-informal">trad-chinese-informal 一</option>
+          <option value="korean-hangul-formal">korean-hangul-formal 일</option>
+          <option value="korean-hanja-formal">korean-hanja-formal 壹</option>
+          <option value="hiragana">hiragana  あ, い, う</option>
+          <option value="hiragana-iroha">hiragana-iroha  い, ろ, は</option>
+          <option value="katakana">katakana  ア, イ, ウ</option>
+          <option value="katakana-iroha">katakana-iroha  イ, ロ, ハ</option>
+        </optgroup>
+        <optgroup label="── Ordered: Indic ──" class="og-ol">
+          <option value="arabic-indic">arabic-indic  ١, ٢, ٣</option>
+          <option value="bengali">bengali  ১, ২, ৩</option>
+          <option value="devanagari">devanagari  १, २, ३</option>
+          <option value="gujarati">gujarati  ૧, ૨, ૩</option>
+          <option value="gurmukhi">gurmukhi  ੧, ੨, ੩</option>
+          <option value="kannada">kannada  ೧, ೨, ೩</option>
+          <option value="malayalam">malayalam  ൧, ൨, ൩</option>
+          <option value="oriya">oriya  ୧, ୨, ୩</option>
+          <option value="tamil">tamil  ௧, ௨, ௩</option>
+          <option value="telugu">telugu  ౧, ౨, ౩</option>
+          <option value="thai">thai  ๑, ๒, ๓</option>
+          <option value="tibetan">tibetan  ༡, ༢, ༣</option>
+        </optgroup>
+        <optgroup label="── Ordered: Other ──" class="og-ol">
+          <option value="armenian">armenian  Ա, Բ, Գ</option>
+          <option value="upper-armenian">upper-armenian  Ա, Բ</option>
+          <option value="lower-armenian">lower-armenian  ա, բ</option>
+          <option value="georgian">georgian  ა, ბ, გ</option>
+          <option value="hebrew">hebrew  א, ב, ג</option>
+          <option value="ethiopic-halehame-am">ethiopic-halehame-am</option>
+          <option value="hangul">hangul  가, 나, 다</option>
+          <option value="hangul-consonant">hangul-consonant  ㄱ, ㄴ</option>
+          <option value="mongolian">mongolian  ᠑, ᠒</option>
+          <option value="myanmar">myanmar  ၁, ၂, ၃</option>
+          <option value="persian">persian  ۱, ۲, ۳</option>
+        </optgroup>
+        <optgroup label="── Custom / None ──">
+          <option value="'→ '">string "→ "</option>
+          <option value="'★ '">string "★ "</option>
+          <option value="'✓ '">string "✓ "</option>
+          <option value="'🔹 '">string "🔹 "</option>
+          <option value="none">none</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="rrow"><span class="lbl"><span class="p">padding-left</span></span><input type="range" id="c-indent" min="16" max="80" value="32" oninput="update()"><span class="rv" id="rv-indent">32px</span></div>
+    <div class="rrow"><span class="lbl"><span class="p">line-height</span></span><input type="range" id="c-lh" min="1.2" max="3.2" step=".1" value="2.0" oninput="update()"><span class="rv" id="rv-lh">2.0</span></div>
+    <div class="rrow"><span class="lbl"><span class="p">font-size</span></span><input type="range" id="c-fs" min="12" max="24" step="1" value="15" oninput="update()"><span class="rv" id="rv-fs">15px</span></div>
+  </div>
+
+  <div class="ctrl-sec" id="sec-marker">
+    <div class="ctrl-sec-title">Marker <span class="badge badge-ok">::marker ✓</span></div>
+    <div id="warn-marker" class="alert-box"><strong>⚠ ::marker</strong> — <code>background</code>, <code>padding</code>, <code>border-radius</code> not supported here. Switch to <strong>::before</strong>.</div>
+    <div class="clr-row">
+      <span class="lbl"><span class="p">color</span></span>
+      <div class="clr-wrap" onclick="document.getElementById('c-mc').click()">
+        <input type="color" id="c-mc" value="#7c6cff" oninput="sh('c-mc','h-mc');update()">
+        <input class="hex" id="h-mc" value="#7c6cff" oninput="sc('h-mc','c-mc');update()" maxlength="7">
+      </div>
+    </div>
+    <div class="rrow"><span class="lbl"><span class="p">font-size</span></span><input type="range" id="c-ms" min=".6" max="2" step=".05" value="1" oninput="update()"><span class="rv" id="rv-ms">1em</span></div>
+    <div class="ctrl-row">
+      <span class="lbl"><span class="p">font-weight</span></span>
+      <select id="c-mw" style="width:90px" onchange="update()"><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700" selected>700</option></select>
+    </div>
+    <div class="ctrl-row"><span class="lbl"><span class="p">content</span> override</span><input type="text" id="c-cont" placeholder="auto" style="width:110px" oninput="update()"></div>
+  </div>
+
+  <div class="ctrl-sec" id="sec-box" style="display:none">
+    <div class="ctrl-sec-title">Box Model <span class="badge badge-warn">::before only</span></div>
+    <div class="ctrl-row"><span class="lbl"><span class="p">background</span></span><div class="tog-wrap"><button class="tog on" id="t-bg" onclick="tog('bg')"></button></div></div>
+    <div id="r-bg">
+      <div class="clr-row" style="padding-left:10px">
+        <span class="lbl">color</span>
+        <div class="clr-wrap" onclick="document.getElementById('c-bg').click()">
+          <input type="color" id="c-bg" value="#7c6cff" oninput="sh('c-bg','h-bg');update()">
+          <input class="hex" id="h-bg" value="#7c6cff" oninput="sc('h-bg','c-bg');update()" maxlength="7">
+        </div>
+      </div>
+      <div class="rrow" style="padding-left:10px"><span class="lbl">opacity</span><input type="range" id="c-bgo" min="0" max="1" step=".05" value="1" oninput="update()"><span class="rv" id="rv-bgo">1</span></div>
+    </div>
+    <div class="ctrl-row" style="margin-top:4px"><span class="lbl"><span class="p">padding</span></span><div class="tog-wrap"><button class="tog on" id="t-pad" onclick="tog('pad')"></button></div></div>
+    <div id="r-pad">
+      <div class="rrow" style="padding-left:10px"><span class="lbl">top/btm</span><input type="range" id="c-py" min="0" max="12" step="1" value="3" oninput="update()"><span class="rv" id="rv-py">3px</span></div>
+      <div class="rrow" style="padding-left:10px"><span class="lbl">left/right</span><input type="range" id="c-px" min="0" max="20" step="1" value="8" oninput="update()"><span class="rv" id="rv-px">8px</span></div>
+    </div>
+    <div class="ctrl-row" style="margin-top:4px"><span class="lbl"><span class="p">border-radius</span></span><div class="tog-wrap"><button class="tog on" id="t-br" onclick="tog('br')"></button></div></div>
+    <div class="rrow" id="r-br" style="padding-left:10px"><span class="lbl">radius</span><input type="range" id="c-br" min="0" max="50" step="1" value="4" oninput="update()"><span class="rv" id="rv-br">4px</span></div>
+    <div class="ctrl-row" style="margin-top:4px"><span class="lbl"><span class="p">border</span></span><div class="tog-wrap"><button class="tog" id="t-brd" onclick="tog('brd')"></button></div></div>
+    <div id="r-brd" style="display:none">
+      <div class="rrow" style="padding-left:10px"><span class="lbl">width</span><input type="range" id="c-bw" min="1" max="4" step="1" value="1" oninput="update()"><span class="rv" id="rv-bw">1px</span></div>
+      <div class="clr-row" style="padding-left:10px">
+        <span class="lbl">color</span>
+        <div class="clr-wrap" onclick="document.getElementById('c-bc').click()">
+          <input type="color" id="c-bc" value="#7c6cff" oninput="sh('c-bc','h-bc');update()">
+          <input class="hex" id="h-bc" value="#7c6cff" oninput="sc('h-bc','c-bc');update()" maxlength="7">
+        </div>
+      </div>
+      <div class="ctrl-row" style="padding-left:10px"><span class="lbl">style</span><select id="c-bs" style="width:90px" onchange="update()"><option>solid</option><option>dashed</option><option>dotted</option><option>double</option></select></div>
+    </div>
+  </div>
+
+  <div class="ctrl-sec" id="sec-sizing" style="display:none">
+    <div class="ctrl-sec-title">Marker Sizing</div>
+    <div class="rrow"><span class="lbl"><span class="p">min-width</span></span><input type="range" id="c-mw2" min="0" max="52" step="1" value="0" oninput="update()"><span class="rv" id="rv-mw2">—</span></div>
+    <div class="ctrl-row"><span class="lbl"><span class="p">text-align</span></span><select id="c-ta" style="width:90px" onchange="update()"><option value="left">left</option><option value="center">center</option><option value="right">right</option></select></div>
+    <div class="rrow"><span class="lbl">gap to text</span><input type="range" id="c-gap" min="4" max="28" step="1" value="10" oninput="update()"><span class="rv" id="rv-gap">10px</span></div>
+  </div>
+
+  <div class="ctrl-sec" id="sec-img" style="display:none">
+    <div class="ctrl-sec-title">Image Source <span class="badge badge-warn">img mode</span></div>
+    <div class="img-tabs">
+      <button class="img-tab active" id="it-builtin" onclick="setImgTab('builtin')">SVG icons</button>
+      <button class="img-tab" id="it-url" onclick="setImgTab('url')">URL</button>
+      <button class="img-tab" id="it-data" onclick="setImgTab('data')">data URI</button>
+    </div>
+    <div id="ip-builtin">
+      <div class="icon-grid" id="icon-grid"></div>
+      <div class="rrow"><span class="lbl"><span class="p">icon size</span></span><input type="range" id="c-isz" min="10" max="32" step="1" value="16" oninput="update()"><span class="rv" id="rv-isz">16px</span></div>
+      <div class="clr-row">
+        <span class="lbl">icon color</span>
+        <div class="clr-wrap" onclick="document.getElementById('c-ic').click()">
+          <input type="color" id="c-ic" value="#7c6cff" oninput="sh('c-ic','h-ic');update()">
+          <input class="hex" id="h-ic" value="#7c6cff" oninput="sc('h-ic','c-ic');update()" maxlength="7">
+        </div>
+      </div>
+    </div>
+    <div id="ip-url" style="display:none">
+      <div class="ctrl-row"><input type="url" id="c-iurl" placeholder="https://…/icon.svg" oninput="update()"></div>
+      <div class="rrow"><span class="lbl">size</span><input type="range" id="c-iusz" min="10" max="40" step="1" value="18" oninput="update()"><span class="rv" id="rv-iusz">18px</span></div>
+      <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">Try SVGs from <span style="color:var(--cyan)">heroicons.com</span> or <span style="color:var(--cyan)">lucide.dev</span></div>
+    </div>
+    <div id="ip-data" style="display:none">
+      <textarea id="c-idata" placeholder="data:image/svg+xml,…" style="font-family:var(--mono);font-size:9.5px;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:7px 8px;border-radius:3px;outline:none;width:100%;resize:vertical;min-height:72px;line-height:1.5;transition:border-color .15s" oninput="update()"></textarea>
+      <div class="rrow" style="margin-top:7px"><span class="lbl">size</span><input type="range" id="c-idsz" min="10" max="40" step="1" value="18" oninput="update()"><span class="rv" id="rv-idsz">18px</span></div>
+    </div>
+    <div class="ctrl-sec-title" style="font-size:9px;letter-spacing:1px;margin-top:12px;margin-bottom:7px">CSS approach</div>
+    <div class="img-tabs">
+      <button class="img-tab active" id="ia-lsi" onclick="setImgApproach('lsi')">list-style-image</button>
+      <button class="img-tab" id="ia-before" onclick="setImgApproach('before')">::before url()</button>
+      <button class="img-tab" id="ia-inline" onclick="setImgApproach('inline')">inline img</button>
+    </div>
+    <div id="img-note" style="font-size:10.5px;color:var(--muted);line-height:1.55;margin-top:6px"></div>
+    <div class="rrow" style="margin-top:10px"><span class="lbl">gap to text</span><input type="range" id="c-igap" min="4" max="28" step="1" value="12" oninput="update()"><span class="rv" id="rv-igap">12px</span></div>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div class="preview-panel">
+  <div class="preview-bar">
+    <div class="preview-bar-left"><div class="dot-live"></div>live · click items to edit</div>
+    <div class="bg-swatches">
+      <span class="bg-label">BG</span>
+      <div class="bgs" style="background:#ffffff" onclick="setBg('#ffffff',this)"></div>
+      <div class="bgs" style="background:#f8f7f4" onclick="setBg('#f8f7f4',this)"></div>
+      <div class="bgs" style="background:#f0f4ff" onclick="setBg('#f0f4ff',this)"></div>
+      <div class="bgs" style="background:#1a1a2e" onclick="setBg('#1a1a2e',this)"></div>
+      <div class="bgs active" style="background:#0d0d0f;border:1px solid #444" onclick="setBg('#0d0d0f',this)"></div>
+    </div>
+  </div>
+  <div class="preview-body" id="pbody" style="background:#0d0d0f">
+    <div class="preview-canvas">
+      <div class="edit-hint">click any item to edit text</div>
+      <ul id="plist" style="padding-left:32px;line-height:2;font-size:15px;color:#f0f0f0">
+        <li contenteditable="true" data-ph="List item…">Design systems at scale</li>
+        <li contenteditable="true" data-ph="List item…">Accessible components</li>
+        <li contenteditable="true" data-ph="List item…">Performance budgets</li>
+        <li contenteditable="true" data-ph="List item…">Testing strategies</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- CODE -->
+<div class="code-panel">
+  <div class="code-bar">
+    <div class="ctabs">
+      <button class="ctab active" onclick="setCodeTab('css',this)">CSS</button>
+      <button class="ctab" onclick="setCodeTab('html',this)">HTML</button>
+      <button class="ctab" onclick="setCodeTab('react',this)">React</button>
+    </div>
+    <button class="copy-snippet" id="copy-snip" onclick="copySnip()">copy</button>
+  </div>
+  <div class="code-out" id="code-out"></div>
+  <div class="insights">
+    <div class="ins-title">technique guide</div>
+    <div class="ins-row"><span>📌</span><span><strong>::marker</strong> — fast and clean. Supports only <code>color</code>, <code>font-size</code>, <code>font-weight</code>, <code>content</code>. No bg/padding/radius.</span></div>
+    <div class="ins-row"><span>🔧</span><span><strong>::before</strong> — full box model. Set <code>list-style:none</code>, use <code>display:flex</code> on li, style the pseudo-element freely.</span></div>
+    <div class="ins-row"><span>🖼️</span><span><strong>img icon</strong> — three sub-approaches: <code>list-style-image</code> (no size ctrl), <code>::before url()</code> (sized), or inline <code>&lt;img&gt;</code> (max control).</span></div>
+  </div>
+</div>
+
+</div>
+<style id="injected"></style>
+<script>
+const ICONS={
+  check:c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M13.5 3.5L6 11 2.5 7.5l-1 1L6 13l8.5-8.5z' fill='${c}'/></svg>`,
+  arrow:c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M3 8h8.5M8 4.5l4 3.5-4 3.5' stroke='${c}' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>`,
+  dot:  c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='3.5' fill='${c}'/></svg>`,
+  star: c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4.4 12.5l.7-4L2.2 5.7l4-.6z' fill='${c}'/></svg>`,
+  diamond:c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 2L14 8 8 14 2 8z' fill='${c}'/></svg>`,
+  bolt: c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M9 2L4 9h4l-1 5 5-7H8z' fill='${c}'/></svg>`,
+  heart:c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 13.5S2 9.5 2 5.5A3 3 0 018 3.8 3 3 0 0114 5.5c0 4-6 8-6 8z' fill='${c}'/></svg>`,
+  leaf: c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M3 13c0-5 3-9 9-10-1 5-3 8-9 10z' fill='${c}'/></svg>`,
+  pin:  c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='6' r='3' fill='${c}'/><line x1='8' y1='9' x2='8' y2='14' stroke='${c}' stroke-width='1.4'/></svg>`,
+  triangle:c=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 3l6 10H2z' fill='${c}'/></svg>`,
+};
+const ICON_KEYS=Object.keys(ICONS);
+let selectedIcon='check', imgTab='builtin', imgApproach='lsi';
+let tech='marker', codeTab='css';
+let props={bg:true,pad:true,br:true,brd:false};
+let _tc='#111111';
+
+// build icon grid
+const grid=document.getElementById('icon-grid');
+ICON_KEYS.forEach(k=>{
+  const b=document.createElement('button');
+  b.className='icon-opt'+(k==='check'?' active':''); b.title=k;
+  b.innerHTML=ICONS[k]('#a090ff').replace('<svg','<svg width="18" height="18"');
+  b.onclick=()=>{selectedIcon=k;document.querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('active'));b.classList.add('active');update();};
+  grid.appendChild(b);
+});
+
+const g=id=>document.getElementById(id);
+const gv=id=>g(id).value;
+function sh(ci,hi){g(hi).value=g(ci).value;}
+function sc(hi,ci){const v=g(hi).value;if(/^#[0-9a-fA-F]{6}$/.test(v))g(ci).value=v;}
+function hexA(hex,a){const r=parseInt(hex.slice(1,3),16),gn=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return a<1?`rgba(${r},${gn},${b},${a})`:hex;}
+function svgUri(k,c){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ICONS[k](c));}
+
+function setBg(color,el){
+  g('pbody').style.background=color;
+  const hex=color.replace('#','');
+  const r=parseInt(hex.slice(0,2),16),gn=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  _tc=(0.299*r+0.587*gn+0.114*b)/255>0.45?'#111111':'#f0f0f0';
+  g('plist').style.color=_tc;
+  document.querySelectorAll('.bgs').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function tog(k){
+  props[k]=!props[k];
+  g('t-'+k).classList.toggle('on',props[k]);
+  const m={bg:['r-bg'],pad:['r-pad'],br:['r-br'],brd:['r-brd']};
+  if(m[k])m[k].forEach(id=>{const e=g(id);if(e)e.style.display=props[k]?'':'none';});
+  update();
+}
+
+function setTech(t){
+  tech=t;
+  ['marker','before','img'].forEach(x=>g('btn-'+x).classList.remove('active','img-active'));
+  g('btn-'+t).classList.add(t==='img'?'img-active':'active');
+  g('warn-marker').classList.toggle('show',t==='marker');
+  g('sec-box').style.display=t==='before'?'':'none';
+  g('sec-sizing').style.display=t==='before'?'':'none';
+  g('sec-img').style.display=t==='img'?'':'none';
+  g('row-type').style.display=t==='img'?'none':'block';
+  update();
+}
+
+function setImgTab(t){
+  imgTab=t;
+  ['builtin','url','data'].forEach(x=>{g('it-'+x).classList.toggle('active',x===t);g('ip-'+x).style.display=x===t?'':'none';});
+  update();
+}
+
+function setImgApproach(a){
+  imgApproach=a;
+  ['lsi','before','inline'].forEach(x=>g('ia-'+x).classList.toggle('active',x===a));
+  const notes={
+    lsi:'<strong>list-style-image</strong> — one line. Cannot control size; renders at natural image size. Works well for small, consistently-sized icons.',
+    before:'<strong>::before url()</strong> — set <code>list-style:none</code>, inject icon via <code>content:url()</code> in ::before. Use <code>width/height</code> for full size control.',
+    inline:'<strong>inline &lt;img&gt;</strong> — most powerful. Actual <code>&lt;img&gt;</code> element inside each <code>&lt;li&gt;</code>. Best for dynamic icons or React/Vue components.',
+  };
+  g('img-note').innerHTML=notes[a];
+  update();
+}
+
+function getImgUrl(v){
+  if(imgTab==='builtin')return svgUri(selectedIcon,v.ic);
+  if(imgTab==='url')return gv('c-iurl').trim()||'';
+  return gv('c-idata').trim()||'';
+}
+function getImgSz(v){
+  if(imgTab==='builtin')return v.isz;
+  if(imgTab==='url')return v.iusz;
+  return v.idsz;
+}
+
+function vals(){
+  const indent=parseInt(gv('c-indent')),lh=parseFloat(gv('c-lh')),fs=parseInt(gv('c-fs'));
+  const mc=gv('c-mc'),ms=parseFloat(gv('c-ms')),mw=gv('c-mw'),cont=gv('c-cont').trim();
+  const el=gv('c-el'),type=gv('c-type');
+  const bgc=gv('c-bg'),bgo=parseFloat(gv('c-bgo'));
+  const py=parseInt(gv('c-py')),px=parseInt(gv('c-px')),br=parseInt(gv('c-br'));
+  const bw=parseInt(gv('c-bw')),bc=gv('c-bc'),bst=gv('c-bs');
+  const mw2=parseInt(gv('c-mw2')),ta=gv('c-ta'),gap=parseInt(gv('c-gap'));
+  const isz=parseInt(gv('c-isz')),ic=gv('c-ic');
+  const iusz=parseInt(gv('c-iusz')),idsz=parseInt(gv('c-idsz')),igap=parseInt(gv('c-igap'));
+  g('rv-indent').textContent=indent+'px';g('rv-lh').textContent=lh.toFixed(1);g('rv-fs').textContent=fs+'px';
+  g('rv-ms').textContent=ms+'em';g('rv-bgo').textContent=bgo;g('rv-py').textContent=py+'px';g('rv-px').textContent=px+'px';
+  g('rv-br').textContent=br+'px';g('rv-bw').textContent=bw+'px';g('rv-mw2').textContent=mw2?mw2+'px':'—';
+  g('rv-gap').textContent=gap+'px';g('rv-isz').textContent=isz+'px';g('rv-iusz').textContent=iusz+'px';g('rv-idsz').textContent=idsz+'px';g('rv-igap').textContent=igap+'px';
+  return{indent,lh,fs,mc,ms,mw,cont,el,type,bgc,bgo,py,px,br,bw,bc,bst,mw2,ta,gap,isz,ic,iusz,idsz,igap};
+}
+
+function update(){
+  const v=vals();
+  let list=g('plist');
+  if(list.tagName.toLowerCase()!==v.el){
+    const n=document.createElement(v.el);n.id='plist';n.className=list.className;
+    n.innerHTML=list.innerHTML;n.style.cssText=list.style.cssText;
+    list.parentNode.replaceChild(n,list);list=g('plist');
+  }
+  list.style.cssText=`padding-left:${v.indent}px;line-height:${v.lh};font-size:${v.fs}px;color:${_tc};`;
+  list.querySelectorAll('li img.list-icon').forEach(i=>i.remove());
+
+  if(tech==='marker'){
+    list.style.listStyleType=v.type;
+    const cv=v.cont?`"${v.cont}"`:(v.el==='ol'?'counter(list-item) ". "':'');
+    g('injected').textContent=`#plist li::marker{color:${v.mc};font-size:${v.ms}em;font-weight:${v.mw};${cv?`content:${cv};`:''}}#plist li::before{content:none!important;}`;
+  } else if(tech==='before'){
+    list.style.listStyleType='none';
+    const bgVal=props.bg?hexA(v.bgc,v.bgo):'transparent';
+    const padVal=props.pad?`${v.py}px ${v.px}px`:'0';
+    const brVal=props.br?`${v.br}px`:'0';
+    const bordVal=props.brd?`${v.bw}px ${v.bst} ${v.bc}`:'none';
+    const mwVal=v.mw2?`${v.mw2}px`:'auto';
+    const isOl=v.el==='ol';
+    let mc;
+    if(v.cont)mc=`"${v.cont}"`;
+    else if(isOl)mc='counter(list-item)';
+    else{const s={disc:'•',circle:'◦',square:'▪',"'→ '":"→","'★ '":"★","'✓ '":"✓",none:''};mc=`"${s[v.type]||'•'}"`;}
+    g('injected').textContent=`
+      #plist{counter-reset:list-item;}
+      #plist li{counter-increment:list-item;display:flex;align-items:baseline;gap:${v.gap}px;}
+      #plist li::before{content:${mc};color:${v.mc};font-size:${v.ms}em;font-weight:${v.mw};
+        background:${bgVal};padding:${padVal};border-radius:${brVal};border:${bordVal};
+        min-width:${mwVal};text-align:${v.ta};flex-shrink:0;line-height:1.35;
+        display:inline-flex;align-items:center;justify-content:${v.ta==='center'?'center':v.ta==='right'?'flex-end':'flex-start'};}
+    `;
+  } else {
+    list.style.listStyleType='none';
+    const url=getImgUrl(v),sz=getImgSz(v),gap=v.igap;
+    if(imgApproach==='lsi'){
+      g('injected').textContent=`#plist{list-style-image:url("${url}");}#plist li::before{content:none!important;}`;
+    } else if(imgApproach==='before'){
+      g('injected').textContent=`#plist li{display:flex;align-items:center;gap:${gap}px;}#plist li::before{content:"";display:inline-flex;width:${sz}px;height:${sz}px;background:url("${url}") no-repeat center/contain;flex-shrink:0;}`;
+    } else {
+      g('injected').textContent=`#plist{list-style:none;}#plist li{display:flex;align-items:center;gap:${gap}px;}#plist li img.list-icon{width:${sz}px;height:${sz}px;object-fit:contain;flex-shrink:0;}#plist li::before{content:none!important;}`;
+      list.querySelectorAll('li').forEach(li=>{
+        if(!li.querySelector('img.list-icon')){
+          const img=document.createElement('img');
+          img.className='list-icon';img.src=url;img.alt='';
+          li.insertBefore(img,li.firstChild);
+        }
+      });
+    }
+  }
+  renderCode();
+}
+
+// ─ syntax helpers ─
+const S=s=>`<span class="s">${s}</span>`;
+const P=s=>`<span class="p_">${s}</span>`;
+const ST=s=>`<span class="st">${s}</span>`;
+const KW=s=>`<span class="kw">${s}</span>`;
+const CM=s=>`<span class="cm">${s}</span>`;
+const PU=s=>`<span class="pu">${s}</span>`;
+const NU=s=>`<span class="nu">${s}</span>`;
+const OB=()=>` ${PU('{')}\n`;
+const CB=()=>PU('}');
+function PR(prop,val,t=''){
+  const vc=t==='s'?'st':(isNaN(parseFloat(val))?'v':'nu');
+  return `  ${P(prop)}${PU(': ')}<span class="${vc}">${val}</span>${PU(';')}\n`;
+}
+function BLOCK(sel,body){return S(sel)+OB()+body+CB();}
+
+function buildCSS(v){
+  if(tech==='marker'){
+    const cv=v.cont?`"${v.cont}"`:(v.el==='ol'?'counter(list-item) ". "':'');
+    return CM('/* ── container ──')+'\n'+BLOCK(v.el,
+      PR('list-style-type',v.type)+PR('padding-left',v.indent+'px')
+    )+'\n\n'+CM('/* ── marker ─ color, size, weight, content only ──')+'\n'+BLOCK(`${v.el} li::marker`,
+      PR('color',v.mc,'s')+PR('font-size',v.ms+'em')+PR('font-weight',v.mw)+
+      (cv?PR('content',cv,'s'):'')+
+      CM('  /* ✗ background    — not supported */')+'\n'+
+      CM('  /* ✗ padding       — not supported */')+'\n'+
+      CM('  /* ✗ border-radius — not supported */')
+    );
+  }
+  if(tech==='before'){
+    const bgVal=props.bg?hexA(v.bgc,v.bgo):'transparent';
+    const padVal=props.pad?`${v.py}px ${v.px}px`:'0';
+    const brVal=props.br?`${v.br}px`:'0';
+    const bordVal=props.brd?`${v.bw}px ${v.bst} ${v.bc}`:'none';
+    const mwVal=v.mw2?v.mw2+'px':'auto';
+    const isOl=v.el==='ol';
+    let mc;
+    if(v.cont)mc=`"${v.cont}"`;else if(isOl)mc='counter(list-item)';
+    else{const s={disc:'•',circle:'◦',square:'▪',"'→ '":"→","'★ '":"★","'✓ '":"✓",none:''};mc=`"${s[v.type]||'•'}"`;}
+    return CM('/* ── reset native marker ──')+'\n'+BLOCK(v.el,
+      PR('list-style','none')+PR('padding-left',v.indent+'px')+(isOl?PR('counter-reset','list-item'):'')
+    )+'\n\n'+CM('/* ── flex row per item ──')+'\n'+BLOCK(`${v.el} li`,
+      (isOl?PR('counter-increment','list-item'):'')+PR('display','flex')+PR('align-items','baseline')+PR('gap',v.gap+'px')
+    )+'\n\n'+CM('/* ── full box model on ::before ──')+'\n'+BLOCK(`${v.el} li::before`,
+      PR('content',mc,'s')+PR('color',v.mc,'s')+PR('font-size',v.ms+'em')+PR('font-weight',v.mw)+
+      PR('background',bgVal,'s')+PR('padding',padVal)+PR('border-radius',brVal)+
+      (props.brd?PR('border',bordVal):'')+
+      (v.mw2?PR('min-width',mwVal):'')+PR('text-align',v.ta)+PR('flex-shrink','0')+
+      PR('line-height','1.35')+PR('display','inline-flex')+PR('align-items','center')
+    );
+  }
+  // img
+  const url=getImgUrl(v),sz=getImgSz(v),gap=v.igap;
+  const displayUrl = url.length > 60 ? url.slice(0,57)+'…' : url;
+  if(imgApproach==='lsi'){
+    return CM('/* ── list-style-image ─ simplest approach ──')+'\n'+
+      CM('/* ⚠ Cannot control image size this way */')+'\n'+
+      BLOCK(v.el,PR('list-style-image',`url("${displayUrl}")`,'s'));
+  }
+  if(imgApproach==='before'){
+    return CM('/* ── ::before background-image ─ with size control ──')+'\n'+
+      BLOCK(v.el,PR('list-style','none')+PR('padding-left',v.indent+'px'))+'\n\n'+
+      BLOCK(`${v.el} li`,PR('display','flex')+PR('align-items','center')+PR('gap',gap+'px'))+'\n\n'+
+      BLOCK(`${v.el} li::before`,
+        PR('content','""','s')+PR('display','inline-flex')+
+        PR('width',sz+'px')+PR('height',sz+'px')+
+        PR('background',`url("${displayUrl}") no-repeat center/contain`,'s')+
+        PR('flex-shrink','0')
+      );
+  }
+  return CM('/* ── inline <img> ─ max control, needs template ──')+'\n'+
+    BLOCK(v.el,PR('list-style','none')+PR('padding-left',v.indent+'px'))+'\n\n'+
+    BLOCK(`${v.el} li`,PR('display','flex')+PR('align-items','center')+PR('gap',gap+'px'))+'\n\n'+
+    BLOCK(`${v.el} li img.icon`,PR('width',sz+'px')+PR('height',sz+'px')+PR('object-fit','contain')+PR('flex-shrink','0'))+
+    '\n\n'+CM('/* See HTML / React tabs for markup */');
+}
+
+function buildHTML(v){
+  const el=v.el||gv('c-el');
+  const url=getImgUrl(v),sz=getImgSz(v);
+  const items=['Design systems at scale','Accessible components','Performance budgets','Testing strategies'];
+  let out=KW('<')+S(el)+' '+P('class')+'='+ST('"my-list"')+KW('>')+'\n';
+  items.forEach(item=>{
+    if(tech==='img'&&imgApproach==='inline'){
+      out+=`  ${KW('<')}${S('li')}${KW('>')}
+    ${KW('<')}${S('img')} ${P('src')}=${ST(`"…icon.svg"`)} ${P('alt')}=${ST('""')} ${P('class')}=${ST('"icon"')} ${P('width')}=${NU(sz)} ${P('height')}=${NU(sz)}${KW('/>')}
+    ${item}
+  ${KW('</')}${S('li')}${KW('>')}\n`;
+    } else {
+      out+=`  ${KW('<')}${S('li')}${KW('>')}${item}${KW('</')}${S('li')}${KW('>')}\n`;
+    }
+  });
+  out+=KW('</')+S(el)+KW('>');
+  return out;
+}
+
+function buildReact(v){
+  const el=v.el||gv('c-el');
+  const isImg=tech==='img',sz=getImgSz(v);
+  let out=KW('import ')+S('React')+KW(' from ')+ST('"react"')+PU(';')+'\n\n';
+  out+=KW('const ')+S('items')+' = '+PU('[');
+  ['Design systems at scale','Accessible components','Performance budgets','Testing strategies'].forEach(i=>{out+='\n  '+ST(`"${i}"`)+PU(',');});
+  out+='\n'+PU(']')+PU(';')+'\n\n';
+  out+=KW('export default function ')+S('MyList')+PU('() {\n  return (\n');
+  out+=`    ${KW('<')}${S(el)} ${P('className')}=${ST('"my-list"')}${KW('>')}\n`;
+  out+=`      {items.map((item, i) => (\n        ${KW('<')}${S('li')} ${P('key')}=${PU('{i}')}\n`;
+  if(isImg&&imgApproach==='inline'){
+    out+=`          ${P('style')}=${PU('{{ display:')} ${ST('"flex"')}${PU(', alignItems:')} ${ST('"center"')}${PU(', gap:')} ${NU(v.igap)} ${PU('}}>')}`;
+    out+=`\n          ${KW('<')}${S('img')} ${P('src')}=${ST('"…icon.svg"')} ${P('alt')}=${ST('""')} ${P('width')}=${PU('{')}${NU(sz)}${PU('}')} ${P('height')}=${PU('{')}${NU(sz)}${PU('}')} ${P('className')}=${ST('"icon"')}${KW('/>')}`;
+    out+=`\n          {item}\n        ${KW('</')}${S('li')}${KW(')')})}\n`;
+  } else {
+    out+=`          ${KW('>')+'{item}'+KW('</')}${S('li')}${KW(')')})}\n`;
+  }
+  out+=`    ${KW('</')}${S(el)}${KW('>')}\n  ${PU(')')}\n${PU('}')}`;
+  return out;
+}
+
+function renderCode(){
+  const v=vals();
+  let out='';
+  if(codeTab==='css') out=buildCSS(v);
+  else if(codeTab==='html') out=buildHTML(v);
+  else out=buildReact(v);
+  const el=g('code-out');
+  el.innerHTML=out;
+  el.classList.remove('popped');void el.offsetWidth;el.classList.add('popped');
+}
+
+function setCodeTab(tab,btn){
+  codeTab=tab;
+  document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderCode();
+}
+
+function copyTop(){
+  navigator.clipboard.writeText(g('code-out').innerText).then(()=>{
+    const b=g('copy-top');b.textContent='✓ copied!';b.classList.add('copied');
+    setTimeout(()=>{b.textContent='copy CSS';b.classList.remove('copied');},2000);
+  });
+}
+function copySnip(){
+  navigator.clipboard.writeText(g('code-out').innerText).then(()=>{
+    const b=g('copy-snip');b.textContent='✓';b.classList.add('copied');
+    setTimeout(()=>{b.textContent='copy';b.classList.remove('copied');},2000);
+  });
+}
+
+// presets
+function applyPreset(btn,name){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const P2={
+    minimal(){setTech('marker');g('c-el').value='ul';g('c-type').value='disc';g('c-mc').value='#7c6cff';g('h-mc').value='#7c6cff';g('c-ms').value=1;g('c-mw').value='700';g('c-indent').value=28;g('c-lh').value=1.9;g('c-fs').value=15;g('c-cont').value='';props={bg:false,pad:false,br:false,brd:false};},
+    pill(){setTech('before');g('c-el').value='ul';g('c-type').value='disc';g('c-mc').value='#ffffff';g('h-mc').value='#ffffff';g('c-ms').value=0.78;g('c-mw').value='700';g('c-indent').value=44;g('c-lh').value=2.2;g('c-fs').value=15;g('c-bg').value='#7c6cff';g('h-bg').value='#7c6cff';g('c-bgo').value=1;g('c-py').value=2;g('c-px').value=10;g('c-br').value=50;g('c-gap').value=12;g('c-mw2').value=0;g('c-ta').value='center';g('c-cont').value='';props={bg:true,pad:true,br:true,brd:false};},
+    outlined(){setTech('before');g('c-el').value='ol';g('c-type').value='decimal';g('c-mc').value='#3ddc97';g('h-mc').value='#3ddc97';g('c-ms').value=0.75;g('c-mw').value='700';g('c-indent').value=48;g('c-lh').value=2.2;g('c-fs').value=15;g('c-bg').value='#0d0d0f';g('h-bg').value='#0d0d0f';g('c-bgo').value=1;g('c-py').value=2;g('c-px').value=8;g('c-br').value=4;g('c-bw').value=1;g('c-bc').value='#3ddc97';g('h-bc').value='#3ddc97';g('c-bs').value='solid';g('c-gap').value=12;g('c-mw2').value=24;g('c-ta').value='center';g('c-cont').value='';props={bg:true,pad:true,br:true,brd:true};},
+    numbox(){setTech('before');g('c-el').value='ol';g('c-mc').value='#ffffff';g('h-mc').value='#ffffff';g('c-ms').value=0.78;g('c-mw').value='700';g('c-indent').value=52;g('c-lh').value=2.4;g('c-fs').value=15;g('c-bg').value='#ff5f7e';g('h-bg').value='#ff5f7e';g('c-bgo').value=1;g('c-py').value=3;g('c-px').value=5;g('c-br').value=4;g('c-gap').value=14;g('c-mw2').value=24;g('c-ta').value='center';g('c-cont').value='';props={bg:true,pad:true,br:true,brd:false};},
+    dotring(){setTech('before');g('c-el').value='ul';g('c-type').value='disc';g('c-mc').value='#38d9f5';g('h-mc').value='#38d9f5';g('c-ms').value=1.3;g('c-mw').value='700';g('c-indent').value=36;g('c-lh').value=2.2;g('c-fs').value=15;g('c-bg').value='#0d0d0f';g('h-bg').value='#0d0d0f';g('c-bgo').value=0;g('c-py').value=0;g('c-px').value=0;g('c-br').value=50;g('c-bw').value=2;g('c-bc').value='#38d9f5';g('h-bc').value='#38d9f5';g('c-bs').value='solid';g('c-gap').value=12;g('c-mw2').value=18;g('c-ta').value='center';g('c-cont').value='';props={bg:false,pad:false,br:true,brd:true};},
+    ghost(){setTech('before');g('c-el').value='ul';g('c-mc').value='#a090ff';g('h-mc').value='#a090ff';g('c-ms').value=0.72;g('c-mw').value='400';g('c-indent').value=40;g('c-lh').value=2.2;g('c-fs').value=15;g('c-bg').value='#7c6cff';g('h-bg').value='#7c6cff';g('c-bgo').value=0.1;g('c-py').value=3;g('c-px').value=10;g('c-br').value=3;g('c-bw').value=1;g('c-bc').value='#7c6cff';g('h-bc').value='#7c6cff';g('c-bs').value='solid';g('c-gap').value=10;g('c-mw2').value=0;g('c-ta').value='left';g('c-cont').value='';props={bg:true,pad:true,br:true,brd:true};},
+    step(){setTech('before');g('c-el').value='ol';g('c-mc').value='#0d0d0f';g('h-mc').value='#0d0d0f';g('c-ms').value=0.72;g('c-mw').value='700';g('c-indent').value=58;g('c-lh').value=2.4;g('c-fs').value=15;g('c-bg').value='#ffb547';g('h-bg').value='#ffb547';g('c-bgo').value=1;g('c-py').value=1;g('c-px').value=6;g('c-br').value=2;g('c-gap').value=14;g('c-mw2').value=22;g('c-ta').value='center';g('c-cont').value='';props={bg:true,pad:true,br:true,brd:false};},
+    'img-svg'(){setTech('img');setImgTab('builtin');setImgApproach('before');selectedIcon='check';document.querySelectorAll('.icon-opt').forEach((b,i)=>b.classList.toggle('active',ICON_KEYS[i]==='check'));g('c-ic').value='#7c6cff';g('h-ic').value='#7c6cff';g('c-isz').value=18;g('c-el').value='ul';g('c-indent').value=40;g('c-lh').value=2.0;g('c-fs').value=15;g('c-igap').value=12;},
+    'img-emoji'(){setTech('img');setImgTab('data');setImgApproach('before');const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><text y="32" font-size="32">🚀</text></svg>`;g('c-idata').value='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);g('c-idsz').value=20;g('c-el').value='ul';g('c-indent').value=44;g('c-lh').value=2.0;g('c-fs').value=15;g('c-igap').value=12;},
+  };
+  P2[name]();
+  ['bg','pad','br','brd'].forEach(k=>{
+    g('t-'+k).classList.toggle('on',props[k]);
+    const m={bg:['r-bg'],pad:['r-pad'],br:['r-br'],brd:['r-brd']};
+    if(m[k])m[k].forEach(id=>{const e=g(id);if(e)e.style.display=props[k]?'':'none';});
+  });
+  update();
+}
+
+setImgApproach('lsi');
+setTech('marker');
+
+// filter list-style-type options by ul/ol
+function filterTypeOpts(){
+  const isOl = gv('c-el') === 'ol';
+  const sel = g('c-type');
+  Array.from(sel.querySelectorAll('optgroup')).forEach(og => {
+    const isUlGroup = og.classList.contains('og-ul');
+    const isOlGroup = og.classList.contains('og-ol');
+    if(isUlGroup) og.style.display = isOl ? 'none' : '';
+    if(isOlGroup) og.style.display = isOl ? '' : 'none';
+  });
+  // auto-switch to a sensible default when switching element type
+  const cur = sel.value;
+  const ulVals = ['disc','circle','square','disclosure-open','disclosure-closed'];
+  const olVals = ['decimal','decimal-leading-zero','lower-roman','upper-roman','lower-alpha','upper-alpha'];
+  if(isOl && ulVals.includes(cur)) sel.value = 'decimal';
+  if(!isOl && olVals.includes(cur)) sel.value = 'disc';
+}
+g('c-el').addEventListener('change', () => { filterTypeOpts(); update(); });
+filterTypeOpts();
+
+// set initial state: dark bg + pill preset active
+_tc = '#f0f0f0';
+applyPreset(document.querySelector('.preset-btn'), 'minimal');
+
+</script>
+</body>
+</html>
