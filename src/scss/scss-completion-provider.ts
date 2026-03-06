@@ -386,10 +386,18 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 		const items: vscode.CompletionItem[] = [];
 
 		// 1) Module member access: alias.  (e.g., math.ceil, color.adjust)
-		const dotMatch = textBeforeCursor.match(/(\w+)\.\s*(\w*)$/);
+		const dotMatch = textBeforeCursor.match(/(\w+)\.\s*([\w-]*)$/);
 		if (dotMatch) {
 			const alias = dotMatch[1];
 			const partial = dotMatch[2] || "";
+			// Range covers "alias.partial" so VS Code replaces the whole thing
+			const matchStart = dotMatch.index!;
+			const replaceRange = new vscode.Range(
+				position.line,
+				matchStart,
+				position.line,
+				position.character,
+			);
 			const useAliases = parseUseStatements(document);
 
 			// Check whether this alias matches a known use statement
@@ -397,7 +405,14 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 			if (moduleName) {
 				const mod = findModuleByName(moduleName);
 				if (mod) {
-					items.push(...this._getModuleMemberCompletions(mod, alias, partial));
+					items.push(
+						...this._getModuleMemberCompletions(
+							mod,
+							alias,
+							partial,
+							replaceRange,
+						),
+					);
 					return items;
 				}
 			}
@@ -408,7 +423,12 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 			);
 			if (directMod) {
 				items.push(
-					...this._getModuleMemberCompletions(directMod, alias, partial),
+					...this._getModuleMemberCompletions(
+						directMod,
+						alias,
+						partial,
+						replaceRange,
+					),
 				);
 				return items;
 			}
@@ -468,6 +488,7 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 		mod: ScssModule,
 		alias: string,
 		_partial: string,
+		replaceRange: vscode.Range,
 	): vscode.CompletionItem[] {
 		const items: vscode.CompletionItem[] = [];
 
@@ -481,8 +502,9 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 			item.documentation = new vscode.MarkdownString(
 				`**${mod.name}**\n\n${fn.description}\n\n\`\`\`scss\n${fn.signature}\n\`\`\``,
 			);
-			item.insertText = new vscode.SnippetString(fn.insertText);
+			item.insertText = new vscode.SnippetString(`${alias}.${fn.insertText}`);
 			item.filterText = `${alias}.${fn.name}`;
+			item.range = replaceRange;
 			item.sortText = `0_${fn.name}`;
 			items.push(item);
 		}
@@ -498,8 +520,9 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 				item.documentation = new vscode.MarkdownString(
 					`**${mod.name}**\n\n${v.description}\n\nValue: \`${v.value}\``,
 				);
-				item.insertText = v.name;
+				item.insertText = `${alias}.${v.name}`;
 				item.filterText = `${alias}.${v.name}`;
+				item.range = replaceRange;
 				item.sortText = `1_${v.name}`;
 				items.push(item);
 			}
@@ -516,8 +539,9 @@ export class ScssCompletionProvider implements vscode.CompletionItemProvider {
 				item.documentation = new vscode.MarkdownString(
 					`**${mod.name}** mixin\n\n${mx.description}\n\n\`\`\`scss\n${mx.signature}\n\`\`\``,
 				);
-				item.insertText = new vscode.SnippetString(mx.insertText);
+				item.insertText = new vscode.SnippetString(`${alias}.${mx.insertText}`);
 				item.filterText = `${alias}.${mx.name}`;
+				item.range = replaceRange;
 				item.sortText = `0_${mx.name}`;
 				items.push(item);
 			}
