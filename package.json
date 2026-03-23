@@ -49,6 +49,7 @@
     "onLanguage:sass",
     "onLanguage:html",
     "onLanguage:vue",
+    "onLanguage:astro",
     "onView:easeGeneratorView"
   ],
   "main": "./out/extension.js",

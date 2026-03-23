@@ -1,16 +1,43 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
 import * as fs from "node:fs";
-import { updateTimingFunctionPreviews } from "./timing-preview";
+import {
+	initTimingPreview,
+	updateTimingFunctionPreviews,
+} from "./timing-preview"; // ← added initTimingPreview
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log("CSS Ease Generator extension is now active!");
+	console.log("[timing-preview] CSS Ease Generator extension is now active!");
+	console.log("[timing-preview] Visible editors at activation:");
+	for (const editor of vscode.window.visibleTextEditors) {
+		if (editor?.document) {
+			console.log(
+				`[timing-preview] Editor: ${editor.document.fileName}, languageId: ${editor.document.languageId}`,
+			);
+		}
+	}
+
+	// ── MUST be called before any updateTimingFunctionPreviews() calls ──────────
+	initTimingPreview(context); // ← ADD THIS LINE
 
 	// ── Timing Function Inline Preview: Only for Supported Languages ─────────────
-	const SUPPORTED_LANGUAGES = ["css", "scss", "less", "sass", "html", "vue"];
+	const SUPPORTED_LANGUAGES = [
+		"css",
+		"scss",
+		"less",
+		"sass",
+		"html",
+		"vue",
+		"astro",
+	];
 	const updateAllVisibleEditors = () => {
 		for (const editor of vscode.window.visibleTextEditors) {
-			if (SUPPORTED_LANGUAGES.includes(editor.document.languageId)) {
+			const lang = editor.document.languageId;
+			const text = editor.document.getText();
+			if (
+				SUPPORTED_LANGUAGES.includes(lang) ||
+				/<style[^>]*>[\s\S]*?<\/style>/i.test(text)
+			) {
 				updateTimingFunctionPreviews(editor);
 			}
 		}
@@ -21,8 +48,12 @@ export function activate(context: vscode.ExtensionContext) {
 			updateAllVisibleEditors();
 		}),
 		vscode.workspace.onDidChangeTextDocument((e) => {
-			// Only update if the changed document is a supported language
-			if (SUPPORTED_LANGUAGES.includes(e.document.languageId)) {
+			const lang = e.document.languageId;
+			const text = e.document.getText();
+			if (
+				SUPPORTED_LANGUAGES.includes(lang) ||
+				/<style[^>]*>[\s\S]*?<\/style>/i.test(text)
+			) {
 				updateAllVisibleEditors();
 			}
 		}),
@@ -282,13 +313,11 @@ class ScrollAnimationCheatSheetPanel {
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
 
-		// If panel already exists, reveal it
 		if (ScrollAnimationCheatSheetPanel.currentPanel) {
 			ScrollAnimationCheatSheetPanel.currentPanel._panel.reveal(column);
 			return;
 		}
 
-		// Otherwise create a new panel
 		const panel = vscode.window.createWebviewPanel(
 			ScrollAnimationCheatSheetPanel.viewType,
 			"CSS Scroll Animation Cheat Sheet",
