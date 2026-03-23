@@ -19,45 +19,104 @@ const timingPreviewDecoration = vscode.window.createTextEditorDecorationType({
  * Scans the document for timing functions and adds inline interactive previews.
  */
 export function updateTimingFunctionPreviews(editor: vscode.TextEditor) {
-	const supportedLanguages = [
-		"css",
-		"scss",
-		"sass",
-		"astro",
-		"vue",
-		"svelte",
-		"html",
-	]; // add more as needed
-	if (!editor || !supportedLanguages.includes(editor.document.languageId)) {
+	if (!editor) {
+		console.log("[timing-preview] No active editor");
 		return;
 	}
-
+	const doc = editor.document;
+	const text = doc.getText();
 	const decorations: vscode.DecorationOptions[] = [];
+	console.log(`[timing-preview] Running on file: ${doc.fileName}`);
 
-	for (let line = 0; line < editor.document.lineCount; line++) {
-		const lineText = editor.document.lineAt(line).text;
-		let match: RegExpExecArray | null = TIMING_FUNCTION_REGEX.exec(lineText);
+	// Regex to match <style ...>...</style> blocks, including multiline and lang attributes
+	const styleBlockRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+	let styleMatch: RegExpExecArray | null;
+
+	// Helper to get line/char from offset
+	function positionAt(offset: number) {
+		return doc.positionAt(offset);
+	}
+
+	// Scan all <style> blocks in the file, regardless of language
+	let styleBlockCount = 0;
+	styleMatch = styleBlockRegex.exec(text);
+	while (styleMatch !== null) {
+		styleBlockCount++;
+		const blockContent = styleMatch[1];
+		const blockStartOffset =
+			styleMatch.index + styleMatch[0].indexOf(blockContent);
+		console.log(
+			`[timing-preview] Found <style> block at offset ${blockStartOffset}, length ${blockContent.length}`,
+		);
+		// Scan for timing functions inside this block
+		let match: RegExpExecArray | null;
+		TIMING_FUNCTION_REGEX.lastIndex = 0;
+		match = TIMING_FUNCTION_REGEX.exec(blockContent);
+		let matchCount = 0;
 		while (match !== null) {
-			const start = match.index;
+			matchCount++;
+			const start = blockStartOffset + match.index;
 			const end = start + match[0].length;
-			const range = new vscode.Range(line, start, line, end);
-
-			// Generate a data URI SVG preview for the timing function
+			const range = new vscode.Range(positionAt(start), positionAt(end));
 			const svgDataUri = generateTimingFunctionSVG(match[0]);
-
+			console.log(
+				`[timing-preview]  - Found timing function '${match[0]}' at ${start}-${end}`,
+			);
 			decorations.push({
 				range,
 				renderOptions: {
 					after: {
 						contentIconPath: svgDataUri,
-						// Optionally, add a hover message or command
 					},
 				},
 			});
-			match = TIMING_FUNCTION_REGEX.exec(lineText);
+			match = TIMING_FUNCTION_REGEX.exec(blockContent);
 		}
+		console.log(
+			`[timing-preview]  - Found ${matchCount} timing functions in this <style> block.`,
+		);
+		styleMatch = styleBlockRegex.exec(text);
 	}
+	console.log(
+		`[timing-preview] Total <style> blocks found: ${styleBlockCount}`,
+	);
 
+	// If no <style> blocks found, and the file is a pure CSS/SCSS/SASS file, scan whole file
+	if (!text.match(styleBlockRegex)) {
+		console.log(
+			"[timing-preview] No <style> blocks found, scanning whole file for timing functions",
+		);
+		let fileMatchCount = 0;
+		for (let line = 0; line < doc.lineCount; line++) {
+			const lineText = doc.lineAt(line).text;
+			let match: RegExpExecArray | null;
+			TIMING_FUNCTION_REGEX.lastIndex = 0;
+			match = TIMING_FUNCTION_REGEX.exec(lineText);
+			while (match !== null) {
+				fileMatchCount++;
+				const start = match.index;
+				const end = start + match[0].length;
+				const range = new vscode.Range(line, start, line, end);
+				const svgDataUri = generateTimingFunctionSVG(match[0]);
+				console.log(
+					`[timing-preview]  - Found timing function '${match[0]}' at line ${line}, cols ${start}-${end}`,
+				);
+				decorations.push({
+					range,
+					renderOptions: {
+						after: {
+							contentIconPath: svgDataUri,
+						},
+					},
+				});
+				match = TIMING_FUNCTION_REGEX.exec(lineText);
+			}
+		}
+		console.log(
+			`[timing-preview] Total timing functions found in file: ${fileMatchCount}`,
+		);
+	}
+	console.log(`[timing-preview] Setting ${decorations.length} decorations`);
 	editor.setDecorations(timingPreviewDecoration, decorations);
 }
 

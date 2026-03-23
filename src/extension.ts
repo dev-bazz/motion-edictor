@@ -6,10 +6,13 @@ import { updateTimingFunctionPreviews } from "./timing-preview";
 export function activate(context: vscode.ExtensionContext) {
 	console.log("CSS Ease Generator extension is now active!");
 
-	// ── Timing Function Inline Preview: Always Active ─────────────
+	// ── Timing Function Inline Preview: Only for Supported Languages ─────────────
+	const SUPPORTED_LANGUAGES = ["css", "scss", "less", "sass", "html", "vue"];
 	const updateAllVisibleEditors = () => {
 		for (const editor of vscode.window.visibleTextEditors) {
-			updateTimingFunctionPreviews(editor);
+			if (SUPPORTED_LANGUAGES.includes(editor.document.languageId)) {
+				updateTimingFunctionPreviews(editor);
+			}
 		}
 	};
 	updateAllVisibleEditors();
@@ -17,8 +20,11 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.onDidChangeActiveTextEditor(() => {
 			updateAllVisibleEditors();
 		}),
-		vscode.workspace.onDidChangeTextDocument(() => {
-			updateAllVisibleEditors();
+		vscode.workspace.onDidChangeTextDocument((e) => {
+			// Only update if the changed document is a supported language
+			if (SUPPORTED_LANGUAGES.includes(e.document.languageId)) {
+				updateAllVisibleEditors();
+			}
 		}),
 		vscode.window.onDidChangeVisibleTextEditors(() => {
 			updateAllVisibleEditors();

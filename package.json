@@ -43,6 +43,12 @@
     "react spring"
   ],
   "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onLanguage:sass",
+    "onLanguage:html",
+    "onLanguage:vue",
     "onView:easeGeneratorView"
   ],
   "main": "./out/extension.js",
