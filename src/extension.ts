@@ -6,21 +6,22 @@ import { updateTimingFunctionPreviews } from "./timing-preview";
 export function activate(context: vscode.ExtensionContext) {
 	console.log("CSS Ease Generator extension is now active!");
 
-	// ── Timing Function Inline Preview ─────────────────────────────
-	if (vscode.window.activeTextEditor) {
-		updateTimingFunctionPreviews(vscode.window.activeTextEditor);
-	}
+	// ── Timing Function Inline Preview: Always Active ─────────────
+	const updateAllVisibleEditors = () => {
+		for (const editor of vscode.window.visibleTextEditors) {
+			updateTimingFunctionPreviews(editor);
+		}
+	};
+	updateAllVisibleEditors();
 	context.subscriptions.push(
-		vscode.window.onDidChangeActiveTextEditor((editor) => {
-			if (editor) {
-				updateTimingFunctionPreviews(editor);
-			}
+		vscode.window.onDidChangeActiveTextEditor(() => {
+			updateAllVisibleEditors();
 		}),
-		vscode.workspace.onDidChangeTextDocument((event) => {
-			const editor = vscode.window.activeTextEditor;
-			if (editor && event.document === editor.document) {
-				updateTimingFunctionPreviews(editor);
-			}
+		vscode.workspace.onDidChangeTextDocument(() => {
+			updateAllVisibleEditors();
+		}),
+		vscode.window.onDidChangeVisibleTextEditors(() => {
+			updateAllVisibleEditors();
 		}),
 	);
 

@@ -19,7 +19,16 @@ const timingPreviewDecoration = vscode.window.createTextEditorDecorationType({
  * Scans the document for timing functions and adds inline interactive previews.
  */
 export function updateTimingFunctionPreviews(editor: vscode.TextEditor) {
-	if (!editor || !["css", "scss"].includes(editor.document.languageId)) {
+	const supportedLanguages = [
+		"css",
+		"scss",
+		"sass",
+		"astro",
+		"vue",
+		"svelte",
+		"html",
+	]; // add more as needed
+	if (!editor || !supportedLanguages.includes(editor.document.languageId)) {
 		return;
 	}
 
