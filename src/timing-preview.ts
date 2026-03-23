@@ -96,10 +96,32 @@ function generateTimingFunctionSVG(timing: string): vscode.Uri {
 		}
 	}
 
+	// SVG with dark and light theme support using embedded style
 	const svg = `
 		<svg width='${width}' height='${height}' xmlns='http://www.w3.org/2000/svg'>
-			<rect width='${width}' height='${height}' fill='#e0e0e0' fill-opacity='1' stroke='#bbb' stroke-width='1'/>
-			<path d='${path}' fill='none' stroke='#0078d4' stroke-width='2'/>
+			<style>
+				.bg { fill: url(#bgGradLight); stroke: #b6c2d1; }
+				.curve { stroke: #0078d4; }
+				@media (prefers-color-scheme: dark) {
+					.bg { fill: url(#bgGradDark); stroke: #444d5a; }
+					.curve { stroke: #4fc3f7; }
+				}
+			</style>
+			<defs>
+				<linearGradient id='bgGradLight' x1='0' y1='0' x2='0' y2='1'>
+					<stop offset='0%' stop-color='#f8fafc'/>
+					<stop offset='100%' stop-color='#e0e7ef'/>
+				</linearGradient>
+				<linearGradient id='bgGradDark' x1='0' y1='0' x2='0' y2='1'>
+					<stop offset='0%' stop-color='#23272e'/>
+					<stop offset='100%' stop-color='#1a1d22'/>
+				</linearGradient>
+				<filter id='shadow' x='-20%' y='-20%' width='140%' height='140%'>
+					<feDropShadow dx='0' dy='1' stdDeviation='1' flood-color='#000' flood-opacity='0.5'/>
+				</filter>
+			</defs>
+			<rect x='0' y='0' width='${width}' height='${height}' rx='6' ry='6' class='bg' stroke-width='1.2' filter='url(#shadow)'/>
+			<path d='${path}' fill='none' class='curve' stroke-width='2.5' filter='url(#shadow)' stroke-linecap='round' stroke-linejoin='round'/>
 		</svg>
 	`;
 	const encoded = Buffer.from(svg).toString("base64");
