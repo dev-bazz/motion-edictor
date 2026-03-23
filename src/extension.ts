@@ -9,13 +9,18 @@ import {
 	initAnimationPreview,
 	scheduleAnimationPreviewUpdate,
 } from "./animation-preview";
+import {
+	initGradientPreview,
+	updateGradientPreviews,
+} from "./gradient-preview"; // ← NEW
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("[motion] CSS Ease Generator extension is now active!");
 
-	// ── Init both preview systems (must come first) ───────────────────────────
+	// ── Init all preview systems (must come first) ────────────────────────────
 	initTimingPreview(context);
 	initAnimationPreview(context);
+	initGradientPreview(context); // ← NEW
 
 	const SUPPORTED_LANGUAGES = [
 		"css",
@@ -35,10 +40,9 @@ export function activate(context: vscode.ExtensionContext) {
 				SUPPORTED_LANGUAGES.includes(lang) ||
 				/<style[^>]*>[\s\S]*?<\/style>/i.test(text)
 			) {
-				// Timing preview: fast, no async, no debounce needed
 				updateTimingFunctionPreviews(editor);
-				// Animation preview: debounced internally (workspace scan is async)
 				scheduleAnimationPreviewUpdate(editor);
+				updateGradientPreviews(editor); // ← NEW
 			}
 		}
 	};
@@ -62,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 		),
 	);
 
-	// ── Webview / panel registrations (unchanged) ─────────────────────────────
+	// ── Webview / panel registrations ─────────────────────────────────────────
 
 	const provider = new EaseEditorViewProvider(
 		context.extensionUri,
@@ -147,7 +151,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-// ─── Webview / Panel classes (unchanged from original) ───────────────────────
+// ─── Shared panel factory ─────────────────────────────────────────────────────
 
 class EaseEditorViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "easeGeneratorView";
