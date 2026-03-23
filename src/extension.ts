@@ -4,7 +4,11 @@ import * as fs from "node:fs";
 import {
 	initTimingPreview,
 	updateTimingFunctionPreviews,
-} from "./timing-preview"; // ← added initTimingPreview
+} from "./timing-preview";
+import {
+	initAnimationPreview,
+	updateAnimationPreviews,
+} from "./animation-preview"; // ← NEW
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("[timing-preview] CSS Ease Generator extension is now active!");
@@ -17,10 +21,11 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
-	// ── MUST be called before any updateTimingFunctionPreviews() calls ──────────
-	initTimingPreview(context); // ← ADD THIS LINE
+	// ── Init both preview systems ─────────────────────────────────────────────
+	initTimingPreview(context);
+	initAnimationPreview(context); // ← NEW
 
-	// ── Timing Function Inline Preview: Only for Supported Languages ─────────────
+	// ── Timing Function Inline Preview: Only for Supported Languages ──────────
 	const SUPPORTED_LANGUAGES = [
 		"css",
 		"scss",
@@ -30,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 		"vue",
 		"astro",
 	];
+
 	const updateAllVisibleEditors = () => {
 		for (const editor of vscode.window.visibleTextEditors) {
 			const lang = editor.document.languageId;
@@ -39,10 +45,13 @@ export function activate(context: vscode.ExtensionContext) {
 				/<style[^>]*>[\s\S]*?<\/style>/i.test(text)
 			) {
 				updateTimingFunctionPreviews(editor);
+				updateAnimationPreviews(editor); // ← NEW (async, fire-and-forget is fine)
 			}
 		}
 	};
+
 	updateAllVisibleEditors();
+
 	context.subscriptions.push(
 		vscode.window.onDidChangeActiveTextEditor(() => {
 			updateAllVisibleEditors();
@@ -260,11 +269,8 @@ class SVGCheatSheetPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -289,13 +295,15 @@ class SVGCheatSheetPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"svg-path-cheat-sheet.html",
+		return fs.readFileSync(
+			path.join(
+				this._extensionPath,
+				"src",
+				"tools",
+				"svg-path-cheat-sheet.html",
+			),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -312,22 +320,16 @@ class ScrollAnimationCheatSheetPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (ScrollAnimationCheatSheetPanel.currentPanel) {
 			ScrollAnimationCheatSheetPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			ScrollAnimationCheatSheetPanel.viewType,
 			"CSS Scroll Animation Cheat Sheet",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		ScrollAnimationCheatSheetPanel.currentPanel =
 			new ScrollAnimationCheatSheetPanel(panel, extensionPath);
 	}
@@ -335,11 +337,8 @@ class ScrollAnimationCheatSheetPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -364,13 +363,15 @@ class ScrollAnimationCheatSheetPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"scroll-animation-cheatsheet.html",
+		return fs.readFileSync(
+			path.join(
+				this._extensionPath,
+				"src",
+				"tools",
+				"scroll-animation-cheatsheet.html",
+			),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -387,22 +388,16 @@ class SVGLoadersCheatSheetPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (SVGLoadersCheatSheetPanel.currentPanel) {
 			SVGLoadersCheatSheetPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			SVGLoadersCheatSheetPanel.viewType,
 			"SVG Loaders Cheat Sheet",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		SVGLoadersCheatSheetPanel.currentPanel = new SVGLoadersCheatSheetPanel(
 			panel,
 			extensionPath,
@@ -412,11 +407,8 @@ class SVGLoadersCheatSheetPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -441,13 +433,15 @@ class SVGLoadersCheatSheetPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"svg-loaders-cheatsheet.html",
+		return fs.readFileSync(
+			path.join(
+				this._extensionPath,
+				"src",
+				"tools",
+				"svg-loaders-cheatsheet.html",
+			),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -464,22 +458,16 @@ class CheatSheetHubPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (CheatSheetHubPanel.currentPanel) {
 			CheatSheetHubPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			CheatSheetHubPanel.viewType,
 			"Cheat Sheets",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		CheatSheetHubPanel.currentPanel = new CheatSheetHubPanel(
 			panel,
 			extensionPath,
@@ -489,11 +477,8 @@ class CheatSheetHubPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				switch (message.command) {
@@ -551,13 +536,10 @@ class CheatSheetHubPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"cheatsheet-hub.html",
+		return fs.readFileSync(
+			path.join(this._extensionPath, "src", "tools", "cheatsheet-hub.html"),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -574,22 +556,16 @@ class ContainerQueryCheatSheetPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (ContainerQueryCheatSheetPanel.currentPanel) {
 			ContainerQueryCheatSheetPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			ContainerQueryCheatSheetPanel.viewType,
 			"CSS Modern Queries Cheat Sheet",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		ContainerQueryCheatSheetPanel.currentPanel =
 			new ContainerQueryCheatSheetPanel(panel, extensionPath);
 	}
@@ -597,11 +573,8 @@ class ContainerQueryCheatSheetPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -626,13 +599,10 @@ class ContainerQueryCheatSheetPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"container-query.html",
+		return fs.readFileSync(
+			path.join(this._extensionPath, "src", "tools", "container-query.html"),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -649,22 +619,16 @@ class GradientForgeProPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (GradientForgeProPanel.currentPanel) {
 			GradientForgeProPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			GradientForgeProPanel.viewType,
 			"Gradient Forge Pro",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		GradientForgeProPanel.currentPanel = new GradientForgeProPanel(
 			panel,
 			extensionPath,
@@ -674,11 +638,8 @@ class GradientForgeProPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -703,13 +664,10 @@ class GradientForgeProPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"gradient-forge-pro.html",
+		return fs.readFileSync(
+			path.join(this._extensionPath, "src", "tools", "gradient-forge-pro.html"),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
 
@@ -726,22 +684,16 @@ class ListPlaygroundPanel {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
-
 		if (ListPlaygroundPanel.currentPanel) {
 			ListPlaygroundPanel.currentPanel._panel.reveal(column);
 			return;
 		}
-
 		const panel = vscode.window.createWebviewPanel(
 			ListPlaygroundPanel.viewType,
 			"List Style Playground",
 			column || vscode.ViewColumn.One,
-			{
-				enableScripts: true,
-				localResourceRoots: [extensionUri],
-			},
+			{ enableScripts: true, localResourceRoots: [extensionUri] },
 		);
-
 		ListPlaygroundPanel.currentPanel = new ListPlaygroundPanel(
 			panel,
 			extensionPath,
@@ -751,11 +703,8 @@ class ListPlaygroundPanel {
 	private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
 		this._panel = panel;
 		this._extensionPath = extensionPath;
-
 		this._panel.webview.html = this._getHtmlForWebview();
-
 		this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
 		this._panel.webview.onDidReceiveMessage(
 			(message) => {
 				if (message.command === "copyToClipboard") {
@@ -780,12 +729,9 @@ class ListPlaygroundPanel {
 	}
 
 	private _getHtmlForWebview(): string {
-		const htmlPath = path.join(
-			this._extensionPath,
-			"src",
-			"tools",
-			"list-playground.html",
+		return fs.readFileSync(
+			path.join(this._extensionPath, "src", "tools", "list-playground.html"),
+			"utf8",
 		);
-		return fs.readFileSync(htmlPath, "utf8");
 	}
 }
