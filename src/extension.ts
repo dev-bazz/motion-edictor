@@ -1,9 +1,28 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
 import * as fs from "node:fs";
+import { updateTimingFunctionPreviews } from "./timing-preview";
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("CSS Ease Generator extension is now active!");
+
+	// ── Timing Function Inline Preview ─────────────────────────────
+	if (vscode.window.activeTextEditor) {
+		updateTimingFunctionPreviews(vscode.window.activeTextEditor);
+	}
+	context.subscriptions.push(
+		vscode.window.onDidChangeActiveTextEditor((editor) => {
+			if (editor) {
+				updateTimingFunctionPreviews(editor);
+			}
+		}),
+		vscode.workspace.onDidChangeTextDocument((event) => {
+			const editor = vscode.window.activeTextEditor;
+			if (editor && event.document === editor.document) {
+				updateTimingFunctionPreviews(editor);
+			}
+		}),
+	);
 
 	// Register the webview view provider for the side panel
 	const provider = new EaseEditorViewProvider(
