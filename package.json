@@ -43,8 +43,7 @@
     "react spring"
   ],
   "activationEvents": [
-    "onView:easeGeneratorView",
-    "onLanguage:scss"
+    "onView:easeGeneratorView"
   ],
   "main": "./out/extension.js",
   "contributes": {

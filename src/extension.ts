@@ -1,40 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "node:path";
 import * as fs from "node:fs";
-import {
-	ScssCompletionProvider,
-	ScssHoverProvider,
-	ScssSignatureHelpProvider,
-} from "./scss/scss-completion-provider";
-
-const SCSS_SELECTOR: vscode.DocumentSelector = [
-	{ language: "scss", scheme: "file" },
-	{ language: "scss", scheme: "untitled" },
-];
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("CSS Ease Generator extension is now active!");
-
-	// ── SCSS IntelliSense ──────────────────────────────────────────
-	context.subscriptions.push(
-		vscode.languages.registerCompletionItemProvider(
-			SCSS_SELECTOR,
-			new ScssCompletionProvider(),
-			".", // trigger on dot for module member access
-			"@", // trigger on @ for at-rules
-			"$", // trigger on $ for variables
-		),
-		vscode.languages.registerHoverProvider(
-			SCSS_SELECTOR,
-			new ScssHoverProvider(),
-		),
-		vscode.languages.registerSignatureHelpProvider(
-			SCSS_SELECTOR,
-			new ScssSignatureHelpProvider(),
-			"(",
-			",",
-		),
-	);
 
 	// Register the webview view provider for the side panel
 	const provider = new EaseEditorViewProvider(
